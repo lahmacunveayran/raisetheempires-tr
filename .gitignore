@@ -15,3 +15,7 @@ coverage.xml
 test-results.xml
 /backups.db
 
+
+# Türkçe araçlar: üretilen dosyalar
+/turkce/araclar/kaynak/
+__pycache__/
