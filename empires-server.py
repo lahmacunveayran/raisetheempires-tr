@@ -1963,7 +1963,7 @@ def perform_world_response(params):
                 costs = ref_item.get("cost") or {}
                 do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
-        event_buildings.after_state_change(lookup_object(id))
+        event_buildings.after_state_change(lookup_object(id), meta)
 
     if step == "clear":
         session['user_object']["userInfo"]["world"]["objects"].remove(lookup_object(id))
@@ -2554,7 +2554,7 @@ def buy_item(meta, code, amount):
     else:
         # param["useCash"]
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-        item_inventory[code] = item_inventory.get(code, 0) + 1
+        item_inventory[code] = item_inventory.get(code, 0) + amount
     costs = item.get("cost", {})
     if "-cash" in costs:
         player['cash'] -= get_cash_cost(item, amount)

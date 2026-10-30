@@ -142,7 +142,7 @@ def activate(user, event):
     [placed] = building(user, event)
     meta = {}
     state_machine.click_next_state(True, placed["id"], meta, "setState", None, cancel=None)
-    event_buildings.after_state_change(placed)
+    event_buildings.after_state_change(placed, meta)
     return meta
 
 
@@ -163,6 +163,21 @@ def test_activating_completes_the_quest_with_the_reward_of_the_day(monkeypatch):
 
         user, new_quests = login()  # the meteorite event starts on this day
         assert [q["name"] for q in new_quests] == ["QBB29"] and building(user, METEORITE)
+
+
+def test_activating_with_parts_lost_on_the_server_still_gives_the_reward():
+    with app.test_request_context():
+        user = setup_session()
+        login()
+        login()
+        items(user).update({"B786": 1, "B787": 1})  # the client had them all, the server did not
+
+        meta = activate(user, VOLCANO)
+
+        assert quest("QVP")["complete"] and quest("QVP")["progress"] == [24, 1]
+        assert [q["name"] for q in meta["QuestComponent"] if q["complete"]] == ["QVP"]
+        assert items(user) == {"EN8": 3}
+        assert not building(user, VOLCANO)
 
 
 def test_meteorite_gives_each_ore_and_the_trophy():

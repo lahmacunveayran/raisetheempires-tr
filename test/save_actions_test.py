@@ -82,6 +82,17 @@ def test_reward_item_goes_to_inventory_for_its_cash_price(server, user):
     assert player["cash"] == 1000 - int(item["cost"]["-cash"])
 
 
+def test_buy_items_gives_every_piece_paid_for(server, user):
+    item = next(e for e in server.game_settings['settings']['items']['item']
+                if e.get("-type") == "buildablepart" and int(((e.get("cost") or {}).get("-cash", 0)) or 0) > 0)
+    player = user["userInfo"]["player"]
+    player["cash"] = 1000
+    player["inventory"]["items"] = {}
+    server.buy_items_response({"itemData": {item["-code"]: 4}})
+    assert player["inventory"]["items"] == {item["-code"]: 4}
+    assert player["cash"] == 1000 - 4 * int(item["cost"]["-cash"])
+
+
 def test_spend_completes_the_spend_task(server, user):
     quest = next(q for q in server.quest_settings['quests']['quest']
                  if any(t.get("_action") == "spend" and t.get("_type") == "coins" for t in server.get_tasks(q)))

@@ -35,7 +35,8 @@ from flask import session
 
 import quest_engine
 from game_settings import lookup_item_by_code
-from quest_engine import handle_quest_progress, new_quest_with_sequels, progress_inventory_count
+from quest_engine import handle_quest_progress, new_quest_with_sequels, progress_inventory_count, get_tasks, \
+    lookup_quest, do_quest_rewards, merge_quest_progress
 from quest_trees import ITEMS_BY_NAME
 from save_engine import my_games_path
 from megaseries import water_spot
@@ -392,15 +393,24 @@ def update_event_buildings(user, new_quests, meta):
         handle_quest_progress(meta, progress_inventory_count())
 
 
-def after_state_change(obj):
-    """setState on an event building: activating it (state 2) ends the event; the quest was completed just before."""
+def after_state_change(obj, meta):
+    """setState on an event building: activating it (state 2) ends the event.
+
+    The quest engine normally completed the quest just before. The client only lets the player activate with all
+    parts in its inventory, so if the server counts fewer (it lost some), the quest is completed here all the same."""
     event = BY_CODE.get((ITEMS_BY_NAME.get(obj.get("itemName")) or {}).get("-code"))
     if not event or str(obj.get("state")) != ACTIVATED:
         return
-    user = session['user_object']
-    done = any(q["name"] == event["quest"] and q["complete"] for q in session['quests'])
-    print("Event", event["key"], "activated", "and its quest completed" if done else "without its quest")
-    _finish(user, event)
+    quest = next((q for q in session['quests'] if q["name"] == event["quest"]), None)
+    if quest and not quest["complete"]:
+        print("Event", event["key"], "activated with parts missing on the server, completing", event["quest"])
+        tasks = get_tasks(lookup_quest(event["quest"]))
+        quest.update({"complete": True, "progress": [int(t["_total"]) for t in tasks],
+                      "completedTasks": 2 ** len(tasks) - 1})
+        do_quest_rewards(lookup_quest(event["quest"]), meta)
+        merge_quest_progress([quest], meta.setdefault('QuestComponent', []), "output quest")
+    print("Event", event["key"], "activated")
+    _finish(session['user_object'], event)
 
 
 def collect_response(step, object_id, meta):
