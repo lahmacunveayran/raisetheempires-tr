@@ -25,7 +25,7 @@ def setup_session(monkeypatch, level=30, opponents=()):
     player["cash"] = 100
     player["level"] = level
     player["energy"] = 50
-    player["lastEnergyCheck"] = time.time()  # no refill during the test
+    player["lastEnergyCheck"] = time.time() - 1  # -1: an earlier clock read would floor to -1 energy
     player["inventory"] = {"items": {}}
     user["userInfo"]["world"]["resources"] = {"coins": 0, "energy": 50, "oil": 0, "wood": 0, "aluminum": 0,
                                               "copper": 0, "gold": 0, "iron": 0, "uranium": 0}

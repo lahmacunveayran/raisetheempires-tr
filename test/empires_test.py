@@ -596,3 +596,13 @@ def test_post_gateway(monkeypatch):
 
 # pytest.main(['-rPA'])
 #pytest.main(['-rPA', '-vv'])
+
+
+def test_dense_arrays_from_ruffle():
+    import pyamf
+    batch = pyamf.MixedArray({0: pyamf.ASObject(functionName="UserService.initUser",
+                                                params=pyamf.MixedArray({0: "x", 1: pyamf.MixedArray()}))})
+    named = pyamf.MixedArray({"a": pyamf.MixedArray({0: 1})})
+    assert empires_server.dense_arrays([None, batch, named]) == [None, [{"functionName": "UserService.initUser",
+                                                                         "params": ["x", []]}], {"a": [1]}]
+    assert empires_server.dense_arrays([None, batch, named])[1][0].functionName == "UserService.initUser"

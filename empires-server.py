@@ -551,6 +551,7 @@ def flashFile():
 
 
 @app.route("/gameSettings.xml")
+@app.route("/127.0.0.1gameSettings.xml")  # Ruffle (absolute app_url)
 def game_settings_file():
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
@@ -837,6 +838,21 @@ def transactional_session(view):
     return wrapper
 
 
+def dense_arrays(value):
+    """Ruffle sends AS3 arrays as AMF0 ECMA arrays (keys 0..n-1); Flash sends strict arrays (lists). Make lists."""
+    if isinstance(value, pyamf.MixedArray):
+        if all(str(k).isdigit() for k in value) and sorted(int(k) for k in value) == list(range(len(value))):
+            return [dense_arrays(value[k]) for k in sorted(value, key=int)]
+        for k in value:
+            value[k] = dense_arrays(value[k])
+    elif isinstance(value, list):
+        value[:] = [dense_arrays(v) for v in value]
+    elif isinstance(value, dict):
+        for k in value:
+            value[k] = dense_arrays(value[k])
+    return value
+
+
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
 @app.route('/127.0.0.1flashservices/gateway.php', methods=['POST'])  # Ruffle needs an absolute app_url
 @transactional_session
@@ -851,6 +867,7 @@ def post_gateway():
     # print(resp_msg.bodies[0])
 
     resps = []
+    resp_msg.bodies[0][1].body = dense_arrays(resp_msg.bodies[0][1].body)
     for reqq in resp_msg.bodies[0][1].body[1]:
         if reqq.functionName == 'UserService.initUser':
             try:
