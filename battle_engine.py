@@ -10,6 +10,7 @@ from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_s
     roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
     progress_parameter_implies
 from save_engine import get_saves, store_session
+import bounty_center
 import titan_lab
 
 
@@ -255,6 +256,7 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
         elif "attackHostId" in params:
             print("challenge won")
             invasion_complete(params["attackHostId"], params, friendlies, friendly_strengths)
+            bounty_center.battle_won(params["attackHostId"], meta)
         elif params.get('target') == "FleetName":
             if session["fleets"]["FleetName"].get("invaded_uid"):
                 print("neighbor repel won")
@@ -278,6 +280,7 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
             else:
                 print("challenge with consumable won")
                 invasion_complete(enemy_fleet['uid'], params, friendlies, friendly_strengths)
+                bounty_center.battle_won(enemy_fleet['uid'], meta)
         session["battle"] = None
 
 

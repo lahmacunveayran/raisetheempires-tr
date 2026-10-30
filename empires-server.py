@@ -51,6 +51,7 @@ import event_buildings
 import titan_lab
 import treasure_vault
 import slot_machine
+import bounty_center
 import megaseries
 import mod_engine
 import quest_trees
@@ -1690,6 +1691,7 @@ def user_response():
     event_buildings.update_event_buildings(user, new_quests, meta)
     treasure_vault.update_treasure_vault(user, new_quests, meta)
     slot_machine.update_slot_machine(user)
+    bounty_center.update_bounty_center(user, new_quests, meta)
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
@@ -1955,6 +1957,8 @@ def perform_world_response(params):
         return event_buildings.collect_response(step, id, meta)
     if step in titan_lab.STEPS:
         return titan_lab.action_response(step, id, req2, meta)
+    if step == bounty_center.STEP:
+        return bounty_center.action_response(step, id, req2, meta)
     if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
                 "decoCrewBuyOnce"] and \
             not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):

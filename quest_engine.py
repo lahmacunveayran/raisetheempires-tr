@@ -421,6 +421,18 @@ def new_quest_with_sequels(name, new_quests, meta, force=False):
             print("Deferring sequel", name, "due to requirements")
 
 
+def start_missed_quests(names, new_quests, meta):
+    """Quests that need a level start only on the level up: give them to a player already past it. Added one by
+    one: activating sequels would also start every other old quest."""
+    given = [q["name"] for q in new_quests + session["quests"]]
+    for name in names:
+        if name not in given:
+            quest = new_quest(lookup_quest(name))
+            new_quests.append(quest)
+            if quest["complete"]:
+                do_quest_rewards(lookup_quest(name), meta)
+
+
 def activate_unlocked_quests(new_quests, meta):
     open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
     if len(open_quests) <= 20:

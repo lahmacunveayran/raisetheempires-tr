@@ -15,7 +15,7 @@ import time
 from flask import session
 
 from game_settings import game_settings
-from quest_engine import do_rewards, do_quest_rewards, lookup_quest, matches_requirement, new_quest
+from quest_engine import do_rewards, lookup_quest, matches_requirement, start_missed_quests
 
 KEY = "B265"
 FREE_KEY_AFTER = 24 * 60 * 60
@@ -87,14 +87,8 @@ def update_treasure_vault(user, new_quests, meta):
         user.setdefault("experiments", {}).setdefault(name, variant)
     player = user["userInfo"]["player"]
     # quests that need a level only start on the level up: players past level 26 never got these
-    given = [q["name"] for q in new_quests + session["quests"]]
     if not player.get("treasureVaultQuestGiven") and matches_requirement(lookup_quest(VAULT_QUESTS[0])):
-        for name in VAULT_QUESTS:
-            if name not in given:  # added one by one: activating sequels would also start every other old quest
-                quest = new_quest(lookup_quest(name))
-                new_quests.append(quest)
-                if quest["complete"]:
-                    do_quest_rewards(lookup_quest(name), meta)
+        start_missed_quests(VAULT_QUESTS, new_quests, meta)
         player["treasureVaultQuestGiven"] = True
         print("Treasure vault quests started")
     user["treasureVaultHighlights"] = highlights()
