@@ -19,7 +19,7 @@ from quest_trees import ITEMS_BY_NAME
 from treasure_vault import RESOURCES, _entry, _items, _player, _response
 
 TOKEN = "GPTK"
-MODE_BUY, MODE_KEYS = 0, 1
+MODE_BUY, MODE_KEYS = 1, 2  # PVPManager.REWARD_SPIN_MODE_*, not the vault's 0 and 1
 RESOURCE_CODES = {"RG08": "coins", "RG07": "oil", "RG06": "wood"}  # the prizes name these resource items
 WEIGHTS = {"Buildable": 4, "consumable": 12, "buildablepart": 12, "resource": 15}
 GRAND_PRIZE_WEIGHT = 1
