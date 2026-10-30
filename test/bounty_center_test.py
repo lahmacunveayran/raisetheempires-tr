@@ -18,7 +18,7 @@ NOW = 1_800_000_000
 
 def setup_session(monkeypatch, level=30, opponents=()):
     monkeypatch.setattr(bounty_center, "_now", lambda: NOW)
-    monkeypatch.setattr(bounty_center, "get_saves", lambda: [
+    monkeypatch.setattr(bounty_center.bot_empires, "get_saves", lambda: [
         {"user_object": {"userInfo": {"player": {"uid": uid, "level": lvl}}}} for uid, lvl in opponents])
     user = copy.deepcopy(INIT_USER)
     player = user["userInfo"]["player"]
@@ -86,3 +86,11 @@ def test_bonds_only_while_active_against_close_players(monkeypatch):
         monkeypatch.setattr(bounty_center, "_now", lambda: NOW + bounty_center.ACTIVE_PERIOD)
         bounty_center.battle_won(5, {})
         assert items(user)["xk01"] == 1  # the hour is over
+
+
+def test_bot_empires_pay_bonds(monkeypatch):
+    with app.test_request_context():
+        user = setup_session(monkeypatch, level=85)
+        bounty_center.action_response(bounty_center.STEP, 7, {}, {})
+        bounty_center.battle_won(bounty_center.bot_empires.FIRST_UID, {})  # the lowest bot: level 83
+        assert items(user)["xk01"] == 1

@@ -13,7 +13,7 @@ from flask import session
 from game_settings import lookup_item_by_code
 from quest_engine import handle_quest_progress, progress_action, all_lambda, do_rewards, start_missed_quests, \
     matches_requirement, lookup_quest
-from save_engine import get_saves
+import bot_empires
 from state_machine import do_costs
 
 BUILDING = "BCB"
@@ -84,8 +84,8 @@ def action_response(step, object_id, request, meta):
 
 
 def _opponent_level(uid):
-    return next((int(save['user_object']["userInfo"]["player"].get("level", 0)) for save in get_saves()
-                 if str(save['user_object']["userInfo"]["player"]["uid"]) == str(uid)), 0)
+    save = bot_empires.find_save(uid)
+    return int(save['user_object']["userInfo"]["player"].get("level", 0)) if save else 0
 
 
 def battle_won(opponent_uid, meta):

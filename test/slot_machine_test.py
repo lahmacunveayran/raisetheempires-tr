@@ -67,5 +67,3 @@ def test_login_turns_on_the_strangers_bar():
         slot_machine.opt_in_response(False)
         slot_machine.update_slot_machine(user)
         assert user["globalPVPOptIn"] is False  # opting out is kept
-        data = slot_machine.fight_list_response()["data"]
-        assert data["fightList"] == [] and data["info"] == []

@@ -5,11 +5,10 @@ the empire_globalpvp_slotpull_epcost experiment). The prizes of the machine are 
 often each came out was decided by Zynga's server: the weights below make the units rare and the last one, the
 grand prize, the rarest.
 
-The strangers bar shows only for players who opted in to global PvP, with the strangerbar experiments on. There are
-no strangers to fight offline, so the fight list is always empty: the bar is there for the machine.
+The strangers bar shows only for players who opted in to global PvP, with the strangerbar experiments on. The
+strangers in the fight list are bot empires (bot_empires.py).
 """
 import random
-import time
 
 from flask import session
 
@@ -55,10 +54,6 @@ def update_slot_machine(user):
 def opt_in_response(opt_in):
     session['user_object']["globalPVPOptIn"] = bool(opt_in)
     return _response({})
-
-
-def fight_list_response():
-    return _response({"ts": int(time.time()), "wins": 0, "fightList": [], "awardClaimed": False, "info": []})
 
 
 def spin_response(mode):

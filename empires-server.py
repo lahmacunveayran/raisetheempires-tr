@@ -52,6 +52,7 @@ import titan_lab
 import treasure_vault
 import slot_machine
 import bounty_center
+import bot_empires
 import megaseries
 import mod_engine
 import quest_trees
@@ -1054,7 +1055,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.expireAQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.getFightList':
-            resps.append(slot_machine.fight_list_response())
+            resps.append(fight_list_response())
         elif reqq.functionName == 'UserService.flashFeedRedeemItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.EPGiftThankYou':
@@ -1762,9 +1763,12 @@ def invader_response():
     return invader_response
 
 
+def fight_list_response():
+    return {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0}, "data": bot_empires.fight_list()}
+
+
 def neighbor_invader_response(uid):
-    saves = [save for save in get_saves() if
-              str(save['user_object']["userInfo"]["player"]["uid"]) == str(uid)]
+    saves = [save for save in [bot_empires.find_save(uid)] if save]
 
     if saves:
         neigbor_invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
@@ -2166,7 +2170,7 @@ def random_fleet_challenge_response(host_uid):
     #     "hp": None
     # }
 
-    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(host_uid)]
+    save = bot_empires.find_save(host_uid)
     defender_fleet = save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["defender_fleet"]
 
     subtype = lookup_item_by_code(defender_fleet[0].split(',')[0])["-subtype"]
@@ -2307,7 +2311,7 @@ def load_challenge_response(param):
 def occupation_place_response(params):
     cancel_unstarted_invasions()
 
-    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+    save = bot_empires.find_save(params[0])
     occupied_objects = lookup_objects_save_by_position(save, params[1], params[2], 5)
     # todo defenders from larger area?
     # occupied_objects_double = lookup_objects_save_by_position(save, params[1] - 3, params[2] - 3, 11)
@@ -2323,7 +2327,9 @@ def occupation_place_response(params):
 
     defense_fleet = [format_player_fleet(e["-code"]) for e in defense_units][:5]
 
-    if not defense_fleet:
+    if save.get("bot"):
+        defense_fleet = bot_empires.defense_fleet(bot_empires.lookup_bot(params[0]))
+    elif not defense_fleet:
         defense_fleet = [format_player_fleet("PT24"), format_player_fleet("PT23"), format_player_fleet("PT02"), format_player_fleet("PT22"), format_player_fleet("PT12")]
     else:
         defense_fleet = (defense_fleet + [format_player_fleet("U01" if subtype == "army" else ("U43" if subtype == "navy" else "U66"))] * 2)[:5]
@@ -2337,7 +2343,7 @@ def occupation_place_response(params):
         "chID": str(get_zid()),
         "defender_fleet": defense_fleet
     }
-    store_session(save)
+    bot_empires.store_save(save)
 
     occupation_place_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
@@ -2345,7 +2351,7 @@ def occupation_place_response(params):
 
 
 def pillage_response(params):
-    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+    save = bot_empires.find_save(params[0])
     # occupied_objects = lookup_objects_save_by_position(save, params[1], params[2], 5)
     # occupied_items = [lookup_item_by_name(e["itemName"]) for e in occupied_objects]
     # defense_units = [e for e in occupied_items if "unit" in e]
@@ -2353,7 +2359,7 @@ def pillage_response(params):
     # defense_units = defense_units[:5]
 
     save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["pillTS"] = datetime.now().timestamp()
-    store_session(save)
+    bot_empires.store_save(save)
 
     pillage_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
@@ -2461,7 +2467,7 @@ def load_world_response(params):
             if "titanName" in allies[str(params[0])]:
                 ally["titanName"] = allies[str(params[0])]["titanName"]
         else:
-            [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+            save = bot_empires.find_save(params[0])
             ally["world"]["objects"] = save['user_object']["userInfo"]["world"]["objects"]
             ally["world"]["roadData"] = save['user_object']["userInfo"]["world"]["roadData"]
             ally["expansions"] = save['user_object']["userInfo"]["player"]["expansions"]

@@ -10,6 +10,7 @@ from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_s
     roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
     progress_parameter_implies
 from save_engine import get_saves, store_session
+import bot_empires
 import bounty_center
 import titan_lab
 
@@ -292,18 +293,18 @@ def neighbor_repelled(enemy_fleet):
 
 
 def invasion_complete(enemy_fleet_uid, params, friendlies, friendly_strengths):
-    [save] = [save for save in get_saves() if
-              str(save['user_object']["userInfo"]["player"]["uid"]) == str(enemy_fleet_uid)]
+    save = bot_empires.find_save(enemy_fleet_uid)
     save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["status"] = 2
     save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["attacker_fleet"] = [format_player_fleet(friendlies[i]["-code"]) for i in get_alive_unit_index(friendly_strengths)]
-    store_session(save)
+    bot_empires.store_save(save)
+    bot_empires.battle_won(enemy_fleet_uid)
 
 
 def cancel_unstarted_invasions():
-    for save in get_saves():
+    for save in bot_empires.all_saves():
         if save['user_object']["pvp"]["invaders"].get("u" + str(get_zid()), {}).get("status") == 1:
             del save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]
-            store_session(save)
+            bot_empires.store_save(save)
 
 
 def get_next_fleet(fleet_name):

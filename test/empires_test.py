@@ -32,6 +32,7 @@ def test_random_fleet_challenge_response(monkeypatch):
             "invaders": {"u2341959767162880": {"defender_fleet": ['V61,,,,', 'U01,,,,', 'U01,,,,', 'U01,,,,']}}}}}]
 
     monkeypatch.setattr(empires_server, "get_saves", get_saves_mock)
+    monkeypatch.setattr(empires_server.bot_empires, "get_saves", get_saves_mock)
 
     with app.test_request_context():
         session.sid = "0"
