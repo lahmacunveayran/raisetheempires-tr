@@ -47,6 +47,7 @@ from pyamf import remoting
 import pyamf
 
 import client_patches
+import event_buildings
 import megaseries
 import mod_engine
 import quest_trees
@@ -553,10 +554,10 @@ def game_settings_file():
     # mini series buildings need free spots on the player's island, see quest_trees.remember_hook_spots
     spots = quest_trees.remembered_hook_spots()
     response = send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml", conditional=False)
-    if not spots:
-        return response
     response.direct_passthrough = False
     xml = quest_trees.patch_settings_xml(response.get_data(as_text=True), spots)
+    # parts events need their dates and some replaced assets, see event_buildings
+    xml = event_buildings.patch_settings_xml(xml, event_buildings.served_event())
     return Response(xml, mimetype="text/xml", headers={"Cache-Control": "no-store"})
 
 
@@ -568,7 +569,10 @@ def en_us_file():
 
 @app.route("/127.0.0.1questSettings.xml")
 def quest_settings_file():
-    return send_from_directory_mod("assets/29oct2012", "questSettings_with_fixes.xml")
+    response = send_from_directory_mod("assets/29oct2012", "questSettings_with_fixes.xml", conditional=False)
+    response.direct_passthrough = False
+    xml = event_buildings.patch_quest_xml(response.get_data(as_text=True), event_buildings.served_event())
+    return Response(xml, mimetype="text/xml", headers={"Cache-Control": "no-store"})
 
 @app.route("/releases.html")
 def releases():
@@ -1676,6 +1680,7 @@ def user_response():
                 item_inventory["TL01"] = 1
                 print("Level 21 has been reached, Titan Lab unlocked at inventory")
 
+    event_buildings.update_event_buildings(user, new_quests, meta)
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
@@ -1937,6 +1942,8 @@ def perform_world_response(params):
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
     print(step)
+    if step in event_buildings.COLLECT_STEPS:
+        return event_buildings.collect_response(step, id, meta)
     if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
                 "decoCrewBuyOnce"] and \
             not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):
@@ -1956,6 +1963,7 @@ def perform_world_response(params):
                 costs = ref_item.get("cost") or {}
                 do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
+        event_buildings.after_state_change(lookup_object(id))
 
     if step == "clear":
         session['user_object']["userInfo"]["world"]["objects"].remove(lookup_object(id))

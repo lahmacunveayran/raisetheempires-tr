@@ -29,6 +29,10 @@ dağıtılır. Orijinal açıklama: [README.en.md](README.en.md).
   eksiksiz olan 7 dizi oynanabilir. Oyunun kendi kodundaki bir hata (dizi binasının yerleştirilememesi)
   sunucu tarafından düzeltilerek gönderiliyor (`client_patches.py`).
 - **Mega diziler** (deneysel): MS02, MS03, MS04.
+- **Parça etkinlikleri** (deneysel): Yanardağ, Göktaşı, Derin Deniz Sondajı, Kasırga ve Nükleer Santral
+  sırayla gelir. Her biri oyuncuya özel süreyle başlar; her gün bir parça kendiliğinden gelir, binayı ne
+  kadar erken çalıştırırsan ödül o kadar büyük olur, süre dolarsa teselli ödülü verilir (`event_buildings.py`).
+  Eksik ekran ve resimlerin yerine var olanlar kullanılır.
 
 ## Kurulum
 

@@ -8,6 +8,11 @@ from game_settings import game_settings, lookup_item_by_code, lookup_state_machi
 from quest_settings import quest_settings, prequels
 from save_engine import lookup_objects_by_item_name, create_backup, get_saves
 
+# quests that are never unlocked by level, only started by their own module (e.g. event_buildings)
+gated_quests = set()
+# quest name -> function returning the rewards to give instead of the quest's own (e.g. rewards depending on the day)
+reward_overrides = {}
+
 
 def merge_quest_progress(qc, output_list, label):
     if qc:
@@ -74,8 +79,8 @@ def prepopulate_task(task):
         number_placed = len(objects)
         return min(number_placed, int(task["_total"])), number_placed >= int(task["_total"])
     elif task["_action"] == 'inventoryCount':
-        item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-        return min(item_inventory.get(task["_item"], 0), int(task["_total"])), item_inventory.get(task["_item"], 0) >= int(task["_total"])
+        total = inventory_total(task["_item"], task["_total"])
+        return total, total >= int(task["_total"])
     elif task["_action"] == 'population':
         return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
     elif task["_action"] == 'neighborsAdded':
@@ -153,9 +158,18 @@ def progress_inventory_count():
         and progress < int(task["_total"])
 
 
-def progress_inventory(item, maximum_total, extra, progress):
+def inventory_total(item, maximum_total):
+    """Owned count for an inventoryCount task; "A,B,C" with total 12 means 4 of each (the building parts quests)."""
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-    total = min(item_inventory.get(item, 0), int(maximum_total))
+    codes = item.split(',')
+    if len(codes) == 1:
+        return min(item_inventory.get(item, 0), int(maximum_total))
+    each = int(maximum_total) // len(codes)
+    return min(sum(min(item_inventory.get(code, 0), each) for code in codes), int(maximum_total))
+
+
+def progress_inventory(item, maximum_total, extra, progress):
+    total = inventory_total(item, maximum_total)
     extra["total"] = total
     return total != progress
 
@@ -442,7 +456,8 @@ def matches_requirement(quest):
                                         and int(quest["requires"]['_count']) <= session['user_object']["userInfo"]["player"]["level"])) and \
            ("_activateExperimentNeeded" not in quest or (quest["_activateExperimentNeeded"] in session['user_object']["experiments"] and
                                                          str(session['user_object']["experiments"][quest["_activateExperimentNeeded"]]) in quest["_activateExperimentVariants"].split(','))) and \
-            not quest["_name"].startswith("QFD") # no daily quests
+            not quest["_name"].startswith("QFD") and \
+            quest["_name"] not in gated_quests  # no daily quests, no quests started by their own module
 
 #TODO or (quest['_questTree'] =='level' and quest['_questTree'] ???
 
@@ -457,7 +472,7 @@ def matches_requirement(quest):
 
 def do_quest_rewards(quest, meta):
     # TODO: rewardModifier
-    raw_rewards = quest['reward']
+    raw_rewards = reward_overrides[quest['_name']]() if quest['_name'] in reward_overrides else quest['reward']
     do_rewards("Quest", raw_rewards, meta)
 
 
