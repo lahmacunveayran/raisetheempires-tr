@@ -38,6 +38,9 @@ dağıtılır. Orijinal açıklama: [README.en.md](README.en.md).
 - **Hazine Kasası** (deneysel): 26. seviyede görevle gelir; anahtarla ya da nakitle dört kasa açılır, anahtar
   bitince 24 saatte bir bedava anahtar gelir. Asıl ödül listeleri kayıp olduğundan oyunun slot makinesi
   ödüllerinden kuruldu (`treasure_vault.py`).
+- **Slot makinesi** (deneysel): boks eldiveni düğmesiyle açılan yabancılar çubuğundaki jetondan girilir; jetonla
+  ya da nakitle çevrilir, ödüller oyunun kendi listesinden gelir (`slot_machine.py`). Çubuktaki bayrağa basma:
+  PvP'den çıkma penceresinin dosyası kayıp.
 
 ## Kurulum
 
