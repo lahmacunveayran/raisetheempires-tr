@@ -43,20 +43,20 @@ def _items():
     return session['user_object']["userInfo"]["player"]["inventory"]["items"]
 
 
-def _response(meta):
-    return {"errorType": 0, "userId": 1, "metadata": meta, "data": []}
+def _response(meta, data=None):
+    return {"errorType": 0, "userId": 1, "metadata": meta, "data": [] if data is None else data}
 
 
 def action_response(step, object_id, request, meta):
     obj = lookup_object(object_id)
     if obj is None:
         print("Titan lab", step, "for missing object", object_id)
-        return _response(meta)
+        return _response(meta, {"id": object_id})
     if step == "partUnlock":
         unlock_part(obj, LAB, (request or {}).get("partCode"))
     else:
         update_part_unlocks(obj, LAB)
-    return _response(meta)
+    return _response(meta, {"id": object_id})  # performAction answers are logged by their id
 
 
 def unlock_part(obj, code, part_code):

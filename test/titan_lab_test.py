@@ -52,7 +52,8 @@ def test_parts_and_counts():
 def test_part_unlocked_for_cash_is_kept():
     with app.test_request_context():
         user = setup_session()
-        titan_lab.action_response("partUnlock", LAB_ID, {"partCode": "B280"}, {})
+        response = titan_lab.action_response("partUnlock", LAB_ID, {"partCode": "B280"}, {})
+        assert response["data"] == {"id": LAB_ID}  # the world log reads it
         assert lab(user)["data"]["partUnlocks"] == {"B280": True}
         assert user["userInfo"]["player"]["cash"] == 80
         titan_lab.action_response("partUnlock", LAB_ID, {"partCode": "B280"}, {})  # already open
