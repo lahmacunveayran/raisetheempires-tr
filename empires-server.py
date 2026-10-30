@@ -48,6 +48,7 @@ import pyamf
 
 import client_patches
 import event_buildings
+import titan_lab
 import megaseries
 import mod_engine
 import quest_trees
@@ -1090,7 +1091,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.matchMakingOptFlag':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.mechlabStatus':
-            resps.append(dummy_response())
+            resps.append(titan_lab.status_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.megaSeriesReset':
             resps.append(megaseries.reset_response(reqq.params))
         elif reqq.functionName == 'ZlingshotService.fetch':
@@ -1944,6 +1945,8 @@ def perform_world_response(params):
     print(step)
     if step in event_buildings.COLLECT_STEPS:
         return event_buildings.collect_response(step, id, meta)
+    if step in titan_lab.STEPS:
+        return titan_lab.action_response(step, id, req2, meta)
     if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
                 "decoCrewBuyOnce"] and \
             not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):

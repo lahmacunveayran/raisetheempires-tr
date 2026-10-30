@@ -33,6 +33,8 @@ dağıtılır. Orijinal açıklama: [README.en.md](README.en.md).
   sırayla gelir. Her biri oyuncuya özel süreyle başlar; her gün bir parça kendiliğinden gelir, binayı ne
   kadar erken çalıştırırsan ödül o kadar büyük olur, süre dolarsa teselli ödülü verilir (`event_buildings.py`).
   Eksik ekran ve resimlerin yerine var olanlar kullanılır.
+- **Titan Laboratuvarı** (deneysel): parasıyla ya da öncekini toplayarak açılan parçalar kaydedilir; Titan
+  savaşlarını sunucu da yürütür, kazanınca parçası verilir (`titan_lab.py`).
 
 ## Kurulum
 

@@ -10,6 +10,7 @@ from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_s
     roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
     progress_parameter_implies
 from save_engine import get_saves, store_session
+import titan_lab
 
 
 class StaleBattleReference(Exception):
@@ -200,6 +201,7 @@ def apply_dot_damage(consumable, selected_unit, strengths, target_description):
 def handle_loss(friendly_strengths):
     if sum(friendly_strengths) == 0:
         print("Player defeated")
+        titan_lab.battle_lost()
         session["battle"] = None
 
 
@@ -218,7 +220,9 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
 
         if replaying:
             current_island = battle_island
-        if current_island is not None:
+        if titan_lab.battle_won(params):
+            pass
+        elif current_island is not None:
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
                                                    progress_parameter_equals("_island", str(current_island))))
             reward_multiplier = get_reward_multiplier()
@@ -362,7 +366,10 @@ def handle_shield_upgrades(friendlies, player_unit_id):
 
 def init_battle(params):
     try:
-        if 'target' not in params:
+        titan_lab.register_enemy_fleet(params)
+        if titan_lab.is_battle(params):
+            baddies, friendlies = titan_lab.fleets(params)
+        elif 'target' not in params:
             fleet_or_name = params['fleet'] if params['fleet'] else params['name']
             if params.get("name") == "AI":
                 if params['map'] is not None:
@@ -1230,6 +1237,10 @@ def get_unit_secondary(unit):
 
 def get_unit_max_strength(unit, ally, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
+    if "-strength" not in unit["unit"] and "strengths" in unit["unit"]:  # Titan units grow with the player level
+        level = int(session['user_object']["userInfo"]["player"]["level"])
+        entries = simple_list(unit["unit"]["strengths"]["entry"])
+        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])["-strength"])
     _, island, map_item = get_current_island(params)
     if has_battle_context() and session["battle"][3].replaying:
         island = session["battle"][3].island
