@@ -48,11 +48,12 @@ def prizes():
 def update_slot_machine(user):
     """On login: turn on the strangers bar (the info popup that asks to opt in is missing, so opt in already)."""
     user.setdefault("experiments", {}).update(EXPERIMENTS)
-    user.setdefault("pvp", {}).setdefault("globalPVPOptIn", True)
+    user.get("pvp", {}).pop("globalPVPOptIn", None)  # the client reads it next to pvp, not in it
+    user.setdefault("globalPVPOptIn", True)
 
 
 def opt_in_response(opt_in):
-    session['user_object'].setdefault("pvp", {})["globalPVPOptIn"] = bool(opt_in)
+    session['user_object']["globalPVPOptIn"] = bool(opt_in)
     return _response({})
 
 

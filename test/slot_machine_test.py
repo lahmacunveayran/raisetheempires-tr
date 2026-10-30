@@ -63,9 +63,9 @@ def test_login_turns_on_the_strangers_bar():
         slot_machine.update_slot_machine(user)
         assert user["experiments"]["empire_globalpvp_strangerbar_enable"] == 2
         assert user["experiments"]["empire_globalpvp_master"] == 2
-        assert user["pvp"]["globalPVPOptIn"] is True
+        assert user["globalPVPOptIn"] is True
         slot_machine.opt_in_response(False)
         slot_machine.update_slot_machine(user)
-        assert user["pvp"]["globalPVPOptIn"] is False  # opting out is kept
+        assert user["globalPVPOptIn"] is False  # opting out is kept
         data = slot_machine.fight_list_response()["data"]
         assert data["fightList"] == [] and data["info"] == []
