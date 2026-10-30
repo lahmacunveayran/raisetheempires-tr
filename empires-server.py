@@ -109,13 +109,17 @@ class AssetSkippingSessionInterface(SessionInterface):
     def __getattr__(self, name):
         return getattr(self.inner, name)
 
+    @staticmethod
+    def is_asset(path):
+        return path.startswith(ASSET_PATH_PREFIXES) and not path.endswith("gateway.php")  # Ruffle's gateway
+
     def open_session(self, app, request):
-        if request.path.startswith(ASSET_PATH_PREFIXES):
+        if self.is_asset(request.path):
             return SecureCookieSession()
         return self.inner.open_session(app, request)
 
     def save_session(self, app, session, response):
-        if request.path.startswith(ASSET_PATH_PREFIXES):
+        if self.is_asset(request.path):
             return
         self.inner.save_session(app, session, response)
 
