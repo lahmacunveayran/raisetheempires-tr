@@ -129,3 +129,10 @@ def test_other_battles_are_left_alone():
         titan_lab.register_enemy_fleet({"fleet": OWN_FLEET, "target": "Q6016"})
         assert "Q6016" not in session["fleets"]
         assert not titan_lab.is_battle({"fleet": OWN_FLEET, "target": ENEMY})
+
+
+def test_titan_name_is_kept():
+    with app.test_request_context():
+        user = setup_session()
+        assert titan_lab.name_response("Demir Dev")["data"] == {"name": "Demir Dev"}
+        assert user["userInfo"]["titanName"] == "Demir Dev"

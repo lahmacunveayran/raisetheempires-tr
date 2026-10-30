@@ -789,13 +789,17 @@ def template_js(path):
 def template_css(path):
     return send_from_directory_mod("templates/css", path)
 
+# Screens missing from the assets we have, shown with one that the client uses the same way
+ASSET_STAND_INS = {"displays/dialogs/MechLabName.swf": "displays/dialogs/PU_NameNation.swf"}  # both are a NamePopup
+
+
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):
-    return send_from_directory_mod('assets/sol_assets_octdict/assets', path)
+    return send_from_directory_mod('assets/sol_assets_octdict/assets', ASSET_STAND_INS.get(path, path))
 
 @app.route('/assets/<path:path>')
 def send_sol_assets_alternate(path):
-    return send_from_directory_mod('assets/sol_assets_octdict/assets', path)
+    return send_from_directory_mod('assets/sol_assets_octdict/assets', ASSET_STAND_INS.get(path, path))
 
 
 def send_from_directory_mod(directory, filename, **options):
@@ -1157,7 +1161,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.removeExtraWorldBuildings':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.setTitanName':
-            resps.append(dummy_response())
+            resps.append(titan_lab.name_response(reqq.params[0]))
         elif reqq.functionName == 'RequestService.allianceInviteRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.allianceJoinRequest':

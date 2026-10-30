@@ -79,6 +79,12 @@ def update_part_unlocks(obj, code):
                 print("Titan lab: part", unlocked, "unlocked by collecting", part["-code"])
 
 
+def name_response(name):
+    """The player names the Titan (TRenameTitan reads the name back from the answer)."""
+    session['user_object']["userInfo"]["titanName"] = name
+    return _response({"newPVE": 0}, {"name": name})
+
+
 def status_response(params):
     """A Titan battle starts: params {"index": part index, "partsItemCode": "TL01"}."""
     all_parts = parts(params.get("partsItemCode") or LAB)
