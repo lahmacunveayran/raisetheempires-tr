@@ -41,6 +41,8 @@ dağıtılır. Orijinal açıklama: [README.en.md](README.en.md).
 - **Slot makinesi** (deneysel): boks eldiveni düğmesiyle açılan yabancılar çubuğundaki jetondan girilir; jetonla
   ya da nakitle çevrilir, ödüller oyunun kendi listesinden gelir (`slot_machine.py`). Çubuktaki bayrağa basma:
   PvP'den çıkma penceresinin dosyası kayıp.
+- **Ödül Merkezi** (deneysel): 20. seviyede görevle gelir; enerjiyle bir saatliğine çalıştırılır, açıkken
+  en çok 10 seviye düşük oyunculara karşı kazanılan savaşlar Özgürlük Tahvili verir (`bounty_center.py`).
 
 ## Kurulum
 
