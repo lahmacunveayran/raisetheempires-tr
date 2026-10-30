@@ -4,8 +4,12 @@ A spin costs slot tokens (GPTK) or cash (GlobalPVPSlotPullKeyCost / GlobalPVPSlo
 the empire_globalpvp_slotpull_epcost experiment). The prizes of the machine are known (slotMachineFeatured), how
 often each came out was decided by Zynga's server: the weights below make the units rare and the last one, the
 grand prize, the rarest.
+
+The strangers bar shows only for players who opted in to global PvP, with the strangerbar experiments on. There are
+no strangers to fight offline, so the fight list is always empty: the bar is there for the machine.
 """
 import random
+import time
 
 from flask import session
 
@@ -19,6 +23,7 @@ MODE_BUY, MODE_KEYS = 0, 1
 RESOURCE_CODES = {"RG08": "coins", "RG07": "oil", "RG06": "wood"}  # the prizes name these resource items
 WEIGHTS = {"Buildable": 4, "consumable": 12, "buildablepart": 12, "resource": 15}
 GRAND_PRIZE_WEIGHT = 1
+EXPERIMENTS = {"empire_globalpvp_master": 2, "empire_globalpvp_strangerbar_enable": 2}  # the client wants exactly 2
 
 
 def _cost(setting):
@@ -38,6 +43,21 @@ def prizes():
         weight = GRAND_PRIZE_WEIGHT if i == len(infos) - 1 else WEIGHTS.get(item["-type"], 4)
         loot.append((code, int(info["-amount"]), weight))
     return loot
+
+
+def update_slot_machine(user):
+    """On login: turn on the strangers bar (the info popup that asks to opt in is missing, so opt in already)."""
+    user.setdefault("experiments", {}).update(EXPERIMENTS)
+    user.setdefault("pvp", {}).setdefault("globalPVPOptIn", True)
+
+
+def opt_in_response(opt_in):
+    session['user_object'].setdefault("pvp", {})["globalPVPOptIn"] = bool(opt_in)
+    return _response({})
+
+
+def fight_list_response():
+    return _response({"ts": int(time.time()), "wins": 0, "fightList": [], "awardClaimed": False, "info": []})
 
 
 def spin_response(mode):

@@ -1053,7 +1053,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.expireAQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.getFightList':
-            resps.append(dummy_response())
+            resps.append(slot_machine.fight_list_response())
         elif reqq.functionName == 'UserService.flashFeedRedeemItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.EPGiftThankYou':
@@ -1125,7 +1125,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.purchaseUnlock':
             resps.append(purchase_unlock_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.globalPVPOptInOut':
-            resps.append(dummy_response())
+            resps.append(slot_machine.opt_in_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.slotMachineSpin':
             resps.append(slot_machine.spin_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.slotMachineSpinBuy':
@@ -1689,6 +1689,7 @@ def user_response():
 
     event_buildings.update_event_buildings(user, new_quests, meta)
     treasure_vault.update_treasure_vault(user, new_quests, meta)
+    slot_machine.update_slot_machine(user)
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())

@@ -54,3 +54,18 @@ def test_spin_with_cash():
         user = setup_session()
         slot_machine.spin_response(slot_machine.MODE_BUY)
         assert user["userInfo"]["player"]["cash"] == 99
+
+
+def test_login_turns_on_the_strangers_bar():
+    with app.test_request_context():
+        user = setup_session()
+        user["experiments"]["empire_globalpvp_strangerbar_enable"] = 0
+        slot_machine.update_slot_machine(user)
+        assert user["experiments"]["empire_globalpvp_strangerbar_enable"] == 2
+        assert user["experiments"]["empire_globalpvp_master"] == 2
+        assert user["pvp"]["globalPVPOptIn"] is True
+        slot_machine.opt_in_response(False)
+        slot_machine.update_slot_machine(user)
+        assert user["pvp"]["globalPVPOptIn"] is False  # opting out is kept
+        data = slot_machine.fight_list_response()["data"]
+        assert data["fightList"] == [] and data["info"] == []
