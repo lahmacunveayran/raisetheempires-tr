@@ -51,20 +51,35 @@ def test_every_prize_exists_and_fits_the_window():
 def test_login_opens_the_vault_quest_and_gives_a_free_key(monkeypatch):
     with app.test_request_context():
         user = setup_session(monkeypatch)
-        treasure_vault.update_treasure_vault(user)
-        assert items(user) == {"B265": 1}
+        treasure_vault.update_treasure_vault(user, [], {})
+        assert items(user)["B265"] == 1
         assert user["treasureVaultHighlights"]["treasure_vault_tier_1"]["lootItem"]
         assert quest_engine.matches_requirement(lookup_quest("Q140J"))
+
+
+def test_players_past_level_26_get_the_vault_quest_once(monkeypatch):
+    with app.test_request_context():
+        user = setup_session(monkeypatch)
+        user["userInfo"]["player"]["level"] = 85
+        new_quests, meta = [], {}
+        treasure_vault.update_treasure_vault(user, new_quests, meta)
+        assert [q["name"] for q in new_quests] == ["Q140J", "QB128"]
+        assert new_quests[0]["complete"] and not new_quests[1]["complete"]
+        assert new_quests[0]["complete"] and items(user)["TV01"] == 1  # the first quest only hands out the vault
+        session["quests"][:] = new_quests
+        again = []
+        treasure_vault.update_treasure_vault(user, again, {})
+        assert again == []
 
 
 def test_no_free_key_within_a_day_or_with_keys_left(monkeypatch):
     with app.test_request_context():
         user = setup_session(monkeypatch, opened=NOW - 3600)
-        treasure_vault.update_treasure_vault(user)
-        assert items(user) == {}
+        treasure_vault.update_treasure_vault(user, [], {})
+        assert "B265" not in items(user)
         user = setup_session(monkeypatch, keys=3)
-        treasure_vault.update_treasure_vault(user)
-        assert items(user) == {"B265": 3}
+        treasure_vault.update_treasure_vault(user, [], {})
+        assert items(user)["B265"] == 3
 
 
 def test_open_with_keys(monkeypatch):

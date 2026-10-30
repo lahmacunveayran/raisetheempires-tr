@@ -15,12 +15,13 @@ import time
 from flask import session
 
 from game_settings import game_settings
-from quest_engine import do_rewards
+from quest_engine import do_rewards, do_quest_rewards, lookup_quest, matches_requirement, new_quest
 
 KEY = "B265"
 FREE_KEY_AFTER = 24 * 60 * 60
 MODE_BUY, MODE_KEYS = 0, 1
 EXPERIMENTS = {"empire_vault_master": 3}  # unlocks the quest that gives the vault
+VAULT_QUESTS = ("Q140J", "QB128")  # the first one gives TV01, the second has it built
 
 RESOURCES = ("coins", "oil", "wood")
 # tier: [(item code or resource, amount, weight)]
@@ -80,12 +81,23 @@ def highlights():
             for tier, loot in LOOT.items()}
 
 
-def update_treasure_vault(user):
-    """On login: open the vault quests and give the free key of the day to a player out of keys."""
+def update_treasure_vault(user, new_quests, meta):
+    """On login: start the vault quest and give the free key of the day to a player out of keys."""
     for name, variant in EXPERIMENTS.items():
         user.setdefault("experiments", {}).setdefault(name, variant)
-    user["treasureVaultHighlights"] = highlights()
     player = user["userInfo"]["player"]
+    # quests that need a level only start on the level up: players past level 26 never got these
+    given = [q["name"] for q in new_quests + session["quests"]]
+    if not player.get("treasureVaultQuestGiven") and matches_requirement(lookup_quest(VAULT_QUESTS[0])):
+        for name in VAULT_QUESTS:
+            if name not in given:  # added one by one: activating sequels would also start every other old quest
+                quest = new_quest(lookup_quest(name))
+                new_quests.append(quest)
+                if quest["complete"]:
+                    do_quest_rewards(lookup_quest(name), meta)
+        player["treasureVaultQuestGiven"] = True
+        print("Treasure vault quests started")
+    user["treasureVaultHighlights"] = highlights()
     items = player["inventory"]["items"]
     if items.get(KEY, 0) <= 0 and _now() >= float(player.get("treasureVaultOpenTS") or 0) + FREE_KEY_AFTER:
         items[KEY] = 1

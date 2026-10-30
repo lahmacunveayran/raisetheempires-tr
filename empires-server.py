@@ -1687,7 +1687,7 @@ def user_response():
                 print("Level 21 has been reached, Titan Lab unlocked at inventory")
 
     event_buildings.update_event_buildings(user, new_quests, meta)
-    treasure_vault.update_treasure_vault(user)
+    treasure_vault.update_treasure_vault(user, new_quests, meta)
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
