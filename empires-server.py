@@ -50,6 +50,7 @@ import client_patches
 import event_buildings
 import titan_lab
 import treasure_vault
+import slot_machine
 import megaseries
 import mod_engine
 import quest_trees
@@ -1126,7 +1127,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.globalPVPOptInOut':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.slotMachineSpin':
-            resps.append(dummy_response())
+            resps.append(slot_machine.spin_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.slotMachineSpinBuy':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.immunityExtend':
