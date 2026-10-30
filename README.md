@@ -35,6 +35,9 @@ dağıtılır. Orijinal açıklama: [README.en.md](README.en.md).
   Eksik ekran ve resimlerin yerine var olanlar kullanılır.
 - **Titan Laboratuvarı** (deneysel): parasıyla ya da öncekini toplayarak açılan parçalar kaydedilir; Titan
   savaşlarını sunucu da yürütür, kazanınca parçası verilir (`titan_lab.py`).
+- **Hazine Kasası** (deneysel): 26. seviyede görevle gelir; anahtarla ya da nakitle dört kasa açılır, anahtar
+  bitince 24 saatte bir bedava anahtar gelir. Asıl ödül listeleri kayıp olduğundan oyunun slot makinesi
+  ödüllerinden kuruldu (`treasure_vault.py`).
 
 ## Kurulum
 

@@ -49,6 +49,7 @@ import pyamf
 import client_patches
 import event_buildings
 import titan_lab
+import treasure_vault
 import megaseries
 import mod_engine
 import quest_trees
@@ -1225,7 +1226,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.setSurvivalModeToaster':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.treasureVaultSpin':
-            resps.append(dummy_response())
+            resps.append(treasure_vault.spin_response(reqq.params[0], reqq.params[1]))
         elif reqq.functionName == 'UserService.unitDropRevealAll':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.unitDropSwitchUnit':
@@ -1686,6 +1687,7 @@ def user_response():
                 print("Level 21 has been reached, Titan Lab unlocked at inventory")
 
     event_buildings.update_event_buildings(user, new_quests, meta)
+    treasure_vault.update_treasure_vault(user)
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
