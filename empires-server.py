@@ -838,6 +838,7 @@ def transactional_session(view):
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
+@app.route('/127.0.0.1flashservices/gateway.php', methods=['POST'])  # Ruffle needs an absolute app_url
 @transactional_session
 def post_gateway():
     print("Gateway:")
