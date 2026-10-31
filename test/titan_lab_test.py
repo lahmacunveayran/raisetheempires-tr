@@ -61,6 +61,14 @@ def test_part_unlocked_for_cash_is_kept():
         assert user["userInfo"]["player"]["cash"] == 80
 
 
+def test_no_part_unlocked_without_the_cash():
+    with app.test_request_context():
+        user = setup_session()
+        user["userInfo"]["player"]["cash"] = 19  # B280 costs 20
+        titan_lab.action_response("partUnlock", LAB_ID, {"partCode": "B280"}, {})
+        assert user["userInfo"]["player"]["cash"] == 19 and not lab(user).get("data", {}).get("partUnlocks")
+
+
 def test_collecting_a_part_unlocks_the_next():
     with app.test_request_context():
         user = setup_session()
@@ -103,6 +111,25 @@ def test_won_titan_battle_gives_the_part():
         battle_engine.handle_win([0] * len(baddie_strengths), {}, params, friendlies, friendly_strengths)
         assert items(user) == {"B287": 3}
         assert session["mechlab"] is None and not titan_lab.is_battle(params)
+
+
+def test_titan_battle_won_by_the_last_hit(monkeypatch):
+    """The battle itself: the Titans take hits of the player's attack strength on their attackStrength (BattleAI
+    .GetAttackingDamage); the hit that leaves the last one at nothing gives the part."""
+    monkeypatch.setattr(battle_engine, "report_battle_log", lambda *a: None)
+    with app.test_request_context():
+        user = setup_session()
+        user["userInfo"]["player"]["level"] = 25
+        start_battle(index=2)
+        params = {"id": [0, 0], "fleet": OWN_FLEET, "target": ENEMY, "ch": 1, "map": None}
+        critical, direct = battle_engine.get_hit_value("antitank", "mega_arm")
+        monkeypatch.setattr(battle_engine, "roll_random_between", lambda a, b: direct)  # direct hits
+        data = battle_engine.battle_complete_response(params)["data"]
+        assert data["es"] == 2400 - 30  # 25 * (3 * 150 + 2400) / (3 * 2400 + 150) / 100 * 300 = 29.1, not 232.7
+        session["battle"][1][:] = [0, 0, 0, 0, 20]
+        params["id"] = [0, 4]
+        assert battle_engine.battle_complete_response(params)["data"]["es"] == 0
+        assert items(user) == {"B287": 3} and session["battle"] is None and session["mechlab"] is None
 
 
 def test_lost_titan_battle_gives_nothing():

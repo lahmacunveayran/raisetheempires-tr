@@ -16,12 +16,12 @@ For this you see:
 │   └── active-limited-edition
 │   │   └── assets
 │   │       └── 29oct2012
-│   │           └── gameSettings.xml.xmldiff
+│   │           └── gameSettings_with_fixes.xml.xmldiff
 ```
 
 The file `mods.conf` needs to be modified in order to activate the mod e.g. `active-limited-edition = true`.
 
-This will apply the differences to the `gameSettings.xml` file, another mod could add a different thing which is why it important to use diffs so multiple mods can work together.
+This will apply the differences to the `gameSettings_with_fixes.xml` file (the server sends this file to the game, not `gameSettings.xml`; the same goes for `questSettings_with_fixes.xml`), another mod could add a different thing which is why it important to use diffs so multiple mods can work together.
 
 ### 1. XMLDIFF
 You need to create an `.xmldiff` file for the xml you want to replace

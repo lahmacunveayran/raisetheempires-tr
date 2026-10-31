@@ -149,7 +149,7 @@ def lookup_state_machine(state_machine_name, custom_values, custom_reference_val
     if custom_reference_values is None:
         custom_reference_values = []
     state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))
-    replacements = {e['-name']: e['-value'] for e in custom_values}
+    replacements = {e['-name']: e['-value'] for e in simple_list(custom_values)}  # one define is a dict
     reference_replacements = {e['-name']: e['-value'] for e in simple_list(custom_reference_values)}
     print('replacements', repr(replacements))
     if reference_replacements:
@@ -162,12 +162,13 @@ def lookup_state_machine(state_machine_name, custom_values, custom_reference_val
 
 
 def lookup_raw_state_machine(state_machine_name):
-    try:
-        [state_machine] = [e for e in game_settings['settings']['stateMachines']['stateMachine'] if e['-name'] == state_machine_name]
-        return state_machine
-    except ValueError as e:
+    # WorldGamesStadiumStateMachine is in the settings twice, the same both times
+    state_machine = next((e for e in game_settings['settings']['stateMachines']['stateMachine']
+                          if e['-name'] == state_machine_name), None)
+    if state_machine is None:
         print("ERROR: Could not look up state machine by name", state_machine_name)
-        raise e
+        raise ValueError("No state machine " + str(state_machine_name))
+    return state_machine
 
 def lookup_crew_template(building_name):
     item = lookup_item_by_name(building_name)

@@ -2,7 +2,7 @@ import copy
 import configparser
 import sqlite3
 import zlib
-from contextlib import closing
+from contextlib import closing, contextmanager
 import json
 import os
 import shutil
@@ -13,7 +13,7 @@ from pathlib import Path
 
 import daiquiri
 import editor
-from flask import session,current_app
+from flask import session, current_app, g, has_request_context
 import logging
 
 from flask_session.sqlalchemy import SqlAlchemySessionInterface
@@ -231,13 +231,54 @@ def enrich_save(save, record):
 
 
 def store_session(save):
+    """Writes another save game. During a call of the game (see defer_save_writes) only when the call succeeds."""
+    pending = g.get("pending_saves") if has_request_context() else None
+    if pending is not None:
+        pending.append(save)
+    else:
+        write_session(save)
+
+
+@contextmanager
+def defer_save_writes():
+    """Other save games written in this block are written when it ends without an error, and not at all if it fails:
+    a failed call's own changes are undone, so must be its changes to the other saves."""
+    g.pending_saves = []
+    try:
+        yield
+        for save in g.pending_saves:
+            write_session(save)
+    finally:
+        g.pop("pending_saves", None)
+
+
+def write_session(save):
     sess_int: SqlAlchemySessionInterface = current_app.session_interface
     sess_model = sess_int.sql_session_model
     record = sess_model.query.filter_by(
             session_id=save["session_id"]).first()
 
-    record.data = pickle.dumps(dict(save))
-    sess_int.db.session.commit()
+    record.data = sess_int.serializer.encode(dict(save))  # like the server's own saves: msgpack, not pickle
+    sess_int.client.session.commit()
+
+
+def convert_pickled_saves():
+    """Saves written by older versions (other saves visited or invaded, savespacks) are pickles. flask-session still
+    reads them but plans to stop that in 1.0, so write them again in the server's own format."""
+    sess_int: SqlAlchemySessionInterface = current_app.session_interface
+    converted = 0
+    for record in get_all_sessions():
+        data = want_bytes(record.data)
+        if not data.startswith(b"\x80"):  # every pickle protocol from 2 on starts like this, msgpack maps never do
+            continue
+        try:
+            record.data = sess_int.serializer.encode(pickle.loads(data))
+            converted += 1
+        except Exception as error:
+            print("Could not convert save", record.session_id, error)
+    if converted:
+        sess_int.client.session.commit()
+        print("Converted", converted, "saves from pickle to msgpack")
 
 
 def validate_save(save, blank_allowed = False):

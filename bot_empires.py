@@ -142,8 +142,11 @@ def _read_state():
 
 
 def _write_state(state):
-    with open(STATE_PATH, "w", encoding="utf-8") as f:
+    """Written aside and then put in place: a write cut short leaves the old state, not a broken file that
+    _read_state would take for no state at all."""
+    with open(STATE_PATH + ".tmp", "w", encoding="utf-8") as f:
         json.dump(state, f)
+    os.replace(STATE_PATH + ".tmp", STATE_PATH)
 
 
 def _unit_strength(item):

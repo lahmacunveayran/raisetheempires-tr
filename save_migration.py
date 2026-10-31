@@ -7,6 +7,7 @@ from save_engine import create_backup
 
 def migrate(meta, version, target_version):
     if version == "0.02a" and version != target_version:
+        create_backup("Update to 0.03a")  # quests and expansions are reset below
         for q in session["quests"]:
             if not q["complete"]:
                 q["completedTasks"] = 0
@@ -67,7 +68,8 @@ def migrate(meta, version, target_version):
         session['user_object']["experiments"]["empire_campaign_mastery"] = 2
         session['save_version'] = version
     if version and version.startswith("0.08a") and version != target_version:  # upcoming
-        pass
+        # nothing to change yet, but remember the version so a later migration can tell these saves apart
+        session['save_version'] = target_version
 
 
 def is_0_08a_preview(version):

@@ -1,5 +1,8 @@
+import contextlib
 import copy
+import functools
 import glob
+import io
 import json
 import math
 import os
@@ -162,35 +165,54 @@ def test_bot_worlds_grow_with_their_level(monkeypatch, tmp_path):
         assert bot_empires.island(bot_empires.bots()[6]) == bot_empires.ISLANDS[-1]
 
 
-def battle(player, bot, rng):
-    """One battle with the rules of battle_engine.battle_complete_response: the player hits first, the sides take
-    turns, the AI attacks as ai_best_attack does. The player picks the hit that takes the largest share of what the
-    target has left. [(kind, strength)] each side; True if the player wins."""
-    def roll():  # roll_random_float
-        return math.floor(rng.random() * 1000) / 1000
+@functools.lru_cache(maxsize=None)
+def hit_value(attacker_kind, defender_kind):  # battle_engine.get_hit_value, looked up once
+    return battle_engine.get_hit_value(attacker_kind, defender_kind)
 
-    def grade(attacker, defender):  # get_hit_chance
-        return GRADES[battle_engine.get_combat_chain_grade(attacker[0], defender[0])]
+
+@functools.lru_cache(maxsize=None)
+def hit_chance(attacker_kind, defender_kind):  # battle_engine.get_hit_chance
+    return GRADES[battle_engine.get_combat_chain_grade(attacker_kind, defender_kind)]
+
+
+def player_pick(player, bot, player_left, bot_left):
+    """The player's hit: the one that takes the largest share of what the target has left, the weakest first."""
+    def expected(attacker, defender, defender_left):
+        critical, direct = hit_value(attacker[0], defender[0])
+        crit = max(0.0, 1 - critical)
+        mean = direct * 0.1 + (1 - direct - crit) + crit * 1.5
+        return mean * 25 * (3 * attacker[1] + defender_left) / (3 * defender_left + attacker[1]) / 100 * defender[1]
+
+    players = [i for i, s in enumerate(player_left) if s > 0]
+    bots = [i for i, s in enumerate(bot_left) if s > 0]
+    return max(((a, d) for a in players for d in bots),
+               key=lambda p: (min(1, expected(player[p[0]], bot[p[1]], bot_left[p[1]]) / bot_left[p[1]]),
+                              -bot_left[p[1]]))
+
+
+def play(player, bot, roll):
+    """One battle with the rules of battle_engine.battle_complete_response: the player hits first, the sides take
+    turns, the AI attacks as ai_best_attack does. [(kind, strength)] each side, roll() the random float of the
+    battle; the strengths both sides have left."""
+    def grade(attacker, defender):
+        return hit_chance(attacker[0], defender[0])
 
     def hit(attacker, defender, defender_left):
-        critical, direct = battle_engine.get_hit_value(attacker[0], defender[0])
+        critical, direct = hit_value(attacker[0], defender[0])
         damage = 25 * (3 * attacker[1] + defender_left) / (3 * defender_left + attacker[1]) / 100 * defender[1]
         damage = math.floor(damage * 1000) / 1000
         r = roll()
         damage *= 0.10 if r < direct else 1.5 if r >= critical else 1
         return math.ceil(damage)
 
-    def expected(attacker, defender, defender_left):
-        critical, direct = battle_engine.get_hit_value(attacker[0], defender[0])
-        crit = max(0.0, 1 - critical)
-        mean = direct * 0.1 + (1 - direct - crit) + crit * 1.5
-        return mean * 25 * (3 * attacker[1] + defender_left) / (3 * defender_left + attacker[1]) / 100 * defender[1]
+    def pick(r, n):  # as3_round: the client's Math.round
+        return math.floor(r * (n - 1) + 0.5)
 
     def best_unit(units, left, other, r):  # ai_best_unit
         alive = [i for i in range(len(units)) if left[i] > 0]
         best = max([grade(units[i], other) for i in alive] + [-1])
         ties = [i for i in alive if grade(units[i], other) == best]
-        return (ties[round(r * (len(ties) - 1))], best) if ties else (None, -1)
+        return (ties[pick(r, len(ties))], best) if ties else (None, -1)
 
     def ai_attack():  # ai_best_attack: (bot unit, player unit)
         first = roll()
@@ -198,13 +220,13 @@ def battle(player, bot, rng):
         top = max(g for _, g, _ in method_1)
         pairs = [x for x in method_1 if x[1] == top and x[1] >= 0]
         if pairs:
-            pick = pairs[round(roll() * (len(pairs) - 1)) if len(pairs) > 1 else 0]
-            pairing_1 = (pairs[0][0],) + pick[1:]  # the engine's "bugged pairings"
+            chosen = pairs[pick(roll(), len(pairs)) if len(pairs) > 1 else 0]
+            pairing_1 = (pairs[0][0],) + chosen[1:]  # the engine's "bugged pairings"
         else:
             pairing_1 = None, 0, None
         method_2 = [best_unit(player, player_left, bot[b], first) + (b,) for b in range(len(bot)) if bot_left[b] > 0]
         top_2 = max(g for _, g, _ in method_2)
-        threats = [p for p, g, _ in method_2 if g == top_2]
+        threats = [p for p, g, _ in method_2 if g == top_2 and g >= 0]
         pairing_2 = best_unit(bot, bot_left, player[threats[0]], roll()) + (threats[0],) if threats else (None, 0, None)
         ratio = pairing_2[1] / top if top > 0 else 0
         b, _, p = pairing_1 if (ratio < 0.5) ^ (roll() < 0.2) else pairing_2
@@ -212,45 +234,109 @@ def battle(player, bot, rng):
 
     player_left, bot_left = [s for _, s in player], [s for _, s in bot]
     for turn in range(500):
-        players = [i for i, s in enumerate(player_left) if s > 0]
-        bots = [i for i, s in enumerate(bot_left) if s > 0]
-        if not bots or not players:
-            return bool(players)
+        if not any(bot_left) or not any(player_left):
+            break
         if turn % 2 == 0:
-            a, d = max(((a, d) for a in players for d in bots),
-                       key=lambda p: (min(1, expected(player[p[0]], bot[p[1]], bot_left[p[1]]) / bot_left[p[1]]),
-                                      -bot_left[p[1]]))
+            a, d = player_pick(player, bot, player_left, bot_left)
             bot_left[d] -= hit(player[a], bot[d], bot_left[d])
-            if bot_left[d] == 1:  # the engine does not leave an enemy at 1
+            if bot_left[d] <= 1:  # the engine does not leave an enemy at 1
                 bot_left[d] = 0
         else:
             b, p = ai_attack()
-            player_left[p] -= hit(bot[b], player[p], player_left[p])
+            player_left[p] = max(0, player_left[p] - hit(bot[b], player[p], player_left[p]))
+    return player_left, bot_left
+
+
+def battle(player, bot, rng):
+    """play() with Python's random numbers (the engine's are as even); True if the player wins."""
+    player_left, bot_left = play(player, bot, lambda: math.floor(rng.random() * 1000) / 1000)
     return sum(player_left) > sum(bot_left)
 
 
+def random_squad(rng, level):
+    """3 to 5 recent units of a player of the level."""
+    pool = [i["-code"] for i in bot_empires.DEFENDER_POOL if level - 20 <= int(i["requiredLevel"]) <= level]
+    return [rng.choice(pool) for _ in range(rng.randint(3, 5))]
+
+
+class EngineRandom:
+    """The random floats of the engine (quest_engine.roll_random_float) from the seeds w and z."""
+    def __init__(self, w, z):
+        self.w, self.z = w, z
+
+    def __call__(self):
+        self.z = 36969 * (self.z & 65535) + (self.z >> 16) & 0xFFFFFFFF
+        self.w = 18000 * (self.w & 65535) + (self.w >> 16) & 0xFFFFFFFF
+        return math.floor(((self.z << 16) + self.w & 0xFFFFFFFF) / (2 ** 32 - 1) * 1000) / 1000
+
+
+def engine_play(player_codes, bot_codes, w, z):
+    """The battle of play(), the same player picks, but each turn answered by battle_complete_response."""
+    world = session["user_object"]["userInfo"]["world"]
+    world["randSeedW"], world["randSeedZ"] = w, z
+    session["quests"] = []
+    session["fleets"] = {"fleet2_1": [c + ",,,," for c in player_codes], "fleet3_1": [{"-" + c: "1"} for c in bot_codes]}
+    session["battle"] = None
+    player, bot = [(kind(c), strength(c)) for c in player_codes], [(kind(c), strength(c)) for c in bot_codes]
+    player_left, bot_left = [s for _, s in player], [s for _, s in bot]
+    for turn in range(500):
+        if not any(bot_left) or not any(player_left):
+            break
+        params = {"fleet": "fleet2_1", "target": "fleet3_1", "map": None}
+        if turn % 2 == 0:
+            params["id"] = list(player_pick(player, bot, player_left, bot_left))
+        r = battle_engine.battle_complete_response(params)["data"]
+        if session["battle"]:
+            player_left, bot_left = list(session["battle"][0]), list(session["battle"][1])
+        elif turn % 2 == 0:  # the battle is over, the engine has let it go
+            bot_left[r["enemyUnit"]] = r["es"]
+        else:
+            player_left[r["playerUnit"]] = r["ps"]
+    return player_left, bot_left
+
+
+def test_the_battles_played_here_are_the_engines(monkeypatch, tmp_path):
+    """play() is battle_engine's battle: with the engine's random numbers it ends every battle as
+    battle_complete_response does, so the balance measured with it is the engine's."""
+    monkeypatch.setattr(battle_engine, "report_battle_log", lambda *a: None)
+    rng = random.Random(1)
+    with app.test_request_context():
+        session.sid = "0"
+        for level in range(10, 100, 10):
+            for _ in range(3):
+                units = random_squad(rng, level)
+                setup_session(monkeypatch, tmp_path, level=level, units=units)
+                bot = bot_empires.bots()[rng.randrange(15)]
+                fleet = [u.split(",")[0] for u in bot_empires.defense_fleet(bot)]
+                w, z = rng.randrange(1, 2 ** 32), rng.randrange(1, 2 ** 32)
+                expected = play([(kind(u), strength(u)) for u in units], [(kind(u), strength(u)) for u in fleet],
+                                EngineRandom(w, z))
+                with contextlib.redirect_stdout(io.StringIO()):  # the engine prints a lot
+                    assert engine_play(units, fleet, w, z) == expected
+
+
 def test_the_easy_bots_are_beaten_more_often(monkeypatch, tmp_path):
-    """Random squads of 3 to 5 recent units of players of level 10 to 90 against the bots of each step. Over 54
-    squads of level 10 to 95 the player won about 58%, 54%, 49%, 39% and 33% of the battles against the five steps;
-    these 18 squads vary more by the draw (over 13 seeds: 51-72%, 44-62% and 29-42%)."""
+    """81 random squads (3 to 5 recent units, players of level 10 to 90) against the bots of each step, 3 battles
+    each. What the player wins depends mostly on the squads drawn, so many squads and few battles: over 20 seeds this
+    sample won 54-67%, 47-61%, 44-57%, 33-46% and 28-39% against the five steps (bot_empires: the numbers of a
+    larger sample). The bounds hold for all of them."""
     rng = random.Random(7)
     wins, games = [0] * len(bot_empires.DELTAS), [0] * len(bot_empires.DELTAS)
     with app.test_request_context():
         for level in range(10, 100, 10):
-            for _ in range(2):
-                pool = [i["-code"] for i in bot_empires.DEFENDER_POOL if level - 20 <= int(i["requiredLevel"]) <= level]
-                units = [rng.choice(pool) for _ in range(rng.randint(3, 5))]
+            for _ in range(9):
+                units = random_squad(rng, level)
                 setup_session(monkeypatch, tmp_path, level=level, units=units)
                 player = [(kind(u), strength(u)) for u in units]
                 for i, bot in enumerate(bot_empires.bots()):
                     fleet = [(kind(u), strength(u)) for u in bot_empires.defense_fleet(bot)]
-                    for _ in range(20):
+                    for _ in range(3):
                         wins[i // 3] += battle(player, fleet, rng)
                         games[i // 3] += 1
     rates = [w / g for w, g in zip(wins, games)]
     print("player wins by step", [round(r, 2) for r in rates])
-    assert rates[0] > rates[2] > rates[4] and rates[0] - rates[4] >= 0.15
-    assert 0.45 <= rates[0] <= 0.78 and 0.40 <= rates[2] <= 0.65 and 0.22 <= rates[4] <= 0.48
+    assert rates[0] > rates[2] > rates[4] and rates[0] - rates[4] >= 0.12
+    assert 0.48 <= rates[0] <= 0.73 and 0.38 <= rates[2] <= 0.62 and 0.22 <= rates[4] <= 0.45
 
 
 def test_bot_saves_keep_invasions(monkeypatch, tmp_path):
@@ -263,6 +349,45 @@ def test_bot_saves_keep_invasions(monkeypatch, tmp_path):
         bot_empires.store_save(save)
         assert bot_empires.find_save(str(uid))["user_object"]["pvp"]["invaders"] == {"u1": {"status": 1}}
         assert bot_empires.find_save(12345) is None
+
+
+def test_a_write_cut_short_keeps_the_old_state(monkeypatch, tmp_path):
+    with app.test_request_context():
+        setup_session(monkeypatch, tmp_path)
+        uid = bot_empires.bots()[3]["uid"]
+        save = bot_empires.find_save(uid)
+        save["user_object"]["pvp"]["invaders"]["u1"] = {"status": 1}
+        bot_empires.store_save(save)
+
+        def cut_short(state, f):
+            f.write('{"%s": {"inva' % uid)
+            raise OSError("disk full")
+        monkeypatch.setattr(bot_empires.json, "dump", cut_short)
+        save["user_object"]["pvp"]["invaders"]["u2"] = {"status": 1}
+        try:
+            bot_empires.store_save(save)
+        except OSError:
+            pass
+        monkeypatch.undo()
+        setup_session(monkeypatch, tmp_path)
+        assert bot_empires.find_save(uid)["user_object"]["pvp"]["invaders"] == {"u1": {"status": 1}}
+
+
+def test_winning_against_a_bot_without_its_state(monkeypatch, tmp_path):
+    """The bot state file was removed during the battle: the win still counts, nothing breaks."""
+    with app.test_request_context():
+        session.sid = "0"
+        setup_session(monkeypatch, tmp_path)
+        uid = bot_empires.bots()[0]["uid"]
+        battle_engine.invasion_complete(uid, {}, [battle_engine.lookup_item_by_code("U05")], [100])
+        assert bot_empires.fight_list()["wins"] == 1
+        zid = "u" + str(battle_engine.get_zid())
+        save = bot_empires.find_save(uid)
+        save["user_object"]["pvp"]["invaders"][zid] = {"status": 1}
+        bot_empires.store_save(save)
+        battle_engine.invasion_complete(uid, {}, [battle_engine.lookup_item_by_code("U05")], [100])
+        assert bot_empires.find_save(uid)["user_object"]["pvp"]["invaders"][zid] == {"status": 2,
+                                                                                    "attacker_fleet": ["U05,,,,"]}
 
 
 def test_wins_count_for_the_day(monkeypatch, tmp_path):
