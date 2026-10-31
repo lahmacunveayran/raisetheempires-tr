@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for slot_machine.py: 100%</title>
+    <title>Coverage for slot_machine.py: 98%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>slot_machine.py</b>:
-            <span class="pc_cov">100%</span>
+            <span class="pc_cov">98%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">44 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">44<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">43<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="state_machine_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-10-31 08:36 +0000
+            created at 2026-10-31 18:45 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -146,7 +146,7 @@
     <p class="run"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="nam">loot</span> <span class="op">=</span> <span class="nam">prizes</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">    <span class="nam">code</span><span class="op">,</span> <span class="nam">amount</span><span class="op">,</span> <span class="nam">_</span> <span class="op">=</span> <span class="nam">random</span><span class="op">.</span><span class="nam">choices</span><span class="op">(</span><span class="nam">loot</span><span class="op">,</span> <span class="nam">weights</span><span class="op">=</span><span class="op">[</span><span class="nam">weight</span> <span class="key">for</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">weight</span> <span class="key">in</span> <span class="nam">loot</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">    <span class="key">if</span> <span class="nam">code</span> <span class="key">in</span> <span class="nam">RESOURCES</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">        <span class="nam">do_rewards</span><span class="op">(</span><span class="str">&quot;Slot machine&quot;</span><span class="op">,</span> <span class="op">{</span><span class="str">&quot;_type&quot;</span><span class="op">:</span> <span class="nam">code</span><span class="op">,</span> <span class="str">&quot;_count&quot;</span><span class="op">:</span> <span class="nam">str</span><span class="op">(</span><span class="nam">amount</span><span class="op">)</span><span class="op">}</span><span class="op">,</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">        <span class="nam">do_rewards</span><span class="op">(</span><span class="str">&quot;Slot machine&quot;</span><span class="op">,</span> <span class="op">{</span><span class="str">&quot;_type&quot;</span><span class="op">:</span> <span class="nam">code</span><span class="op">,</span> <span class="str">&quot;_count&quot;</span><span class="op">:</span> <span class="nam">str</span><span class="op">(</span><span class="nam">amount</span><span class="op">)</span><span class="op">}</span><span class="op">,</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">        <span class="nam">do_rewards</span><span class="op">(</span><span class="str">&quot;Slot machine&quot;</span><span class="op">,</span> <span class="op">{</span><span class="str">&quot;_type&quot;</span><span class="op">:</span> <span class="str">&quot;item&quot;</span><span class="op">,</span> <span class="str">&quot;_item&quot;</span><span class="op">:</span> <span class="nam">code</span><span class="op">,</span> <span class="str">&quot;_count&quot;</span><span class="op">:</span> <span class="nam">str</span><span class="op">(</span><span class="nam">amount</span><span class="op">)</span><span class="op">}</span><span class="op">,</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="str">&quot;Slot machine gives&quot;</span><span class="op">,</span> <span class="nam">amount</span><span class="op">,</span> <span class="nam">code</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -160,7 +160,7 @@
             <a class="nav" href="state_machine_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-10-31 08:36 +0000
+            created at 2026-10-31 18:45 +0000
         </p>
     </div>
 </footer>
