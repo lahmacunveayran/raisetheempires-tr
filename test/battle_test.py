@@ -1,17 +1,50 @@
 #TO RUN TESTS RUN empires_test.py
-
-import json
+"""init_battle, the powers and the fleet helpers. The units a battle has are worked out here from the input (the fleets
+of the session) or from the quest XML (questSettings_with_fixes.xml: <task action="fight" item> is the enemy fleet item
+of gameSettings_with_fixes.xml, its <baddie item> the enemy units, <fleet> the units the quest gives the player), the
+strengths from the game XML (battle_reward_test reads both with ElementTree), never from the server's own item dicts."""
 
 import battle_engine
-import pytest
+import client_settings as client
 from flask import Flask, session
-from pathlib import Path
+
+from battle_reward_test import UNIQUE_NUMBER, chip_damage, fight_baddies, island_strength, items, modifier_of, \
+    power_damage, researched_strength, task_fleet, tasks
 
 
 app = Flask(__name__)
 app.secret_key = 'test'
 
-TEST_DIR = Path(__file__).parent
+# the fleets of setup_session: two UB96 of the player against the enemy fleet of island 2 of C037 (status 2 << 20)
+OWN_UNITS = ['UB96,300,0,0,0', 'UB96,300,0,1,0']
+ENEMY_FLEET = {'-U58': '1', '-SU02': '1', '-U63': '1'}
+C037_ISLAND = 2097152 >> 20
+# setup_session_invade: the player's fleet and the neighbour's FleetName
+INVADE_OWN_UNITS = ['V06,180,1,0,0', 'V06,180,1,1,0', 'UN33,780,0,2,0', 'UN33,780,0,3,0', 'UL61,340,0,4,0']
+INVADE_ENEMY_UNITS = ['V61,,,,', 'V61,,,,', 'U01,,,,', 'U01,,,,', 'U01,,,,']
+RESEARCH = {'U43': ['XD01', 'XA01', 'XT01'], 'U45': ['XD01'], 'U44': ['XD01'], 'U72': ['XD01', 'XA01'],
+            'U48': ['XD02', 'XA02', 'XT02', 'XS02', 'XC02', 'XR02'], 'U15': ['XD04'],
+            'V06': ['XD05', 'XT05', 'XA05', 'XC05', 'XR05', 'XS05'],
+            'U60': ['XD04', 'XT04', 'XA04', 'XC04', 'XS04', 'XR04']}
+
+
+def codes_of(unit_strings):
+    return [u.split(',')[0] for u in unit_strings]
+
+
+def codes_of_counts(fleet):
+    return [code[1:] for code, count in fleet.items() for _ in range(int(count))]
+
+
+def the_shield_power():
+    """The power the shields research gives each unit at the start (N75: <consumable givesAbility="shield">)."""
+    assert items()['N75'].find('consumable').get('givesAbility') == 'shield'
+    return 'N75'
+
+
+def has_shields_research(code, research):
+    return any(modifier_of(u).get('shields') for u in research.get(code, []))
+
 
 def test_init_battle():
     run_init_battle({'id': [0, 0], 'fleet': 'fleet14_2341959767162880', 'target': 'fleet15_2341959767162880', 'ch': 4858,
@@ -70,75 +103,76 @@ def test_init_battle_ai_invade_consumable():
 #
 
 
+FIRST_QUESTS = [
+    {'name': 'Q6016', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+    {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]
+SECOND_QUESTS = [
+    {'name': 'Q6019', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+    {'name': 'Q0633', 'complete': True, 'expired': False, 'progress': [1, 2, 1], 'completedTasks': 7},
+    {'name': 'Q0676', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+    {'name': 'Q0521', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+    {'name': 'Q0691', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q0671', 'complete': True, 'expired': False, 'progress': [2, 2], 'completedTasks': 3},
+    {'name': 'Q0571', 'complete': True, 'expired': False, 'progress': [1, 1], 'completedTasks': 3},
+    {'name': 'Q0591', 'complete': True, 'expired': False, 'progress': [4], 'completedTasks': 1},
+    {'name': 'Q1098', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q6011', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q0611', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q6016', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+    {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]
+
+
+def fight_task(quest):
+    [task] = [t for t in tasks(quest) if t.get('action') == 'fight']
+    return task
+
+
+def run_quest_battle(params, session_quests, quest):
+    """A battle of a quest with no fleet of the player in the session: the units the task gives the player against
+    the baddies of its fleet item (no research, no campaign island: their XML strengths)."""
+    run_init_battle_dynamic(
+        params,
+        [lambda s: s.setdefault('quests', default=[dict(q) for q in session_quests]),
+         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
+        task_fleet(fight_task(quest)), fight_baddies(fight_task(quest)), [], research={})
+
 
 def test_init_battle_first_quest():
-    run_init_battle_dynamic(
-        {'id': [0, 0], 'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3027, 'map': None},
-        [lambda s: s.setdefault('quests', default=[
-            {'name': 'Q6016', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
-         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
-        'friendlies_first_quest.json', [30], 'baddies_first_quest.json', [25], []
-    )
+    run_quest_battle({'id': [0, 0], 'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3027, 'map': None},
+                     FIRST_QUESTS, 'Q6016')
 
 
 def test_init_battle_ai_first_quest():
-    run_init_battle_dynamic(
-        {'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3028, 'map': None},
-        [lambda s: s.setdefault('quests', default=[
-            {'name': 'Q6016', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
-         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
-        'friendlies_first_quest.json', [30], 'baddies_first_quest.json', [25], []
-    )
+    run_quest_battle({'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3028, 'map': None},
+                     FIRST_QUESTS, 'Q6016')
 
 
 def test_init_battle_second_quest():
-    run_init_battle_dynamic(
-        {'id': [1, 0], 'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3069, 'map': None},
-        [lambda s: s.setdefault('quests', default=[
-            {'name': 'Q6019', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0633', 'complete': True, 'expired': False, 'progress': [1, 2, 1], 'completedTasks': 7},
-            {'name': 'Q0676', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0521', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0691', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0671', 'complete': True, 'expired': False, 'progress': [2, 2], 'completedTasks': 3},
-            {'name': 'Q0571', 'complete': True, 'expired': False, 'progress': [1, 1], 'completedTasks': 3},
-            {'name': 'Q0591', 'complete': True, 'expired': False, 'progress': [4], 'completedTasks': 1},
-            {'name': 'Q1098', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q6011', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0611', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q6016', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
-         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
-        'friendlies_second_quest.json', [30, 40], 'baddies_second_quest.json', [50], []
-    )
+    run_quest_battle({'id': [1, 0], 'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3069, 'map': None},
+                     SECOND_QUESTS, 'Q6019')
 
 
 def test_init_battle_ai_second_quest():
+    run_quest_battle({'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3070, 'map': None},
+                     SECOND_QUESTS, 'Q6019')
+
+
+def test_init_battle_quest_fight_by_fleet_name():
+    """QW228 is open: its fight task has fleetname="quest_W228_1_3" and no <fleet>, so the player fights with the
+    fleet of the session against the baddies of its fleet item (BD30); a done quest of the list does not count."""
+    task = fight_task('QW228')
+    assert task.get('fleetname') == 'quest_W228_1_3' and task.find('fleet') is None
+    own = ['U05,,,,', 'V61,,,,']
     run_init_battle_dynamic(
-        {'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3070, 'map': None},
+        {'fleet': 'fleet2_2341959767162880', 'target': 'quest_W228_1_3', 'ch': 1, 'map': None},
         [lambda s: s.setdefault('quests', default=[
-            {'name': 'Q6019', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0633', 'complete': True, 'expired': False, 'progress': [1, 2, 1], 'completedTasks': 7},
-            {'name': 'Q0676', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0521', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
-            {'name': 'Q0691', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0671', 'complete': True, 'expired': False, 'progress': [2, 2], 'completedTasks': 3},
-            {'name': 'Q0571', 'complete': True, 'expired': False, 'progress': [1, 1], 'completedTasks': 3},
-            {'name': 'Q0591', 'complete': True, 'expired': False, 'progress': [4], 'completedTasks': 1},
-            {'name': 'Q1098', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q6011', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0611', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
             {'name': 'Q6016', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
-            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
+            {'name': 'QW228', 'complete': False, 'expired': False, 'progress': [0, 0, 0], 'completedTasks': 0}]),
+         lambda s: s.setdefault('fleets', default={'fleet2_2341959767162880': own}),
          lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
-        'friendlies_second_quest.json', [30, 40], 'baddies_second_quest.json', [50], []
-    )
+        codes_of(own), fight_baddies(task), [], research={})
 
 
 def run_init_battle(params):
@@ -163,8 +197,8 @@ def run_init_battle_invade(params):
         log_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths)
 
 
-def run_init_battle_dynamic(params, setup_session_funcs, expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
-                          expected_baddie_strengths, expected_active_consumables):
+def run_init_battle_dynamic(params, setup_session_funcs, expected_friendly_codes, expected_baddie_codes,
+                            expected_shielded, research, island=None):
     with app.test_request_context():
         for setup_session_func in setup_session_funcs:
             setup_session_func(session)
@@ -172,8 +206,8 @@ def run_init_battle_dynamic(params, setup_session_funcs, expected_friendlies_jso
         friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables = \
             battle_engine.init_battle(params)
 
-        assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths, expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
-                          expected_baddie_strengths, expected_active_consumables)
+        assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
+                              expected_friendly_codes, expected_baddie_codes, expected_shielded, research, island)
         log_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths)
 
 
@@ -197,51 +231,35 @@ def log_result_battle(active_consumables, baddie_strengths, baddies, friendlies,
 
 def assert_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
     assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
-                          'friendlies.json', [300, 300], 'baddies.json', [120, 200, 150], [])
+                          codes_of(OWN_UNITS), codes_of_counts(ENEMY_FLEET), [], RESEARCH, ('C037', C037_ISLAND))
+
+
+def assert_units(units, expected_codes):
+    """The units are the game's items of these codes, in this order (code and unit type as in the XML)."""
+    assert [u['-code'] for u in units] == expected_codes
+    assert [u['unit']['-type'].split(',') for u in units] == [client.unit(c)['types'] for c in expected_codes]
 
 
 def assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
-                          expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
-                          expected_baddie_strengths, expected_active_consumables):
-    with open(TEST_DIR / expected_friendlies_json, 'r') as f:
-        assert friendlies == json.load(f)
-    assert friendly_strengths == expected_friendly_strengths
-    with open(TEST_DIR / expected_baddies_json, 'r') as f:
-        assert baddies == json.load(f)
-    assert baddie_strengths == expected_baddie_strengths
-    assert active_consumables == expected_active_consumables
+                          expected_friendly_codes, expected_baddie_codes, expected_shielded, research, island):
+    """The player's units start with their researched strength (UnitItem.getStrength with the fleet), the enemy's
+    with the strength of the campaign island if there is one (int(strength * mult)), else their XML strength; each
+    unit with shields research has the shield power for the whole battle."""
+    assert_units(friendlies, expected_friendly_codes)
+    assert friendly_strengths == [researched_strength(c, research.get(c, [])) for c in expected_friendly_codes]
+    assert_units(baddies, expected_baddie_codes)
+    assert baddie_strengths == [island_strength(island[0], island[1], c) if island else client.strength(c)
+                                for c in expected_baddie_codes]
+    assert [(c['-code'], target) for c, target, _ in active_consumables] == \
+        [(the_shield_power(), ('ally', i)) for i in expected_shielded]
 
 
 def assert_result_invade(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
+    own = codes_of(INVADE_OWN_UNITS)
+    shielded = [i for i, code in enumerate(own) if has_shields_research(code, RESEARCH)]
+    assert shielded == [0, 1]  # the two V06 have XR05 (shields 1)
     assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
-                          'friendlies_invade.json', [180.0, 180.0, 780, 780, 340], 'baddies_invade.json',
-                          [40, 40, 30, 30, 30],
-                          [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
-                             '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
-                             'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
-                             'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
-                                            '-diweapon': 'DefenseShield', '-postWait': '1s',
-                                            '-givesAbility': 'shield'}, 'image': [
-                                  {'-name': 'icon',
-                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
-                                  {'-name': 'cursor',
-                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
-                             'loc': {'-sentenceName': 'true'},
-                             'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
-                            ('ally', 0), 9999999),
-                           ({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
-                             '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
-                             'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
-                             'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
-                                            '-diweapon': 'DefenseShield', '-postWait': '1s',
-                                            '-givesAbility': 'shield'}, 'image': [
-                                   {'-name': 'icon',
-                                    '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
-                                   {'-name': 'cursor',
-                                    '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
-                             'loc': {'-sentenceName': 'true'},
-                             'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
-                            ('ally', 1), 9999999)])
+                          own, codes_of(INVADE_ENEMY_UNITS), shielded, RESEARCH, None)
 
 
 def setup_session():
@@ -250,8 +268,8 @@ def setup_session():
                          'fleet7_2341959767162880': None, 'fleet9_2341959767162880': None,
                          'fleet11_2341959767162880': None,
                          'fleet13_2341959767162880': None,
-                         'fleet15_2341959767162880': {'-U58': '1', '-SU02': '1', '-U63': '1'},
-                         'fleet14_2341959767162880': ['UB96,300,0,0,0', 'UB96,300,0,1,0'],
+                         'fleet15_2341959767162880': dict(ENEMY_FLEET),
+                         'fleet14_2341959767162880': list(OWN_UNITS),
                          'ally_fleet14_2341959767162880': ['123']}
     setup_user_object()
     session.sid = "0"
@@ -272,11 +290,10 @@ def setup_session_invade():
                                                       'battleTimestamp': None, 'ransomRandom': None,
                                                       'ransomResource': None,
                                                       'ransomAmount': None,
-                                                      'units': ['V61,,,,', 'V61,,,,', 'U01,,,,', 'U01,,,,', 'U01,,,,'],
+                                                      'units': list(INVADE_ENEMY_UNITS),
                                                       'store': [0], 'fleets': [], 'upgrades': None, 'hp': None,
                                                       'invader': False},
-                         'fleet14_2341959767162880': ['V06,180,1,0,0', 'V06,180,1,1,0', 'UN33,780,0,2,0',
-                                                      'UN33,780,0,3,0', 'UL61,340,0,4,0']}
+                         'fleet14_2341959767162880': list(INVADE_OWN_UNITS)}
 
     setup_user_object()
     session.sid = "0"
@@ -302,44 +319,74 @@ def setup_user_object():
         'C032': {'status': 9437184, 'fleets': []}, 'C033': {'status': 9437184, 'fleets': []},
         'C034': {'status': 8388608, 'fleets': []}, 'C035': {'status': 9437184, 'fleets': []},
         'C036': {'status': 8388608, 'fleets': []}, 'C037': {'status': 2097152, 'fleets': []}}, 'mastery': {}}}}}
-    session['user_object']["userInfo"]["world"]["research"] = {'U43': ['XD01', 'XA01', 'XT01'], 'U45': ['XD01'],
-                                                               'U44': ['XD01'], 'U72': ['XD01', 'XA01'],
-                                                               'U48': ['XD02', 'XA02', 'XT02', 'XS02', 'XC02',
-                                                                       'XR02'], 'U15': ['XD04'],
-                                                               'V06': ['XD05', 'XT05', 'XA05', 'XC05', 'XR05',
-                                                                       'XS05'],
-                                                               'U60': ['XD04', 'XT04', 'XA04', 'XC04', 'XS04',
-                                                                       'XR04']}
+    session['user_object']["userInfo"]["world"]["research"] = {k: list(v) for k, v in RESEARCH.items()}
+
+
+# --- powers on the enemy fleet of setup_session (U58, SU02, U63 on island 2 of C037) ------------------------------
+
+def start_strengths():
+    return [island_strength('C037', C037_ISLAND, c) for c in codes_of_counts(ENEMY_FLEET)]
+
+
+def own_strengths():
+    return [researched_strength(c, RESEARCH.get(c, [])) for c in codes_of(OWN_UNITS)]
+
+
+def after_power(code, target, strengths):
+    """A power on the target: its direct impact on it; with a chipFactor, ChipDamageManager.getDamage on each other
+    unit that was alive before it, counted by the units alive before it (the target too, even when it dies)."""
+    codes = codes_of_counts(ENEMY_FLEET)
+    live = [i for i, s in enumerate(strengths) if s > 0]
+    out = list(strengths)
+    out[target] = max(out[target] - power_damage(code, codes[target]), 0)
+    if items()[code].find('consumable').get('chipFactor'):
+        for k, i in enumerate(live):
+            if i != target:
+                out[i] -= chip_damage(code, len(live), live.index(target), k)
+    return out
 
 
 def test_assign_consumable_response_consumable(monkeypatch):
+    expected = after_power('N04', 1, start_strengths())
+    assert expected == [120, 170, 150]  # an air strike of 30 (twice on land only) on the SU02 (200)
     run_assign_consumable_response(monkeypatch,
                                    {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880', 'fleet': None,
-                                    'map': 'C037', 'code': 'N04'}, None, [300, 300], None, [120, 170, 150], [], True)
+                                    'map': 'C037', 'code': 'N04'}, None, own_strengths(), None, expected, [], True)
 
 
 def test_assign_consumable_response_shrapnel(monkeypatch):
+    expected = after_power('N80', 1, start_strengths())
+    # 30 on the SU02; uniqueNumber(1, 0) = 4 and (1, 2) = 3 of 3 units: ceil(4 * 3 * 30 / 100) = 4, ceil(2.7) = 3
+    assert UNIQUE_NUMBER[3][1] == [4, 0, 3] and expected == [116, 170, 147]
     run_assign_consumable_response(monkeypatch,
                                    {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
-                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 170, 147], [],
+                                    'map': 'C037', 'code': 'N80'}, None, own_strengths(), None, expected, [],
                                    True)
 
 
 def test_assign_consumable_response_shrapnel_removed_dead(monkeypatch):
+    before = start_strengths()
+    before[1] = 0  # the SU02 is dead: 2 units left, the U63 is the second of them
+    expected = after_power('N80', 2, before)
+    assert expected == [116, 0, 120]  # uniqueNumber(1, 0) of 2 units = 4: ceil(4 * 3 * 30 / 100) = 4
     run_assign_consumable_response(monkeypatch,
                                    {'id': 2, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
-                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 120], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], [], battle_engine.BattleContext()))])
+                                    'map': 'C037', 'code': 'N80'}, None, own_strengths(), None, expected, [],
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=(own_strengths(), list(before), [], battle_engine.BattleContext()))])
 
 
 def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
+    before = start_strengths()
+    before[1] = power_damage('N80', 'SU02')  # the SU02 dies of the 30
+    expected = after_power('N80', 1, before)
+    assert expected == [116, 0, 147]
     run_assign_consumable_response(monkeypatch,
                                    {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
-                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 147], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], [], battle_engine.BattleContext()))])
+                                    'map': 'C037', 'code': 'N80'}, None, own_strengths(), None, expected, [],
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=(own_strengths(), list(before), [], battle_engine.BattleContext()))])
 
 
 def run_assign_consumable_response(monkeypatch, params, expected_player_unit_id, expected_friendly_strengths, expected_enemy_unit_id,
@@ -386,13 +433,16 @@ def assert_battle_result(active_consumables, baddie_strengths, enemy_unit_id, pl
 
 
 def test_spawn_fleet_initial_attack():
+    """Q6019's fight task is a PVE invasion (isPVE): the client is told where it lands and who leads it."""
+    task = fight_task('Q6019')
     with app.test_request_context():
         session["fleets"] = {}
 
         res = battle_engine.spawn_fleet({'fleet': 'Q6019', 'code': 'Q6019'})
 
         assert res == {'errorType': 0, 'userId': 1,
-         'metadata': {'newPVE': {'status': 2, 'pos': '52,49', 'villain': 'v18', 'quest': 'Q6019'}}, 'data': []}
+         'metadata': {'newPVE': {'status': 2, 'pos': task.get('spawnLocation'), 'villain': task.get('pveVillain'),
+                                 'quest': 'Q6019'}}, 'data': []}
         assert session["fleets"] == {}
 
 
@@ -405,8 +455,8 @@ def test_spawn_fleet_quest_based():
 
         assert res == {'errorType': 0, 'userId': 1, 'metadata': {}, 'data': []}
         assert session["fleets"] == {'fleet1_2341959767162880': None}
-        
-        
+
+
 def test_spawn_fleet_quest_odd_fleets():
     with app.test_request_context():
         session["fleets"] = {'fleet1_2341959767162880': None}
