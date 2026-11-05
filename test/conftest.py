@@ -97,10 +97,15 @@ def _server_setup(tmp_path_factory):
 @pytest.fixture
 def server(_server_setup):
     """The server's app as configure_app set it up: save games in save.db (flask-session with SQLAlchemy and
-    msgspec), the save lock, the host check around the Socket.IO middleware."""
+    msgspec), the save lock, the host check around the Socket.IO middleware. Each test starts with an empty save.db:
+    the saves a test leaves (often only the part of a save it needs) are not other players of the next test, which the
+    calls that look through all saves (get_saves) would see."""
     app, plain, configured = _server_setup
     app.session_interface, app.wsgi_app = configured
     yield app
+    with app.app_context():
+        app.session_interface.sql_session_model.query.delete()
+        importlib.import_module("empires-server").db.session.commit()
     app.session_interface, app.wsgi_app = plain
 
 

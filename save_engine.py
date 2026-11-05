@@ -222,7 +222,9 @@ def decode_save(serialized_save):
 
 
 def get_saves():
-    return [enrich_save(save, record) for record in get_all_sessions() for save in [decode_save(want_bytes(record.data))] if save is not None and 'user_object' in save]
+    """Every save game in save.db. A save that is not one by validate_save (a corrupt one) is left out: the calls that
+    look through the saves for another player read its userInfo.player, as the pages that list the saves check it."""
+    return [enrich_save(save, record) for record in get_all_sessions() for save in [decode_save(want_bytes(record.data))] if save is not None and 'user_object' in save and validate_save(save)]
 
 
 def enrich_save(save, record):

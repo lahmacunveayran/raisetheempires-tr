@@ -373,6 +373,21 @@ def test_pillaging_marks_the_time_in_the_invaded_save(server):
     assert invader["pos"] == "10,10,0"
 
 
+def test_a_corrupt_save_of_someone_else_does_not_stop_a_pillage(server):
+    """Calls that look for another player's save go through every save in save.db (get_saves). A save that is not a
+    save game by validate_save (here one with no player, the save editor's 'Your savegame is corrupt.' case) is
+    skipped there, as the friend list and the save dropdown already skip it (get_sessions_info,
+    get_sessions_dropdown_info), so it does not break the call of another player."""
+    new_save(server, user_object={"userInfo": {"worldName": "No player"}}, quests=[])
+    client, sid, _ = player_save(server)
+    host_sid, host_uid = invaded_save(server, sid)
+
+    answers = batch(client, ("PVPService.pillage", [str(host_uid)]))
+
+    assert answers[0]["errorType"] == 0
+    assert "pillTS" in stored(server, host_sid)["user_object"]["pvp"]["invaders"]["u" + str(zid(sid))]
+
+
 def test_pillaging_a_save_the_visitor_did_not_invade_changes_nothing(server):
     client, sid, _ = player_save(server)
     host_client, host_sid, host_uid = player_save(server)
