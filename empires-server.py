@@ -28,9 +28,9 @@ if not settings.debug:
 if os.name == 'nt':
     os.system('color')
 
-from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
+from save_engine import db, save_database_path, log_path, lookup_objects_save_by_position, get_all_sessions, \
     store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path, \
-    move_nested_backups, list_backups, load_backup
+    move_nested_backups, list_backups, load_backup, backup_database_path, use_backup_database
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -118,7 +118,9 @@ app: Flask = Flask(__name__, root_path=app_base_path)
 print("Root folder", app.root_path)
 print("Instance folder", app.instance_path)
 app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri(app.root_path, app.instance_path)
+save_db_path = save_database_path(app.root_path, app.instance_path)
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{save_db_path}"
+use_backup_database(backup_database_path(save_db_path))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False

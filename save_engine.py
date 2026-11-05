@@ -57,8 +57,34 @@ BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved
                'original_save_version']
 
 
+backup_db_file = None  # set at startup by use_backup_database()
+
+
 def backup_db_path():
-    return os.path.join(my_games_path(), "backups.db")
+    return backup_db_file
+
+
+def use_backup_database(path):
+    global backup_db_file
+    backup_db_file = path
+
+
+def backup_database_path(save_db_path):
+    """backups.db is kept next to save.db, wherever save_database_path() put it (the instance folder when running
+    from source). One made by an earlier version in MyGamesPath is moved there once."""
+    path = os.path.join(os.path.dirname(save_db_path), "backups.db")
+    old_path = os.path.join(my_games_path(), "backups.db")
+    if os.path.exists(old_path) and not os.path.exists(path):
+        print("INFORMATION: Moving backups.db next to save.db")
+        backup_save_dir_path = os.path.join(my_games_path(), "backup-save-db")
+        os.makedirs(backup_save_dir_path, exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        shutil.copy(old_path, backup_save_dir_path)
+        shutil.move(old_path, path)
+        print("Moved your backups.db to", path, "and a backup can be found at", backup_save_dir_path)
+    elif os.path.exists(old_path) and not os.path.samefile(old_path, path):
+        print("WARNING: You have a backups.db in both", my_games_path(), "and next to save.db, only", path, "will be used!")
+    return path
 
 
 def _backup_db():
@@ -126,7 +152,7 @@ def create_backup(message):
     store_backup(_save_id(session), backup)
     session['saved_on'] = timestamp
 
-def save_database_uri(root_path, instance_path):
+def save_database_path(root_path, instance_path):
     save_db_path = os.path.join(my_games_path(), "save.db")
 
     if os.path.samefile(my_games_path(), root_path):
@@ -148,7 +174,7 @@ def save_database_uri(root_path, instance_path):
 
     print("SQLITE", f"sqlite:///{save_db_path}")
 
-    return f"sqlite:///{save_db_path}"
+    return save_db_path
 
 
 def my_games_path():
