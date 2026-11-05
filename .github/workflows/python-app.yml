@@ -357,20 +357,13 @@ jobs:
           PREVIEW_TAG="preview-${BRANCH}"
           
 
-      - name: Update nightly tag (main only)
-        if:  github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master') && env.TAG_SEMANTIC_RELEASE != true
-        run: |
-          git tag -f nightly
-          git push origin nightly --force
-      
-
-      - name: Update preview tag
+      # No tags are pushed: the nightly and preview releases below are drafts, which only people who can push to the
+      # repository see. Publishing a draft makes its tag on the commit it was built from.
+      - name: Preview release name
         if:  github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master') && env.TAG_SEMANTIC_RELEASE != true
         run: |
           PREVIEW_TAG="preview-${BRANCH}"
           echo "PREVIEW_TAG=$PREVIEW_TAG" >> $GITHUB_ENV
-          git tag -f "$PREVIEW_TAG"
-          git push origin "$PREVIEW_TAG" --force
 
 
       - name: Create full release notes
@@ -500,7 +493,8 @@ jobs:
           gh release create nightly ./setup/empires-setup.exe \
             --title "Nightly ${GITHUB_SHA::8}" \
             --notes-file nightly-release-notes.md \
-            --prerelease    
+            --target "$GITHUB_SHA" \
+            --prerelease --draft
 
       - name: Create preview branch release
         if: github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master')  && env.TAG_SEMANTIC_RELEASE != true
@@ -510,7 +504,8 @@ jobs:
           gh release create $PREVIEW_TAG ./setup/empires-setup.exe \
             --title "Preview branch release ${GITHUB_SHA::8}" \
             --notes-file preview-release-notes.md \
-            --prerelease
+            --target "$GITHUB_SHA" \
+            --prerelease --draft
                 
 
 #      - name: Update nightly tag
