@@ -3264,16 +3264,10 @@ def serializer_init_patch(self, app, format):
 MsgSpecSerializer.__init__ = serializer_init_patch
 
 
-
-if __name__ == '__main__':
-    if 'WERKZEUG_RUN_MAIN' not in os.environ and settings.open_browser:
-        if os.path.exists(os.path.join("chromium", "chrome.exe")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
-        elif os.path.exists(os.path.join("chromium", "chrome")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
-        else:
-            threading.Timer(1.25, lambda: webbrowser.open("http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
-    # init_db(app, db)
+def configure_app(app):
+    """Sets the app up the way the server runs it, before it serves (the tests set it up with this too): the crash
+    log, compression, the log page's Socket.IO, the host check around everything, the save games in the database and
+    the save lock, and the pickled saves converted."""
     set_crash_log(settings.crash_log)
     if settings.compression:
         compress.init_app(app)
@@ -3284,6 +3278,18 @@ if __name__ == '__main__':
     app.session_interface = AssetSkippingSessionInterface(app.session_interface)
     with app.app_context():
         convert_pickled_saves()
+
+
+if __name__ == '__main__':
+    if 'WERKZEUG_RUN_MAIN' not in os.environ and settings.open_browser:
+        if os.path.exists(os.path.join("chromium", "chrome.exe")):
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
+        elif os.path.exists(os.path.join("chromium", "chrome")):
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
+        else:
+            threading.Timer(1.25, lambda: webbrowser.open("http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
+    # init_db(app, db)
+    configure_app(app)
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()
