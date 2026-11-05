@@ -1,0 +1,128 @@
+== PlayerUnit.playDamageXPReward
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce Object
+    5 setlocal2 
+    6 pushbyte 0
+    8 setlocal3 
+    9 pushnull 
+   10 coerce Array
+   12 setlocal 4
+   14 pushbyte 0
+   16 convert_u 
+   17 setlocal 5
+   19 pushbyte 0
+   21 convert_u 
+   22 setlocal 6
+   24 pushnull 
+   25 coerce ResourceInfo
+   28 setlocal 7
+   30 getlocal1 
+   31 getproperty damage
+   35 iffalse ->311
+   39 getlex battleObject
+   42 getproperty unit
+   45 getproperty dead
+   48 iffalse ->311
+   52 getlex SoundEvent
+   55 pushstring 'CriticalHit'
+   59 callproperty getSoundEvent 1
+   64 callpropvoid play 0
+   68 pushstring 'flags'
+   72 getlex RewardPickup
+   75 getproperty FLAG_RIGHT_ONLY
+   79 pushstring 'delay'
+   82 pushshort 250
+   85 pushstring 'x'
+   88 getlex x
+   91 pushstring 'y'
+   94 getlex y
+   97 newobject 4
+   99 coerce Object
+  101 setlocal2 
+  102 getlex battleObject
+  105 getproperty unitItem
+  108 getlex battleObject
+  111 getproperty fleet
+  114 callproperty getStrength 1
+  118 convert_i 
+  119 setlocal3 
+  120 getlex battleObject
+  123 getproperty unitItem
+  126 getproperty resourceCosts
+  129 coerce Array
+  131 dup 
+  132 setlocal 4
+  134 getproperty length
+  137 convert_u 
+  138 setlocal 5
+  140 pushbyte 0
+  142 convert_u 
+  143 setlocal 6
+  145 jump ->220
+  150 getlex WorldResourceManager
+  153 getproperty instance
+  157 getlocal 4
+  159 getlocal 6
+  161 getproperty 
+  165 getproperty type
+  169 callproperty getResourceInfoByType 1
+  173 coerce ResourceInfo
+  176 dup 
+  177 setlocal 7
+  179 getproperty isRare
+  182 iffalse ->214
+  186 getlocal2 
+  187 getlocal 7
+  189 getproperty type
+  192 setproperty rareType
+  196 getlocal2 
+  197 pushbyte 1
+  199 setproperty rareAmount
+  203 getlocal2 
+  204 pushbyte 1
+  206 setproperty numRareLoot
+  210 jump ->228
+  214 getlocal 6
+  216 increment 
+  217 convert_u 
+  218 setlocal 6
+  220 getlocal 6
+  222 getlocal 5
+  224 iflt ->149
+  228 getlocal2 
+  229 getlocal2 
+  230 getproperty flags
+  234 getlex RewardPickup
+  237 getproperty FLAG_HIGH_BOUNCE
+  241 bitor 
+  242 setproperty flags
+  246 getlocal2 
+  247 findpropstrict getCoinAmount
+  250 getlocal3 
+  251 getlocal1 
+  252 getproperty damage
+  256 callproperty getCoinAmount 2
+  260 setproperty coinAmount
+  264 getlocal2 
+  265 pushbyte 1
+  267 setproperty numCoinLoot
+  271 getlocal2 
+  272 findpropstrict getOilAmount
+  275 getlocal3 
+  276 getlocal1 
+  277 getproperty damage
+  281 callproperty getOilAmount 2
+  285 setproperty oilAmount
+  289 getlocal2 
+  290 pushbyte 1
+  292 setproperty numOilLoot
+  296 findpropstrict spawnLoot
+  299 getlocal2 
+  300 pushfalse 
+  301 callpropvoid spawnLoot 2
+  305 getlocal0 
+  306 getlocal1 
+  307 callsupervoid playDamageXPReward 1
+  311 returnvoid 

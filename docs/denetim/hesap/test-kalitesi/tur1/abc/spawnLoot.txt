@@ -1,0 +1,323 @@
+== BattleUnit.spawnLoot
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce RewardPickupSpawner
+    7 setlocal 4
+    9 pushbyte 0
+   11 setlocal 5
+   13 getlocal2 
+   14 iffalse ->35
+   18 getlex ZGlobal
+   21 getproperty player
+   24 getproperty campaign
+   27 getproperty currentMasteryScalar
+   30 convert_d 
+   31 jump ->38
+   35 pushbyte 1
+   37 convert_d 
+   38 convert_d 
+   39 setlocal3 
+   40 getlocal3 
+   41 pushbyte 0
+   43 ifngt ->853
+   47 findpropstrict RewardPickupSpawner
+   51 findpropstrict Pt
+   53 getlocal1 
+   54 getproperty x
+   58 getlocal1 
+   59 getproperty y
+   63 constructprop Pt 2
+   66 constructprop RewardPickupSpawner 1
+   71 coerce RewardPickupSpawner
+   75 setlocal 4
+   77 getlocal1 
+   78 findpropstrict int
+   80 getlex Math
+   84 getlocal1 
+   85 getproperty numXPLoot
+   89 getlocal3 
+   90 multiply 
+   91 callproperty ceil 1
+   95 callproperty int 1
+   98 setproperty numXPLoot
+  102 getlocal1 
+  103 getlex PrisonCampManager
+  106 getproperty instance
+  110 getlocal1 
+  111 getproperty numXPLoot
+  115 getlex ZGameRandom
+  118 getproperty rewardInstance
+  122 callproperty applyXPMultiplier 2
+  126 setproperty numXPLoot
+  130 jump ->191
+  135 getlocal 4
+  137 pushstring 'type'
+  140 getlex RewardPickupSpawner
+  144 getproperty XP
+  148 pushstring 'amount'
+  151 getlocal0 
+  152 getproperty battleObject
+  155 getproperty unitItem
+  158 getproperty xp
+  161 newobject 2
+  163 callpropvoid addLoot 1
+  168 getlocal1 
+  169 dup 
+  170 setlocal 6
+  172 getproperty numXPLoot
+  176 decrement 
+  177 setlocal 7
+  179 getlocal 6
+  181 getlocal 7
+  183 setproperty numXPLoot
+  187 kill 7
+  189 kill 6
+  191 getlocal1 
+  192 getproperty numXPLoot
+  196 pushbyte 0
+  198 ifgt ->134
+  202 jump ->279
+  207 findpropstrict int
+  209 getlex Math
+  213 getlocal1 
+  214 getproperty coinAmount
+  218 getlocal3 
+  219 multiply 
+  220 callproperty round 1
+  225 callproperty int 1
+  228 convert_i 
+  229 setlocal 5
+  231 getlocal 4
+  233 pushstring 'type'
+  236 getlex RewardPickupSpawner
+  240 getproperty COINS
+  244 pushstring 'amount'
+  247 getlocal 5
+  249 newobject 2
+  251 callpropvoid addLoot 1
+  256 getlocal1 
+  257 dup 
+  258 setlocal 6
+  260 getproperty numCoinLoot
+  264 decrement 
+  265 setlocal 7
+  267 getlocal 6
+  269 getlocal 7
+  271 setproperty numCoinLoot
+  275 kill 7
+  277 kill 6
+  279 getlocal1 
+  280 getproperty numCoinLoot
+  284 pushbyte 0
+  286 ifgt ->206
+  290 getlocal1 
+  291 findpropstrict int
+  293 getlex Math
+  297 getlocal1 
+  298 getproperty numRareLoot
+  302 getlocal3 
+  303 multiply 
+  304 callproperty ceil 1
+  308 callproperty int 1
+  311 setproperty numRareLoot
+  315 jump ->380
+  320 getlocal 4
+  322 pushstring 'type'
+  325 getlex RewardPickupSpawner
+  329 getproperty RESOURCE
+  333 pushstring 'rareType'
+  337 getlocal1 
+  338 getproperty rareType
+  342 pushstring 'amount'
+  345 getlocal1 
+  346 getproperty rareAmount
+  350 newobject 3
+  352 callpropvoid addLoot 1
+  357 getlocal1 
+  358 dup 
+  359 setlocal 6
+  361 getproperty numRareLoot
+  365 decrement 
+  366 setlocal 7
+  368 getlocal 6
+  370 getlocal 7
+  372 setproperty numRareLoot
+  376 kill 7
+  378 kill 6
+  380 getlocal1 
+  381 getproperty numRareLoot
+  385 pushbyte 0
+  387 ifgt ->319
+  391 getlocal1 
+  392 getlocal3 
+  393 pushbyte 1
+  395 ifne ->409
+  399 getlocal1 
+  400 getproperty numEnergyLoot
+  404 coerce_a 
+  405 jump ->412
+  409 pushbyte 0
+  411 coerce_a 
+  412 setproperty numEnergyLoot
+  416 jump ->516
+  421 getlex PlayerAmmo
+  424 callproperty variantAmmoMasterOn 0
+  429 iffalse ->465
+  433 getlocal 4
+  435 pushstring 'type'
+  438 getlex RewardPickupSpawner
+  442 getproperty AMMO
+  446 pushstring 'amount'
+  449 getlocal1 
+  450 getproperty energyAmount
+  454 newobject 2
+  456 callpropvoid addLoot 1
+  461 jump ->493
+  465 getlocal 4
+  467 pushstring 'type'
+  470 getlex RewardPickupSpawner
+  474 getproperty ENERGY
+  478 pushstring 'amount'
+  481 getlocal1 
+  482 getproperty energyAmount
+  486 newobject 2
+  488 callpropvoid addLoot 1
+  493 getlocal1 
+  494 dup 
+  495 setlocal 6
+  497 getproperty numEnergyLoot
+  501 decrement 
+  502 setlocal 7
+  504 getlocal 6
+  506 getlocal 7
+  508 setproperty numEnergyLoot
+  512 kill 7
+  514 kill 6
+  516 getlocal1 
+  517 getproperty numEnergyLoot
+  521 pushbyte 0
+  523 ifgt ->420
+  527 jump ->583
+  532 getlocal 4
+  534 pushstring 'type'
+  537 getlex RewardPickupSpawner
+  541 getproperty MANA
+  545 pushstring 'amount'
+  548 getlocal1 
+  549 getproperty manaAmount
+  553 newobject 2
+  555 callpropvoid addLoot 1
+  560 getlocal1 
+  561 dup 
+  562 setlocal 6
+  564 getproperty numManaLoot
+  568 decrement 
+  569 setlocal 7
+  571 getlocal 6
+  573 getlocal 7
+  575 setproperty numManaLoot
+  579 kill 7
+  581 kill 6
+  583 getlocal1 
+  584 getproperty numManaLoot
+  588 pushbyte 0
+  590 ifgt ->531
+  594 jump ->660
+  599 getlocal 4
+  601 pushstring 'type'
+  604 getlex RewardPickupSpawner
+  608 getproperty ITEM
+  612 pushstring 'item'
+  615 getlocal1 
+  616 getproperty itemLoot
+  620 getlocal1 
+  621 getproperty numItemLoot
+  625 decrement 
+  626 getproperty 
+  630 newobject 2
+  632 callpropvoid addLoot 1
+  637 getlocal1 
+  638 dup 
+  639 setlocal 6
+  641 getproperty numItemLoot
+  645 decrement 
+  646 setlocal 7
+  648 getlocal 6
+  650 getlocal 7
+  652 setproperty numItemLoot
+  656 kill 7
+  658 kill 6
+  660 getlocal1 
+  661 getproperty numItemLoot
+  665 pushbyte 0
+  667 ifgt ->598
+  671 getlocal1 
+  672 findpropstrict int
+  674 getlex Math
+  678 getlocal1 
+  679 getproperty numOilLoot
+  683 getlocal3 
+  684 multiply 
+  685 callproperty round 1
+  690 callproperty int 1
+  693 setproperty numOilLoot
+  697 jump ->753
+  702 getlocal 4
+  704 pushstring 'type'
+  707 getlex RewardPickupSpawner
+  711 getproperty OIL
+  715 pushstring 'amount'
+  718 getlocal1 
+  719 getproperty oilAmount
+  723 newobject 2
+  725 callpropvoid addLoot 1
+  730 getlocal1 
+  731 dup 
+  732 setlocal 6
+  734 getproperty numOilLoot
+  738 decrement 
+  739 setlocal 7
+  741 getlocal 6
+  743 getlocal 7
+  745 setproperty numOilLoot
+  749 kill 7
+  751 kill 6
+  753 getlocal1 
+  754 getproperty numOilLoot
+  758 pushbyte 0
+  760 ifgt ->701
+  764 jump ->820
+  769 getlocal 4
+  771 pushstring 'type'
+  774 getlex RewardPickupSpawner
+  778 getproperty SCRAP
+  782 pushstring 'amount'
+  785 getlocal1 
+  786 getproperty scrap
+  790 newobject 2
+  792 callpropvoid addLoot 1
+  797 getlocal1 
+  798 dup 
+  799 setlocal 6
+  801 getproperty scrap
+  805 decrement 
+  806 setlocal 7
+  808 getlocal 6
+  810 getlocal 7
+  812 setproperty scrap
+  816 kill 7
+  818 kill 6
+  820 getlocal1 
+  821 getproperty scrap
+  825 pushbyte 0
+  827 ifgt ->768
+  831 getlocal 4
+  833 getlocal1 
+  834 getproperty delay
+  838 setproperty delay
+  841 getlocal 4
+  843 getlocal1 
+  844 getproperty flags
+  848 callpropvoid go 1
+  853 returnvoid 

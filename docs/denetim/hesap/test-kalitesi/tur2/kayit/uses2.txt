@@ -1,0 +1,484 @@
+===== VARIANT_VALUE_REQUEST2_MASTER_ON
+-- ViralsManager.onTimeout
+  766 callproperty getExperimentVariant 1
+  770 getlex ExperimentsManager
+  773 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  777 ifne ->849
+  781 findpropstrict RequestNeighborDialog
+  784 getlex ViralsManager
+  787 getproperty INVITE_REQUEST_SOURCE_IDLE
+  791 getlex ExperimentsManager
+  794 getproperty EXPERIMENT_REQUEST2_MFS
+-- ViralsManager.onTimeout
+ 1087 callproperty getExperimentVariant 1
+ 1091 getlex ExperimentsManager
+ 1094 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+ 1098 ifne ->1180
+ 1102 findpropstrict RequestGiftDialog
+ 1105 pushstring 'mysterygift'
+ 1108 getlex RequestGiftDialog
+ 1111 getproperty RECENT_PLAYER_GIFTTYPE
+ 1115 getlex RequestDialog
+-- ViralsManager.onTimeout
+ 1315 callproperty getExperimentVariant 1
+ 1319 getlex ExperimentsManager
+ 1322 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+ 1326 ifne ->1339
+ 1330 getlocal0 
+ 1331 pushtrue 
+ 1332 initproperty m_disableOreInvitePopup
+ 1335 jump ->1377
+ 1339 getlex OreInvite
+-- QuestManagerPopup.onRequest
+  283 callproperty getExperimentVariant 1
+  287 getlex ExperimentsManager
+  290 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  294 ifne ->374
+  298 findpropstrict Array
+  300 constructprop Array 0
+  303 coerce Array
+  305 dup 
+  306 setlocal 8
+-- QuestDetailsPopup.onInvite
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->62
+   31 getlex PopupManager
+   33 getproperty instance
+   37 findpropstrict RequestNeighborDialog
+   40 getlex ViralsManager
+   43 getproperty INVITE_REQUEST_SOURCE_NEW_INSTALL_QUEST
+-- QuestDetailsPopup.onRequest
+  277 callproperty getExperimentVariant 1
+  281 getlex ExperimentsManager
+  284 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  288 ifne ->367
+  292 findpropstrict Array
+  294 constructprop Array 0
+  297 coerce Array
+  299 dup 
+  300 setlocal 8
+-- InviteNeighborSlot.onButtonClicked
+   39 callproperty getExperimentVariant 1
+   43 getlex ExperimentsManager
+   46 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   50 ifne ->82
+   54 getlex PopupManager
+   56 getproperty instance
+   60 findpropstrict RequestNeighborDialog
+   63 getlex ViralsManager
+   66 getproperty INVITE_REQUEST_SOURCE_NEIGHBOR_SLOT
+-- RecommendedNeighborSlot.onButtonClicked
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->59
+   31 getlex PopupManager
+   33 getproperty instance
+   37 findpropstrict RequestNeighborDialog
+   40 getlex ViralsManager
+   43 getproperty INVITE_REQUEST_SOURCE_NEIGHBOR_SLOT
+-- AllianceQuestPopup.onRequest
+  289 callproperty getExperimentVariant 1
+  293 getlex ExperimentsManager
+  296 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  300 ifne ->381
+  304 findpropstrict Array
+  306 constructprop Array 0
+  309 coerce Array
+  311 dup 
+  312 setlocal 8
+-- AddFriendSlot.doOnClick
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->59
+   31 getlex PopupManager
+   33 getproperty instance
+   37 findpropstrict RequestNeighborDialog
+   40 getlex ViralsManager
+   43 getproperty INVITE_REQUEST_SOURCE_NEIGHBOR_SLOT
+-- ViralSurfacePopup.onClicked
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->117
+   31 getlocal0 
+   32 getproperty m_xml
+   36 getproperty type
+   40 callproperty toString 0
+   45 getlex NEIGHBOR
+-- GoldenStatuePopUp1.onRequest
+  287 callproperty getExperimentVariant 1
+  291 getlex ExperimentsManager
+  294 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  298 ifne ->378
+  302 findpropstrict Array
+  304 constructprop Array 0
+  307 coerce Array
+  309 dup 
+  310 setlocal 8
+-- LEUnitPartsGather.onAskClick
+  157 callproperty getExperimentVariant 1
+  161 getlex ExperimentsManager
+  164 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  168 ifne ->208
+  172 getlex PopupManager
+  174 getproperty instance
+  178 findpropstrict RequestAskPartsDialog
+  181 getlocal3 
+  182 getproperty name
+-- WorldGamesPopUp.onInvite
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->62
+   31 getlex PopupManager
+   33 getproperty instance
+   37 findpropstrict RequestNeighborDialog
+   40 getlex ViralsManager
+   43 getproperty INVITE_REQUEST_SOURCE_NEW_INSTALL_QUEST
+-- WorldGamesPopUp.onRequest
+  305 callproperty getExperimentVariant 1
+  309 getlex ExperimentsManager
+  312 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  316 ifne ->397
+  320 findpropstrict Array
+  322 constructprop Array 0
+  325 coerce Array
+  327 dup 
+  328 setlocal 8
+-- RafflePopUp.onAskClicked
+  171 callproperty getExperimentVariant 1
+  175 getlex ExperimentsManager
+  178 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  182 ifne ->375
+  186 findpropstrict Array
+  188 constructprop Array 0
+  191 coerce Array
+  193 dup 
+  194 setlocal 5
+-- PowerupPartsGather.onAskClick
+  171 callproperty getExperimentVariant 1
+  175 getlex ExperimentsManager
+  178 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  182 ifne ->218
+  186 getlex PopupManager
+  188 getproperty instance
+  192 findpropstrict RequestAskPartsDialog
+  195 getlocal3 
+  196 getproperty name
+===== EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- ZGlobal.<cinit>
+ 1018 pushbyte 6
+ 1020 initproperty EXPERIMENT_MISSION_BUILDABLE_PARTS_V6
+ 1024 findproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+ 1028 pushbyte 2
+ 1030 initproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+ 1034 findproperty EXPERIMENT_CAMPAIGN_MASTERY_UNIT_TIER_HARD_VARIANT
+ 1038 pushbyte 2
+ 1040 initproperty EXPERIMENT_CAMPAIGN_MASTERY_UNIT_TIER_HARD_VARIANT
+ 1044 findproperty EXPERIMENT_EXPANSION_CREW_ENABLED
+-- ZGlobal.<cinit>
+ 1024 findproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+ 1028 pushbyte 2
+ 1030 initproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+ 1034 findproperty EXPERIMENT_CAMPAIGN_MASTERY_UNIT_TIER_HARD_VARIANT
+ 1038 pushbyte 2
+ 1040 initproperty EXPERIMENT_CAMPAIGN_MASTERY_UNIT_TIER_HARD_VARIANT
+ 1044 findproperty EXPERIMENT_EXPANSION_CREW_ENABLED
+ 1048 pushbyte 3
+ 1050 initproperty EXPERIMENT_EXPANSION_CREW_ENABLED
+-- OptionUIItem.onStrategicMapEntered
+   48 getlocal2 
+   49 getlex ZGlobal
+   52 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   56 ifne ->89
+   60 getlex ZGlobal
+   63 getproperty player
+   66 getproperty campaign
+   69 getproperty isMasteryEnabled
+   72 iffalse ->89
+-- PlayerCampaign.calculateMasteryScalar
+  145 getlocal2 
+  146 getlex ZGlobal
+  149 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  153 ifne ->189
+  157 getlocal0 
+  158 getlocal1 
+  159 getproperty currentIslandItem
+  162 getproperty index
+  165 callproperty getMastery 1
+-- PlayerCampaign.calculateMasteryScore
+   39 getlocal3 
+   40 getlex ZGlobal
+   43 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   47 ifne ->67
+   51 getlex Math
+   55 pushbyte 3
+   57 getlocal2 
+   58 pushbyte 1
+   60 add 
+-- IslandItem.getUnits
+   55 getlocal3 
+   56 getlex ZGlobal
+   59 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   63 ifne ->154
+   67 getlex ZGlobal
+   70 getproperty player
+   73 getproperty campaign
+   76 getlocal0 
+   77 getproperty index
+-- StrategicSWF2RendererComponent.addCampaignMasteryIcons
+   38 getlocal1 
+   39 getlex ZGlobal
+   42 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   46 ifne ->336
+   50 getlocal0 
+   51 getproperty m_resource
+   54 pushstring 'Mastery_mc'
+   58 callproperty getAssetClass 1
+   62 coerce Class
+-- BattleCampaignWonPopup.setRewards
+  257 getlocal3 
+  258 getlex ZGlobal
+  261 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  265 ifne ->396
+  269 getlex ZGlobal
+  272 getproperty player
+  275 getproperty campaign
+  278 getproperty currentMap
+  281 getproperty currentIslandItem
+-- BattleSelectPopup.<init>
+   25 getlocal3 
+   26 getlex ZGlobal
+   29 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   33 ifne ->46
+   37 pushstring 'PU_battleSelect2.swf'
+   41 setlocal2 
+   42 jump ->51
+   46 pushstring 'PU_battleSelect.swf'
+   50 setlocal2 
+-- BattleSelectPopup.initDialog
+   22 getlocal1 
+   23 getlex ZGlobal
+   26 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+   30 ifne ->155
+   34 findproperty contentWidth
+   37 pushshort 680
+   40 initproperty contentWidth
+   43 findproperty contentHeight
+   46 pushshort 400
+-- BattleSelectPopup.initPageButtons
+  253 setlocal 13
+  255 getlex ZGlobal
+  258 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  262 ifeq ->270
+  266 pushbyte 0
+  268 setlocal 11
+  270 pushbyte 0
+  272 setlocal 20
+  274 getlocal3 
+-- BattleSelectPopup.initPageButtons
+  386 getlocal 13
+  388 getlex ZGlobal
+  391 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  395 ifne ->618
+  399 getlocal0 
+  400 getproperty m_islandGroupItem
+  404 getlocal 10
+  406 callproperty getIslandItem 1
+  410 coerce IslandItem
+-- BattleSelectPopup.initPageButtons
+  718 getlocal 13
+  720 getlex ZGlobal
+  723 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  727 ifne ->737
+  731 getlocal 15
+  733 pushtrue 
+  734 setproperty completed
+  737 jump ->753
+  741 getlocal3 
+-- BattleSelectPopup.initPageButtons
+  784 getlocal 13
+  786 getlex ZGlobal
+  789 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  793 ifne ->803
+  797 getlocal0 
+  798 callpropvoid setVillainTokens 0
+  803 getlocal1 
+  804 returnvalue 
+-- BattleSelectPopup.loadMap
+   96 getlocal2 
+   97 getlex ZGlobal
+  100 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  104 ifne ->119
+  108 getlocal0 
+  109 getlocal1 
+  110 callpropvoid loadMapWithCampaignMastery 1
+  115 jump ->850
+  119 getlocal0 
+-- BattleSelectPopup.setBattleStatus
+   97 getlocal 4
+   99 getlex ZGlobal
+  102 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  106 ifne ->126
+  110 getlocal0 
+  111 getproperty screen
+  115 getproperty title_frame_mc
+  119 pushbyte 4
+  121 callpropvoid gotoAndStop 1
+-- BattleSelectPopup.setBattleStatus
+  167 getlocal 4
+  169 getlex ZGlobal
+  172 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  176 ifne ->196
+  180 getlocal0 
+  181 getproperty screen
+  185 getproperty title_frame_mc
+  189 pushbyte 3
+  191 callpropvoid gotoAndStop 1
+-- BattleSelectPopup.setBattleStatus
+  237 getlocal 4
+  239 getlex ZGlobal
+  242 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  246 ifne ->266
+  250 getlocal0 
+  251 getproperty screen
+  255 getproperty title_frame_mc
+  259 pushbyte 1
+  261 callpropvoid gotoAndStop 1
+-- BattleSelectPopup.setBattleStatus
+  284 getlocal 4
+  286 getlex ZGlobal
+  289 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+  293 ifne ->313
+  297 getlocal0 
+  298 getproperty screen
+  302 getproperty title_frame_mc
+  306 pushbyte 2
+  308 callpropvoid gotoAndStop 1
+===== VARIANT_SURVIVALMODE3_MASTER_ENABLED
+-- SurvivalModeManager.<cinit>
+  128 pushstring 'empire_survivalmode3_master'
+  132 initproperty EXPERIMENT_SURVIVALMODE3_MASTER
+  136 findproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  140 pushbyte 3
+  142 initproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  146 findproperty EXPERIMENT_SURVIVALMODE_REFRESHREWARDS
+  150 pushstring 'empire_survivalmode_refreshrewards'
+  154 initproperty EXPERIMENT_SURVIVALMODE_REFRESHREWARDS
+  158 findproperty VARIANT_SURVIVALMODE_REFRESHREWARDS_ENABLED
+-- SurvivalModeManager.<cinit>
+  136 findproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  140 pushbyte 3
+  142 initproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  146 findproperty EXPERIMENT_SURVIVALMODE_REFRESHREWARDS
+  150 pushstring 'empire_survivalmode_refreshrewards'
+  154 initproperty EXPERIMENT_SURVIVALMODE_REFRESHREWARDS
+  158 findproperty VARIANT_SURVIVALMODE_REFRESHREWARDS_ENABLED
+  162 pushbyte 1
+  164 initproperty VARIANT_SURVIVALMODE_REFRESHREWARDS_ENABLED
+-- SurvivalModeManager.launchSurvivalMode
+  240 getlex EXPERIMENT_SURVIVALMODE3_MASTER
+  244 callproperty getExperimentVariant 1
+  248 getlex VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  252 ifne ->287
+  256 getlocal0 
+  257 pushfalse 
+  258 initproperty bIsInBattle
+  261 getlex PopupManager
+  263 getproperty instance
+-- SurvivalModeManager.isInSurvivalMode3Battle
+    9 getlex EXPERIMENT_SURVIVALMODE3_MASTER
+   13 callproperty getExperimentVariant 1
+   17 getlex VARIANT_SURVIVALMODE3_MASTER_ENABLED
+   21 equals 
+   22 dup 
+   23 iffalse ->49
+   27 pop 
+   28 getlocal0 
+   29 getproperty isInBattle
+===== EXPERIMENT_SUPPORT_UNITS_ACTIVE
+-- ZGlobal.<cinit>
+  886 pushstring 'empires_support_units'
+  890 initproperty EXPERIMENT_SUPPORT_UNITS
+  894 findproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  898 pushbyte 3
+  900 initproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  904 findproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_CONTROL
+  908 pushbyte 0
+  910 initproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_CONTROL
+  914 findproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_V1
+-- ZGlobal.<cinit>
+  894 findproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  898 pushbyte 3
+  900 initproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  904 findproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_CONTROL
+  908 pushbyte 0
+  910 initproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_CONTROL
+  914 findproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_V1
+  918 pushbyte 1
+  920 initproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_V1
+-- PlayerStatsUIItem.onGameInitComplete
+   21 callproperty getExperimentVariant 1
+   25 getlex ZGlobal
+   28 getproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+   32 ifnge ->119
+   36 getlex ManaDispatcher
+   39 getproperty instance
+   43 getlex ManaDispatcher
+   46 getproperty VALUE_UPDATED
+   50 getlocal0 
+-- PlayerStatsUIItem.shouldManaBarBeVisible
+   19 callproperty getExperimentVariant 1
+   23 getlex ZGlobal
+   26 getproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+   30 ifnge ->67
+   34 getlex ZGlobal
+   37 getproperty gameSettings
+   41 pushstring 'manaStartingLevel'
+   45 callproperty getInt 1
+   49 convert_i 
+-- PreBattleUI.updateUnitSuggester
+   38 callproperty getExperimentVariant 1
+   42 getlex ZGlobal
+   45 getproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+   49 ifnge ->232
+   53 getlex ZGlobal
+   56 getproperty gameSettings
+   60 pushstring 'manaStartingLevel'
+   64 callproperty getInt 1
+   68 convert_i 
+-- EnemyUnit.allowManaLootDrops
+   19 callproperty getExperimentVariant 1
+   23 getlex ZGlobal
+   26 getproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+   30 ifnge ->67
+   34 getlex ZGlobal
+   37 getproperty gameSettings
+   41 pushstring 'manaStartingLevel'
+   45 callproperty getInt 1
+   49 convert_i 
+===== USE_HOOBERS
+-- StreakBonus.rewardStreakBonus
+   25 callproperty getExperimentVariant 1
+   29 getlocal0 
+   30 getproperty USE_HOOBERS
+   33 ifne ->65
+   37 getlex Math
+   41 getlocal2 
+   42 getlex ZGlobal
+   45 getproperty gameSettings
+   49 callproperty getStreakReductionPercent 0
+-- RewardPickup.init
+   76 getlocal3 
+   77 getlocal0 
+   78 getproperty USE_HOOBERS
+   81 ifne ->90
+   85 getlocal0 
+   86 pushtrue 
+   87 initproperty m_useHoobers
+   90 getlocal0 
+   91 getproperty m_useHoobers

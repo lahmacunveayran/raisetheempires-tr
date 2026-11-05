@@ -1,0 +1,15 @@
+== UnitItem.getStrength
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 getlocal1 
+    4 pushfalse 
+    5 callproperty getXmlStrength 2
+    9 convert_i 
+   10 setlocal3 
+   11 getlocal0 
+   12 getlocal3 
+   13 getlocal1 
+   14 getlocal2 
+   15 callproperty getModifiedStrength 3
+   19 returnvalue 

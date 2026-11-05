@@ -1,0 +1,105 @@
+﻿== BattleAI.FindBestDefendingUnitAgainstBestAttacker
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce BattleObject
+    6 setlocal 5
+    8 pushnull 
+    9 coerce BattleObject
+   12 setlocal 6
+   14 pushnan 
+   15 setlocal 7
+   17 pushnull 
+   18 coerce Object
+   20 setlocal 8
+   22 pushnull 
+   23 coerce Object
+   25 setlocal 9
+   27 pushtrue 
+   28 setlocal2 
+   29 pushbyte 255
+   31 convert_d 
+   32 setlocal3 
+   33 pushnull 
+   34 coerce BattleObject
+   37 setlocal 4
+   39 pushbyte 0
+   41 setlocal 10
+   43 getlocal0 
+   44 getproperty m_defenders
+   48 coerce_a 
+   49 setlocal 11
+   51 jump ->125
+   56 getlocal 11
+   58 getlocal 10
+   60 nextvalue 
+   61 coerce BattleObject
+   64 dup 
+   65 setlocal 5
+   67 getproperty unit
+   70 getproperty dead
+   73 iftrue ->125
+   77 getlocal0 
+   78 getlocal0 
+   79 getproperty m_attackers
+   83 getlocal 5
+   85 getlocal2 
+   86 getlocal1 
+   87 callproperty findBestUnit 4
+   92 coerce Object
+   94 dup 
+   95 setlocal 8
+   97 getproperty value
+  101 getlocal3 
+  102 ifngt ->125
+  106 getlocal 8
+  108 getproperty value
+  112 convert_d 
+  113 setlocal3 
+  114 getlocal 8
+  116 getproperty obj
+  120 coerce BattleObject
+  123 setlocal 4
+  125 hasnext2 11 10
+  128 iftrue ->55
+  132 kill 11
+  134 kill 10
+  136 pushnull 
+  137 coerce BattleObject
+  140 setlocal 6
+  142 pushbyte 0
+  144 convert_d 
+  145 setlocal 7
+  147 pushnull 
+  148 getlocal 4
+  150 ifeq ->205
+  154 getlex ZGameRandom
+  157 getproperty instance
+  161 callproperty float 0
+  165 convert_d 
+  166 setlocal1 
+  167 getlocal0 
+  168 getlocal0 
+  169 getproperty m_defenders
+  173 getlocal 4
+  175 getlocal2 
+  176 getlocal1 
+  177 callproperty findBestUnit 4
+  182 coerce Object
+  184 dup 
+  185 setlocal 9
+  187 getproperty obj
+  191 coerce BattleObject
+  194 setlocal 6
+  196 getlocal 9
+  198 getproperty value
+  202 convert_d 
+  203 setlocal 7
+  205 pushstring 'defender'
+  208 getlocal 6
+  210 pushstring 'attacker'
+  213 getlocal 4
+  215 pushstring 'value'
+  218 getlocal 7
+  220 newobject 3
+  222 returnvalue 

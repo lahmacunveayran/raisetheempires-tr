@@ -1,0 +1,46 @@
+﻿== UnitItem.getModifier
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce XML
+    5 setlocal 4
+    7 pushnull 
+    8 coerce_s 
+    9 setlocal 5
+   11 pushbyte 1
+   13 convert_d 
+   14 setlocal3 
+   15 pushbyte 0
+   17 setlocal 6
+   19 getlocal1 
+   20 coerce_a 
+   21 setlocal 7
+   23 jump ->87
+   28 getlocal 7
+   30 getlocal 6
+   32 nextvalue 
+   33 coerce XML
+   35 setlocal 4
+   37 getlocal2 
+   38 getlocal 4
+   40 pushstring 'type'
+   43 callproperty attribute 1
+   48 callproperty hasType 1
+   52 iffalse ->87
+   56 getlocal 4
+   58 pushstring 'mod'
+   62 callproperty attribute 1
+   67 coerce_s 
+   68 setlocal 5
+   70 findpropstrict parseFloat
+   74 getlocal 5
+   76 callproperty parseFloat 1
+   81 convert_d 
+   82 setlocal3 
+   83 jump ->94
+   87 hasnext2 7 6
+   90 iftrue ->27
+   94 kill 7
+   96 kill 6
+   98 getlocal3 
+   99 returnvalue 

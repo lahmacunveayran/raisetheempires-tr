@@ -1,0 +1,12 @@
+﻿== UnitItem.hasType
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 callpropvoid allocTypes 0
+    7 getlocal0 
+    8 getproperty m_types
+   11 getlocal1 
+   12 callproperty indexOf 1
+   17 pushbyte 0
+   19 greaterequals 
+   20 returnvalue 

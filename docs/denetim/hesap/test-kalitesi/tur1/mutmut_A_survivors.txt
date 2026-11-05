@@ -1,0 +1,236 @@
+=== 3
+@@ -47,7 +47,7 @@
+-        baddie_attack_strength = get_unit_attack_strength(baddies[enemy_unit_id], False, params)
++        baddie_attack_strength = get_unit_attack_strength(baddies[enemy_unit_id], True, params)
+=== 5
+@@ -51,7 +51,7 @@
+-        friendly_attack_strength = get_unit_attack_strength(friendlies[player_unit_id], True)
++        friendly_attack_strength = get_unit_attack_strength(friendlies[player_unit_id], False)
+=== 34
+@@ -121,7 +121,7 @@
+-            if damage > 0:
++            if damage > 1:
+=== 36
+@@ -133,7 +133,7 @@
+-                if damage > 0:
++                if damage >= 0:
+=== 37
+@@ -133,7 +133,7 @@
+-                if damage > 0:
++                if damage > 1:
+=== 45
+@@ -307,7 +307,7 @@
+-        print("No invasion of", enemy_fleet_uid, "to complete")
++        print("XXNo invasion ofXX", enemy_fleet_uid, "to complete")
+=== 46
+@@ -307,7 +307,7 @@
+-        print("No invasion of", enemy_fleet_uid, "to complete")
++        print("No invasion of", enemy_fleet_uid, "XXto completeXX")
+=== 71
+@@ -600,7 +600,7 @@
+-    elif defender_type in chain.get('-great', '').split(','):
++    elif defender_type in chain.get('-great', 'XXXX').split(','):
+=== 81
+@@ -939,7 +939,7 @@
+-                   and (baddie_strengths[i] > 0 or "controller" in get_unit_types(b))
++                   and (baddie_strengths[i] > 1 or "controller" in get_unit_types(b))
+=== 86
+@@ -940,7 +940,7 @@
+-                   and not is_stunned(("enemy", i), active_consumables)]
++                   and not is_stunned(("XXenemyXX", i), active_consumables)]
+=== 94
+@@ -942,7 +942,7 @@
+-        if tried >= len(casters):
++        if tried > len(casters):
+=== 95
+@@ -943,7 +943,7 @@
+-            print("ERROR: no secondary", repr(casters), "tried", tried)
++            print("XXERROR: no secondaryXX", repr(casters), "tried", tried)
+=== 96
+@@ -943,7 +943,7 @@
+-            print("ERROR: no secondary", repr(casters), "tried", tried)
++            print("ERROR: no secondary", repr(casters), "XXtriedXX", tried)
+=== 97
+@@ -944,7 +944,7 @@
+-            raise Exception("ERROR: no secondary", repr(casters))
++            raise Exception("XXERROR: no secondaryXX", repr(casters))
+=== 99
+@@ -947,7 +947,7 @@
+-        active_consumables.append(({"consumable": {}}, ("AI tried", None), -1))
++        active_consumables.append(({"XXconsumableXX": {}}, ("AI tried", None), -1))
+=== 101
+@@ -947,7 +947,7 @@
+-        active_consumables.append(({"consumable": {}}, ("AI tried", None), -1))
++        active_consumables.append(({"consumable": {}}, ("AI tried", None), +1))
+=== 102
+@@ -947,7 +947,7 @@
+-        active_consumables.append(({"consumable": {}}, ("AI tried", None), -1))
++        active_consumables.append(({"consumable": {}}, ("AI tried", None), -2))
+=== 103
+@@ -976,7 +976,7 @@
+-                    targeted_baddie = live_baddies_index[as3_round(roll_random_between(0, len(live_baddies_index) - 1))] if len(live_baddies_index) > 1 else live_baddies_index[0]
++                    targeted_baddie = live_baddies_index[as3_round(roll_random_between(1, len(live_baddies_index) - 1))] if len(live_baddies_index) > 1 else live_baddies_index[0]
+=== 106
+@@ -976,7 +976,7 @@
+-                    targeted_baddie = live_baddies_index[as3_round(roll_random_between(0, len(live_baddies_index) - 1))] if len(live_baddies_index) > 1 else live_baddies_index[0]
++                    targeted_baddie = live_baddies_index[as3_round(roll_random_between(0, len(live_baddies_index) - 1))] if len(live_baddies_index) >= 1 else live_baddies_index[0]
+=== 110
+@@ -993,7 +993,7 @@
+-                        as3_round(roll_random_between(0, len(live_friendly_index) - 1))] if len(
++                        as3_round(roll_random_between(1, len(live_friendly_index) - 1))] if len(
+=== 118
+@@ -1089,7 +1089,7 @@
+-            damage += 1  # the client adds the 1 to the damage, which the coins are counted from
++            damage += 2  # the client adds the 1 to the damage, which the coins are counted from
+=== 124
+@@ -1123,7 +1123,7 @@
+-            if collateral_unit_current_strength > 0:  # not the unit the power killed itself
++            if collateral_unit_current_strength >= 0:  # not the unit the power killed itself
+=== 125
+@@ -1123,7 +1123,7 @@
+-            if collateral_unit_current_strength > 0:  # not the unit the power killed itself
++            if collateral_unit_current_strength > 1:  # not the unit the power killed itself
+=== 128
+@@ -1132,7 +1132,7 @@
+-    if damage <= 0:
++    if damage < 0:
+=== 129
+@@ -1132,7 +1132,7 @@
+-    if damage <= 0:
++    if damage <= 1:
+=== 135
+@@ -1138,7 +1138,7 @@
+-            doBattleRewards("kill", get_unit_attack_strength(unit, False, params), damage, None)
++            doBattleRewards("kill", get_unit_attack_strength(unit, True, params), damage, None)
+=== 154
+@@ -1276,7 +1276,7 @@
+-    return unit["unit"].get("-type", "").split(',')
++    return unit["unit"].get("-type", "XXXX").split(',')
+=== 158
+@@ -1298,7 +1298,7 @@
+-        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])[attribute])
++        strength = int(next((e for e in entries if level <= int(e["-level"])), entries[-1])[attribute])
+=== 160
+@@ -1298,7 +1298,7 @@
+-        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])[attribute])
++        strength = int(next((e for e in entries if level < int(e["-level"])), entries[+1])[attribute])
+=== 161
+@@ -1298,7 +1298,7 @@
+-        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])[attribute])
++        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-2])[attribute])
+=== 168
+@@ -1392,7 +1392,7 @@
+-    rare_amount = math.ceil(attack_strength * damage * 0.0001)  # getRareAmount: combatRewardRareMultiplier
++    rare_amount = math.ceil(attack_strength / damage * 0.0001)  # getRareAmount: combatRewardRareMultiplier
+=== 186
+@@ -1400,7 +1400,7 @@
+-    xp = 0
++    xp = 1
+=== 187
+@@ -1400,7 +1400,7 @@
+-    xp = 0
++    xp = None
+=== 215
+@@ -1412,7 +1412,7 @@
+-    rare_amount *= math.ceil(rare_count * mastery_scalar)
++    rare_amount = math.ceil(rare_count * mastery_scalar)
+=== 221
+@@ -1440,7 +1440,7 @@
+-    strength = get_unit_max_strength(unit, True)  # UnitItem.getStrength
++    strength = get_unit_max_strength(unit, False)  # UnitItem.getStrength
+=== 240
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"XX-rareXX": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 241
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 1, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 242
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 0, "XX-nrare0XX": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 243
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 0, "-nrare0": 1, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 244
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 0, "-nrare0": 0, "XX-nrare1XX": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 245
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 2, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+=== 250
+@@ -1445,7 +1445,7 @@
+-    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
++    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "XX-nrare4XX": 4}  # as do_rewards
+=== 258
+@@ -1448,7 +1448,7 @@
+-        resources[world['resourceOrder'][rare]] += 1
++        resources[world['resourceOrder'][rare]] = 1
+=== 261
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("XXCombat loss rewardsXX", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
+=== 263
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("Combat loss rewards", unit["-code"], "XXcoins:XX", math.ceil(strength * damage * 0.01), "oil:",
+=== 264
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength / damage * 0.01), "oil:",
+=== 265
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage / 0.01), "oil:",
+=== 266
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 1.01), "oil:",
+=== 267
+@@ -1449,7 +1449,7 @@
+-    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
++    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "XXoil:XX",
+=== 268
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength / 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
+=== 269
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 1.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
+=== 270
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 0.001), "XXrareXX" + str(rare) + ":", 1 if rare is not None else 0)
+=== 273
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 0.001), "rare" + str(rare) + "XX:XX", 1 if rare is not None else 0)
+=== 274
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 2 if rare is not None else 0)
+=== 275
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is  None else 0)
+=== 276
+@@ -1450,7 +1450,7 @@
+-          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
++          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 1)
+=== 290
+@@ -65,7 +65,7 @@
+-    if player["cash"] < int(part.get("-unlockCost", 0)):  # the client does not ask without the cash either
++    if player["cash"] < int(part.get("-unlockCost", 1)):  # the client does not ask without the cash either
+=== 291
+@@ -66,7 +66,7 @@
+-        print("Titan lab: not enough cash to unlock", part_code)
++        print("XXTitan lab: not enough cash to unlockXX", part_code)
+=== 296
+@@ -68,7 +68,7 @@
+-    player["cash"] -= int(part.get("-unlockCost", 0))
++    player["cash"] -= int(part.get("-unlockCost", 1))

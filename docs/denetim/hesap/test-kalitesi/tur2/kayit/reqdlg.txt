@@ -1,0 +1,189 @@
+== RequestDialog.<init>
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 findpropstrict Array
+    5 constructprop Array 0
+    8 initproperty rewardButtons
+   11 getlocal0 
+   12 getlex ExperimentsManager
+   15 getproperty instance
+   19 getlex ExperimentsManager
+   22 getproperty EXPERIMENT_MFS_UILI
+   26 callproperty getExperimentVariant 1
+   30 initproperty variant
+   33 getlocal0 
+   34 getlex ExperimentsManager
+   37 getproperty instance
+   41 getlex ExperimentsManager
+   44 getproperty EXPERIMENT_MFSP2_MASTER
+   48 callproperty getExperimentVariant 1
+   52 initproperty mfsp2_variant
+   55 getlocal0 
+   56 getlex ExperimentsManager
+   59 getproperty instance
+   63 getlex ExperimentsManager
+   66 getproperty EXPERIMENT_MFSP2_GAMECLICK
+   70 callproperty getExperimentVariant 1
+   74 initproperty mfsp2_gameClick_variant
+   77 getlocal0 
+   78 getlex ExperimentsManager
+   81 getproperty instance
+   85 getlex ExperimentsManager
+   88 getproperty EXPERIMENT_MFSP2_TAB
+   92 callproperty getExperimentVariant 1
+   96 initproperty mfsp2_tab_variant
+   99 getlocal0 
+  100 getlex ExperimentsManager
+  103 getproperty instance
+  107 getlex ExperimentsManager
+  110 getproperty EXPERIMENT_MFSP2_SEARCH
+  114 callproperty getExperimentVariant 1
+  118 initproperty mfsp2_search_variant
+  121 getlocal0 
+  122 getlex ExperimentsManager
+  125 getproperty instance
+  129 getlex ExperimentsManager
+  132 getproperty EXPERIMENT_MFSP2_REWARDBAR
+  136 callproperty getExperimentVariant 1
+  140 initproperty mfsp2_rewardBar_variant
+  143 getlocal0 
+  144 findpropstrict Array
+  146 constructprop Array 0
+  149 initproperty m_friendPickStrings
+  152 pushbyte 1
+  154 setlocal 8
+  156 jump ->211
+  161 getlocal0 
+  162 getproperty m_friendPickStrings
+  165 getlex ZGameUtils
+  168 pushstring 'Dialogs'
+  172 pushstring 'MFS_Pick'
+  176 getlocal 8
+  178 callproperty toString 0
+  183 add 
+  184 pushstring 'user'
+  188 getlex ZGlobal
+  191 getproperty player
+  194 getproperty firstName
+  197 newobject 1
+  199 callproperty ZlocT 3
+  204 callpropvoid push 1
+  209 inclocal_i 8
+  211 getlocal 8
+  213 pushbyte 15
+  215 ifle ->160
+  219 pushnull 
+  220 coerce_s 
+  221 setlocal 9
+  223 getlocal0 
+  224 getproperty _mfsp2
+  227 iffalse ->329
+  231 pushstring 'assets/displays/dialogs/PU_requestsNewV2.swf'
+  235 setlocal 9
+  237 getlocal0 
+  238 getproperty _search
+  241 convert_b 
+  242 dup 
+  243 iffalse ->253
+  247 pop 
+  248 getlocal0 
+  249 getproperty _tab
+  252 convert_b 
+  253 iffalse ->271
+  257 findproperty NUM_LIST
+  261 pushbyte 9
+  263 setproperty NUM_LIST
+  267 jump ->325
+  271 getlocal0 
+  272 getproperty _search
+  275 iffalse ->293
+  279 findproperty NUM_LIST
+  283 pushbyte 11
+  285 setproperty NUM_LIST
+  289 jump ->325
+  293 getlocal0 
+  294 getproperty _tab
+  297 iffalse ->315
+  301 findproperty NUM_LIST
+  305 pushbyte 10
+  307 setproperty NUM_LIST
+  311 jump ->325
+  315 findproperty NUM_LIST
+  319 pushbyte 12
+  321 setproperty NUM_LIST
+  325 jump ->354
+  329 getlocal0 
+  330 callproperty isNewMFSDialog 0
+  334 iffalse ->348
+  338 pushstring 'assets/displays/dialogs/PU_requestsNew.swf'
+  342 setlocal 9
+  344 jump ->354
+  348 pushstring 'assets/displays/dialogs/PU_Requests.swf'
+  352 setlocal 9
+  354 getlocal0 
+  355 getlex ZGlobal
+  358 getlocal 9
+  360 callproperty getAssetURL 1
+  365 constructsuper 1
+  367 getlocal0 
+  368 getlocal2 
+  369 initproperty m_title
+  372 getlocal0 
+  373 getlocal3 
+  374 initproperty m_body
+  377 getlocal0 
+  378 getlocal 4
+  380 initproperty m_toaster
+  383 getlocal0 
+  384 getlocal 5
+  386 initproperty m_iconURL
+  389 getlocal0 
+  390 getlocal 6
+  392 initproperty m_requestType
+  395 getlocal0 
+  396 getlocal 7
+  398 initproperty m_requestSubcategory
+  401 getlocal0 
+  402 getlocal 7
+  404 initproperty m_requestSubtype
+  407 getlocal0 
+  408 getlex ZGameUtils
+  411 pushstring 'Dialogs'
+  415 pushstring 'RequestPlaceholderEmpire'
+  419 callproperty ZlocT 2
+  424 initproperty m_placeholder
+  427 getlocal0 
+  428 getlex ZGameUtils
+  431 pushstring 'Dialogs'
+  435 pushstring 'RequestPlaceholderZynga'
+  439 callproperty ZlocT 2
+  444 initproperty m_zyngaPlaceholder
+  447 getlocal0 
+  448 pushfalse 
+  449 initproperty m_allSelected
+  452 getlocal0 
+  453 getlocal1 
+  454 callpropvoid initFriends 1
+  458 getlocal0 
+  459 callpropvoid sortFriends 0
+  463 getlocal0 
+  464 getproperty m_maxNumFriends
+  467 getlocal0 
+  468 getproperty m_friends
+  471 getproperty length
+  474 ifnlt ->503
+  478 getlocal0 
+  479 getproperty m_friends
+  482 getlocal0 
+  483 getproperty m_maxNumFriends
+  486 getlocal0 
+  487 getproperty m_friends
+  490 getproperty length
+  493 getlocal0 
+  494 getproperty m_maxNumFriends
+  497 subtract 
+  498 callpropvoid splice 2
+  503 getlocal0 
+  504 callpropvoid removeActiveRequests 0
+  508 returnvoid 

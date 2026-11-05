@@ -1,0 +1,142 @@
+﻿== BattleAI.FindBestDefendingUnitAgainstAttackers
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce BattleObject
+    6 setlocal 6
+    8 pushnull 
+    9 coerce BattleObject
+   12 setlocal 7
+   14 pushnull 
+   15 coerce Object
+   17 setlocal 8
+   19 pushbyte 0
+   21 setlocal 9
+   23 pushnan 
+   24 setlocal 10
+   26 pushnan 
+   27 setlocal 11
+   29 pushnull 
+   30 coerce Array
+   32 setlocal2 
+   33 pushtrue 
+   34 setlocal3 
+   35 pushbyte 255
+   37 convert_d 
+   38 setlocal 4
+   40 pushnull 
+   41 coerce BattleObject
+   44 setlocal 5
+   46 pushbyte 0
+   48 setlocal 12
+   50 getlocal0 
+   51 getproperty m_attackers
+   55 coerce_a 
+   56 setlocal 13
+   58 jump ->181
+   63 getlocal 13
+   65 getlocal 12
+   67 nextvalue 
+   68 coerce BattleObject
+   71 dup 
+   72 setlocal 6
+   74 getproperty unit
+   77 getproperty dead
+   80 iftrue ->181
+   84 getlocal0 
+   85 getlocal0 
+   86 getproperty m_defenders
+   90 getlocal 6
+   92 getlocal3 
+   93 getlocal1 
+   94 callproperty findBestUnit 4
+   99 coerce Object
+  101 dup 
+  102 setlocal 8
+  104 getproperty value
+  108 getlocal 4
+  110 ifngt ->145
+  114 getlocal 8
+  116 getproperty value
+  120 convert_d 
+  121 setlocal 4
+  123 getlocal 8
+  125 getproperty obj
+  129 coerce BattleObject
+  132 setlocal 5
+  134 getlocal 6
+  136 newarray 1
+  138 coerce Array
+  140 setlocal2 
+  141 jump ->181
+  145 getlocal 8
+  147 getproperty value
+  151 pushbyte 0
+  153 greaterequals 
+  154 dup 
+  155 iffalse ->169
+  159 pop 
+  160 getlocal 8
+  162 getproperty value
+  166 getlocal 4
+  168 equals 
+  169 iffalse ->181
+  173 getlocal2 
+  174 getlocal 6
+  176 callpropvoid push 1
+  181 hasnext2 13 12
+  184 iftrue ->62
+  188 kill 13
+  190 kill 12
+  192 pushnull 
+  193 coerce BattleObject
+  196 setlocal 7
+  198 getlocal2 
+  199 iffalse ->297
+  203 getlocal0 
+  204 getproperty m_shouldFocusFire
+  208 iffalse ->224
+  212 getlocal0 
+  213 getlocal2 
+  214 callproperty pickBestFocusFireAttacker 1
+  219 coerce BattleObject
+  222 setlocal 7
+  224 getlocal 7
+  226 iftrue ->297
+  230 pushbyte 0
+  232 setlocal 9
+  234 getlocal2 
+  235 getproperty length
+  238 convert_d 
+  239 dup 
+  240 setlocal 10
+  242 pushbyte 1
+  244 ifngt ->285
+  248 getlex ZGameRandom
+  251 getproperty instance
+  255 callproperty float 0
+  259 convert_d 
+  260 setlocal 11
+  262 findpropstrict int
+  264 getlex Math
+  268 getlocal 11
+  270 getlocal 10
+  272 decrement 
+  273 multiply 
+  274 callproperty round 1
+  279 callproperty int 1
+  282 convert_i 
+  283 setlocal 9
+  285 getlocal2 
+  286 getlocal 9
+  288 getproperty 
+  292 coerce BattleObject
+  295 setlocal 7
+  297 pushstring 'defender'
+  300 getlocal 5
+  302 pushstring 'attacker'
+  305 getlocal 7
+  307 pushstring 'value'
+  310 getlocal 4
+  312 newobject 3
+  314 returnvalue 

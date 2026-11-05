@@ -1,0 +1,73 @@
+﻿== BattleAI.GetAttackingStrengthAgainst
+    0 getlocal0 
+    1 pushscope 
+    2 pushbyte 0
+    4 convert_d 
+    5 setlocal 4
+    7 pushbyte 0
+    9 convert_d 
+   10 setlocal 5
+   12 getlocal3 
+   13 getlex STRENGTH_CURRENT
+   17 ifne ->35
+   21 getlocal1 
+   22 getproperty unit
+   25 getproperty strength
+   28 convert_d 
+   29 setlocal 5
+   31 jump ->75
+   35 getlocal3 
+   36 getlex STRENGTH_MAX
+   40 ifne ->63
+   44 getlocal1 
+   45 getproperty unitItem
+   48 getlocal1 
+   49 getproperty fleet
+   52 callproperty getAttackStrength 1
+   56 convert_d 
+   57 setlocal 5
+   59 jump ->75
+   63 findpropstrict Error
+   66 pushstring 'GetAttackingStrengthAgainst unknown strength type '
+   70 constructprop Error 1
+   74 throw 
+   75 getlocal1 
+   76 getproperty fleet
+   79 getlocal1 
+   80 getproperty unit
+   83 getproperty id
+   86 callproperty getStrengthModifier 1
+   90 convert_d 
+   91 dup 
+   92 setlocal 4
+   94 pushdouble 0.0
+   96 ifeq ->119
+  100 getlex Math
+  104 pushbyte 0
+  106 getlocal 5
+  108 getlocal 4
+  110 add 
+  111 callproperty max 2
+  116 convert_d 
+  117 setlocal 5
+  119 getlocal2 
+  120 getproperty unitItem
+  123 getproperty weaker
+  126 iffalse ->140
+  130 pushshort 10000
+  133 convert_d 
+  134 setlocal 5
+  136 jump ->156
+  140 getlocal1 
+  141 getproperty unitItem
+  144 getproperty weaker
+  147 iffalse ->156
+  151 pushbyte 0
+  153 convert_d 
+  154 setlocal 5
+  156 getlex MathUtils
+  159 getlocal 5
+  161 getlex ZGameRandom
+  164 getproperty ACCURACY
+  168 callproperty roundTo 2
+  173 returnvalue 

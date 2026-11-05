@@ -1,0 +1,18 @@
+﻿== CombatChain.getHitValue
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 getlocal1 
+    4 callproperty getChain 1
+    9 coerce Chain
+   12 setlocal3 
+   13 pushnull 
+   14 getlocal3 
+   15 ifeq ->27
+   19 getlocal3 
+   20 getlocal2 
+   21 callproperty getHitValue 1
+   26 returnvalue 
+   27 getlex Chain
+   30 getproperty GOOD
+   34 returnvalue 

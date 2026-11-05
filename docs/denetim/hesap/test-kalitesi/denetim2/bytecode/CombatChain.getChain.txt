@@ -1,0 +1,43 @@
+﻿== CombatChain.getChain
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce_s 
+    4 setlocal2 
+    5 pushbyte 0
+    7 setlocal3 
+    8 getlocal0 
+    9 getproperty m_combatChain
+   13 coerce_a 
+   14 setlocal 4
+   16 jump ->51
+   21 getlocal 4
+   23 getlocal3 
+   24 nextname 
+   25 coerce_s 
+   26 setlocal2 
+   27 getlocal1 
+   28 getproperty unitItem
+   31 getlocal2 
+   32 callproperty hasType 1
+   36 iffalse ->51
+   40 getlocal0 
+   41 getproperty m_combatChain
+   45 getlocal2 
+   46 getproperty 
+   50 returnvalue 
+   51 hasnext2 4 3
+   54 iftrue ->20
+   58 kill 4
+   60 kill 3
+   62 getlex Logger
+   65 getlocal0 
+   66 pushstring 'getChain'
+   69 pushstring 'no type match found in combat chain for '
+   73 getlocal1 
+   74 getproperty unitItem
+   77 getproperty code
+   80 add 
+   81 callpropvoid error 3
+   85 pushnull 
+   86 returnvalue 

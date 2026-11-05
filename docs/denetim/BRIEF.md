@@ -12,8 +12,8 @@ Flask sunucu (`empires-server.py` ve modüller), oyunun asıl Flash istemcisi (`
 tutar. Oyun tek kişiliktir; çok oyunculu özellikler (komşular, PvP rakipleri) yerel kayıtlar ve botlarla taklit edilir.
 GPL-3.0. Proje sahibi yazılımcı değildir; kodu yapay zekâ oturumları yazar, sahibi oyunda dener.
 
-Denetlenen kod: `C:\Users\Avukat Emre Aydoğdu\Desktop\Raise\raisetheempires-pr`, dal `denetim-1`, commit `a4de86e`.
-Python: `C:\Users\Avukat Emre Aydoğdu\Desktop\Raise\venv312\Scripts\python.exe`. Testler depo kökünden:
+Denetlenen kod: `C:\Users\<user>\Desktop\Raise\raisetheempires-pr`, dal `denetim-1`, commit `a4de86e`.
+Python: `C:\Users\<user>\Desktop\Raise\venv312\Scripts\python.exe`. Testler depo kökünden:
 `../venv312/Scripts/python.exe -m pytest -q` (bugün 147 test geçiyor).
 
 ## Bağımsızlık (zorunlu)
@@ -24,7 +24,7 @@ Python: `C:\Users\Avukat Emre Aydoğdu\Desktop\Raise\venv312\Scripts\python.exe`
   GitHub issue ve PR'ları, depo dışındaki notlar. Vardığın her sonuç kendi okumanla ve kendi hesabınla olmalı.
 - **Dokunma yasağı:** depodaki hiçbir dosyayı değiştirme (yalnızca kendi rapor dosyanı ve `docs/denetim/hesap/<alan>/`
   altındaki betiklerini yazabilirsin), commit atma, dal değiştirme. Oyuncunun gerçek kurulumuna
-  (`C:\Users\Avukat Emre Aydoğdu\Desktop\Raise\TurkceOyun`, içindeki `mygames` ve çalışan sunucu) hiç dokunma, okuma
+  (`C:\Users\<user>\Desktop\Raise\TurkceOyun`, içindeki `mygames` ve çalışan sunucu) hiç dokunma, okuma
   da.
 - Test ve küçük Python betikleri çalıştırmak serbest. İstemcinin bir alanı nasıl okuduğunu görmek için
   `turkce/araclar/abc.py <swf> strings|classes|method|refs <regex>` kullanılabilir (swf: `assets/ZGame.109338.swf`).

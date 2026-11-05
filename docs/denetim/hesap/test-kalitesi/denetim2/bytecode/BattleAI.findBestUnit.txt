@@ -1,0 +1,124 @@
+﻿== BattleAI.findBestUnit
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce BattleObject
+    6 setlocal 7
+    8 pushnull 
+    9 coerce BattleObject
+   12 setlocal 8
+   14 pushnan 
+   15 setlocal 9
+   17 pushbyte 0
+   19 convert_u 
+   20 setlocal 10
+   22 pushbyte 0
+   24 setlocal 11
+   26 findpropstrict Array
+   28 constructprop Array 0
+   31 coerce Array
+   33 setlocal 5
+   35 pushbyte 255
+   37 setlocal 6
+   39 pushbyte 0
+   41 setlocal 12
+   43 getlocal1 
+   44 coerce_a 
+   45 setlocal 13
+   47 jump ->151
+   52 getlocal 13
+   54 getlocal 12
+   56 nextvalue 
+   57 coerce BattleObject
+   60 dup 
+   61 setlocal 7
+   63 getproperty unit
+   66 getproperty dead
+   69 not 
+   70 dup 
+   71 iffalse ->82
+   75 pop 
+   76 getlocal 7
+   78 getproperty stunned
+   81 not 
+   82 iffalse ->151
+   86 getlocal0 
+   87 getlocal 7
+   89 getlocal2 
+   90 callproperty GetAttackingHitChance 2
+   95 convert_u 
+   96 dup 
+   97 setlocal 10
+   99 getlocal 6
+  101 ifngt ->122
+  105 getlocal 7
+  107 newarray 1
+  109 coerce Array
+  111 setlocal 5
+  113 getlocal 10
+  115 convert_i 
+  116 setlocal 6
+  118 jump ->151
+  122 getlocal 10
+  124 pushbyte 0
+  126 greaterequals 
+  127 dup 
+  128 iffalse ->138
+  132 pop 
+  133 getlocal 10
+  135 getlocal 6
+  137 equals 
+  138 iffalse ->151
+  142 getlocal 5
+  144 getlocal 7
+  146 callpropvoid push 1
+  151 hasnext2 13 12
+  154 iftrue ->51
+  158 kill 13
+  160 kill 12
+  162 pushnull 
+  163 coerce BattleObject
+  166 setlocal 8
+  168 getlocal 5
+  170 getproperty length
+  173 convert_d 
+  174 dup 
+  175 setlocal 9
+  177 pushbyte 0
+  179 ifngt ->259
+  183 getlocal0 
+  184 getproperty m_shouldFocusFire
+  188 iffalse ->205
+  192 getlocal0 
+  193 getlocal 5
+  195 callproperty pickBestFocusFireDefender 1
+  200 coerce BattleObject
+  203 setlocal 8
+  205 getlocal 8
+  207 iftrue ->259
+  211 pushbyte 0
+  213 setlocal 11
+  215 getlocal 9
+  217 pushbyte 1
+  219 ifngt ->246
+  223 findpropstrict int
+  225 getlex Math
+  229 getlocal 4
+  231 getlocal 9
+  233 decrement 
+  234 multiply 
+  235 callproperty round 1
+  240 callproperty int 1
+  243 convert_i 
+  244 setlocal 11
+  246 getlocal 5
+  248 getlocal 11
+  250 getproperty 
+  254 coerce BattleObject
+  257 setlocal 8
+  259 pushstring 'obj'
+  263 getlocal 8
+  265 pushstring 'value'
+  268 getlocal 6
+  270 newobject 2
+  272 returnvalue 

@@ -1,0 +1,46 @@
+﻿
+[shuffle] order seed 11 first: test/event_buildings_test.py::test_meteorite_gives_each_ore_and_the_trophy
+................EE...E.......................E.........E....E..E......E. [ 31%]
+..........EE....E.......E......E..........EE..E..E.....E.....EE.....E..E [ 62%]
+.....................E...E..E......................E.E......E........... [ 93%]
+..............                                                           [100%]
+=================================== ERRORS ====================================
+________ ERROR at setup of test_migrating_a_0_02a_save_keeps_a_backup _________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_world_names_cannot_end_the_script_of_the_game_pages[/home.html] _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_other_saves_changed_by_a_call_that_works_are_written _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+___________ ERROR at setup of test_save_editor_opens_for_a_new_save ___________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_save_editor_takes_an_old_backup_without_battle_fleets_and_population _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+__________ ERROR at setup of test_bytes_the_client_sent_can_be_saved __________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+____ ERROR at setup of test_values_the_client_left_undefined_can_be_saved _____
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_mods_of_the_settings_files_are_served[<settings/>1] __
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_____________ ERROR at setup of test_crew_from_another_local_save _____________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+__ ERROR at setup of test_a_stale_battle_answer_is_left_alone_by_the_client ___
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+___ ERROR at setup of test_save_editor_writes_nothing_of_an_incomplete_save ___
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_____ ERROR at setup of test_the_settings_files_are_served_without_a_mod ______
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+________ ERROR at setup of test_save_editor_lists_the_quests_of_a_save ________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_a_backup_that_cannot_be_written_does_not_stop_the_migration _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_____ ERROR at setup of test_save_editor_refuses_what_is_not_a_save_game ______
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_a_failing_call_is_undone_and_the_other_calls_are_kept _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+____________ ERROR at setup of test_deleting_a_save_keeps_a_backup ____________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_ ERROR at setup of test_world_names_cannot_end_the_script_of_the_game_pages[/ruffle.html] _
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+___________ ERROR at setup of test_pickled_saves_are_converted_once ___________
+E   RuntimeError: A 'SQLAlchemy' instance has already been registered on this Flask app. Import and use that instance instead.
+_______ ERROR at setup of test_init_user_migrates_a_0_08a_preview_save ________

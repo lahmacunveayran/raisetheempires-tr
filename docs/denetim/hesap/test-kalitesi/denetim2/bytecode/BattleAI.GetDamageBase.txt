@@ -1,0 +1,52 @@
+﻿== BattleAI.GetDamageBase
+    0 getlocal0 
+    1 pushscope 
+    2 pushbyte 0
+    4 setlocal 5
+    6 pushbyte 0
+    8 setlocal 6
+   10 getlex ZGlobal
+   13 getproperty gameSettings
+   17 pushbyte 25
+   19 callproperty getCombatDamageBase 1
+   23 convert_d 
+   24 setlocal3 
+   25 getlocal1 
+   26 getproperty unitItem
+   29 getproperty tier
+   32 getlocal2 
+   33 getproperty unitItem
+   36 getproperty tier
+   39 subtract 
+   40 convert_i 
+   41 dup 
+   42 setlocal 4
+   44 pushbyte 0
+   46 ifeq ->105
+   50 getlex ZGlobal
+   53 getproperty gameSettings
+   57 pushbyte 0
+   59 callproperty getCombatDamageTierIncrement 1
+   63 convert_i 
+   64 setlocal 5
+   66 getlocal3 
+   67 getlocal 4
+   69 getlocal 5
+   71 multiply 
+   72 add 
+   73 convert_d 
+   74 setlocal3 
+   75 getlex ZGlobal
+   78 getproperty gameSettings
+   82 pushbyte 25
+   84 callproperty getCombatDamageBaseMin 1
+   88 convert_i 
+   89 setlocal 6
+   91 getlex Math
+   95 getlocal 6
+   97 getlocal3 
+   98 callproperty max 2
+  103 convert_d 
+  104 setlocal3 
+  105 getlocal3 
+  106 returnvalue 

@@ -1,0 +1,95 @@
+﻿== BattleAI.FindBestDefendingUnit
+    0 getlocal0 
+    1 pushscope 
+    2 getlex ZGameRandom
+    5 getproperty instance
+    9 callproperty float 0
+   13 convert_d 
+   14 setlocal1 
+   15 getlocal0 
+   16 getlocal1 
+   17 callproperty FindBestDefendingUnitAgainstAttackers 1
+   22 coerce Object
+   24 setlocal2 
+   25 getlocal0 
+   26 getproperty m_shouldFocusFire
+   30 convert_b 
+   31 dup 
+   32 iffalse ->43
+   36 pop 
+   37 getlocal2 
+   38 getproperty defender
+   42 convert_b 
+   43 iffalse ->49
+   47 getlocal2 
+   48 returnvalue 
+   49 getlocal0 
+   50 getlocal1 
+   51 callproperty FindBestDefendingUnitAgainstBestAttacker 1
+   56 coerce Object
+   58 setlocal3 
+   59 pushbyte 0
+   61 convert_d 
+   62 setlocal 4
+   64 getlocal2 
+   65 getproperty value
+   69 pushbyte 0
+   71 ifngt ->89
+   75 getlocal3 
+   76 getproperty value
+   80 getlocal2 
+   81 getproperty value
+   85 divide 
+   86 convert_d 
+   87 setlocal 4
+   89 getlocal 4
+   91 getlocal0 
+   92 getproperty m_switchRatio
+   96 lessthan 
+   97 setlocal 5
+   99 getlex ZGameRandom
+  102 getproperty instance
+  106 callproperty float 0
+  110 convert_d 
+  111 dup 
+  112 setlocal 6
+  114 getlocal0 
+  115 getproperty m_switchPercent
+  119 ifnlt ->161
+  123 getlex Logger
+  126 getlocal0 
+  127 pushstring 'FindBestDefendingUnit'
+  130 pushstring 'Switching defender choice, m_switchPercent: '
+  134 getlocal0 
+  135 getproperty m_switchPercent
+  139 add 
+  140 pushstring ' switchPercent: '
+  144 add 
+  145 getlocal 6
+  147 add 
+  148 pushstring '.'
+  151 add 
+  152 callpropvoid info 3
+  156 getlocal 5
+  158 not 
+  159 setlocal 5
+  161 getlocal 5
+  163 iffalse ->202
+  167 getlex Logger
+  170 getlocal0 
+  171 pushstring 'FindBestDefendingUnit'
+  174 pushstring 'Reverting to basic defender choice, : '
+  178 getlocal0 
+  179 getproperty m_switchRatio
+  183 add 
+  184 pushstring ' ratio: '
+  188 add 
+  189 getlocal 4
+  191 add 
+  192 pushstring '.'
+  195 add 
+  196 callpropvoid info 3
+  200 getlocal2 
+  201 returnvalue 
+  202 getlocal3 
+  203 returnvalue 

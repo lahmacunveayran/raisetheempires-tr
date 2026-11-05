@@ -1,0 +1,74 @@
+== UnitItem.getXmlStrength
+    0 getlocal0 
+    1 pushscope 
+    2 pushbyte 0
+    4 setlocal3 
+    5 pushnull 
+    6 coerce XML
+    8 setlocal 4
+   10 getlex m_xml
+   13 getproperty unit
+   17 getproperty strength
+   21 getlex undefined
+   25 ifeq ->41
+   29 getlex m_xml
+   32 getproperty unit
+   36 getproperty strength
+   40 returnvalue 
+   41 getlex m_xml
+   44 getproperty unit
+   48 getproperty strengths
+   52 getlex undefined
+   56 equals 
+   57 not 
+   58 dup 
+   59 iffalse ->68
+   63 pop 
+   64 getlocal1 
+   65 pushnull 
+   66 equals 
+   67 not 
+   68 iffalse ->155
+   72 getlocal1 
+   73 getproperty playerLevel
+   76 convert_i 
+   77 setlocal3 
+   78 pushbyte 0
+   80 setlocal 5
+   82 getlex m_xml
+   85 getproperty unit
+   89 getproperty strengths
+   93 getproperty entry
+   97 coerce_a 
+   98 setlocal 6
+  100 jump ->144
+  105 getlocal 6
+  107 getlocal 5
+  109 nextvalue 
+  110 coerce XML
+  112 setlocal 4
+  114 getlocal3 
+  115 getlocal 4
+  117 getproperty level
+  121 ifnlt ->144
+  125 getlocal2 
+  126 iffalse ->137
+  130 getlocal 4
+  132 getproperty attackStrength
+  136 returnvalue 
+  137 getlocal 4
+  139 getproperty strength
+  143 returnvalue 
+  144 hasnext2 6 5
+  147 iftrue ->104
+  151 kill 6
+  153 kill 5
+  155 getlex Logger
+  158 getlocal0 
+  159 pushstring 'getXmlStrength'
+  162 pushstring 'no strength defined for unit '
+  166 getlex code
+  169 add 
+  170 callpropvoid error 3
+  174 pushbyte 1
+  176 returnvalue 

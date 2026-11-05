@@ -1,0 +1,4 @@
+files created or changed in the repository folder during the run:
+  C:\Users\<user>\AppData\Local\Temp\claude\44db76dc85e0ce87\6e027af0-22bc-435d-8563-59919183e99e\scratchpad\denetim2\wt\log.txt
+tests after which other threads were alive:
+network calls (socket connect/bind): 0

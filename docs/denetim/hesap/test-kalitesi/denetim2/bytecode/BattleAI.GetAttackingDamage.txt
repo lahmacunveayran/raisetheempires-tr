@@ -1,0 +1,116 @@
+﻿== BattleAI.GetAttackingDamage
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 getlocal1 
+    4 getlocal2 
+    5 getlex STRENGTH_MAX
+    9 callproperty GetAttackingStrengthAgainst 3
+   14 convert_d 
+   15 setlocal3 
+   16 getlocal0 
+   17 getlocal2 
+   18 getlocal1 
+   19 getlex STRENGTH_CURRENT
+   23 callproperty GetAttackingStrengthAgainst 3
+   28 convert_d 
+   29 setlocal 4
+   31 getlocal0 
+   32 getlocal1 
+   33 getlocal2 
+   34 callproperty GetDamageBase 2
+   39 convert_d 
+   40 dup 
+   41 setlocal 5
+   43 pushbyte 3
+   45 getlocal3 
+   46 multiply 
+   47 getlocal 4
+   49 add 
+   50 multiply 
+   51 pushbyte 3
+   53 getlocal 4
+   55 multiply 
+   56 getlocal3 
+   57 add 
+   58 divide 
+   59 convert_d 
+   60 setlocal 6
+   62 getlocal2 
+   63 getproperty unitItem
+   66 getlocal2 
+   67 getproperty fleet
+   70 callproperty getAttackStrength 1
+   74 convert_d 
+   75 setlocal 7
+   77 getlocal 6
+   79 pushbyte 100
+   81 divide 
+   82 getlocal 7
+   84 multiply 
+   85 convert_d 
+   86 setlocal 6
+   88 getlocal1 
+   89 getproperty fleet
+   92 coerce Fleet
+   95 setlocal 8
+   97 getlocal2 
+   98 getproperty fleet
+  101 coerce Fleet
+  104 setlocal 9
+  106 getlocal 8
+  108 getlocal 9
+  110 getlocal2 
+  111 getproperty unit
+  114 getproperty id
+  117 getlocal1 
+  118 getproperty unit
+  121 getproperty id
+  124 callproperty getDamageModifier 3
+  128 convert_d 
+  129 dup 
+  130 setlocal 10
+  132 pushdouble 0.0
+  134 ifeq ->157
+  138 getlex Math
+  142 getlocal 6
+  144 getlocal 10
+  146 add 
+  147 pushbyte 0
+  149 callproperty max 2
+  154 convert_d 
+  155 setlocal 6
+  157 getlocal 6
+  159 convert_d 
+  160 setlocal 11
+  162 getlex WorldUpgradeManager
+  165 getproperty instance
+  169 getlocal1 
+  170 getproperty fleet
+  173 getlocal1 
+  174 getproperty unit
+  177 getproperty code
+  180 callproperty getUpgrades 1
+  184 getlocal 6
+  186 callproperty getModifiedDamage 2
+  190 convert_d 
+  191 dup 
+  192 setlocal 6
+  194 getlocal 11
+  196 subtract 
+  197 convert_d 
+  198 setlocal 12
+  200 pushstring 'damage'
+  204 getlex MathUtils
+  207 getlocal 6
+  209 getlex ZGameRandom
+  212 getproperty ACCURACY
+  216 callproperty roundTo 2
+  221 pushstring 'upgradeDamage'
+  225 getlex MathUtils
+  228 getlocal 12
+  230 getlex ZGameRandom
+  233 getproperty ACCURACY
+  237 callproperty roundTo 2
+  242 newobject 2
+  244 returnvalue 

@@ -1,0 +1,32 @@
+baseline 10.5 s, timeout 105
+audit#1 killed 7.6 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#2 killed 7.9 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#4 killed 7.8 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#6 killed 8.4 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#7 killed 8.6 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#8 killed 8.6 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#44 killed 6.5 FAILED test/server_setup_test.py::test_the_save_cookie_can_be_replaced_by_the_pages_and_is_not_sent_by_other_sites
+audit#52 killed 6.7 FAILED test/server_setup_test.py::test_the_save_editor_takes_a_form_of_5_mb_but_not_more
+audit#55 killed 6.4 FAILED test/server_setup_test.py::test_the_save_editor_takes_a_form_of_5_mb_but_not_more
+audit#60 killed 5.5 ERROR    empires-server:app.py:875 Exception on /gazillionaire [GET]
+audit#61 killed 5.4 ERROR    empires-server:app.py:875 Exception on /deprogress [GET]
+audit#65 killed 5.1 ERROR    empires-server:app.py:875 Exception on /complete_quest/Q0516 [GET]
+audit#68 killed 5.5 FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/chooseavatar/img/avatars/a.png]
+audit#93 killed 4.7 FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio
+audit#98 killed 4.8 FAILED test/server_setup_test.py::test_flask_itself_also_refuses_other_hosts
+audit#109 killed 4.7 FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/wipe_session]
+audit#113 survived 10.2 ........................................................................ [ 75%]
+.......................                                                  [100%]
+audit#118 killed 6.1 FAILED test/server_setup_test.py::test_deleting_a_save_goes_to_the_login_page
+audit#299 killed 7.9 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+audit#301 killed 7.6 ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]
+audit#350 NOT APPLIED (2 matches)
+audit#351 killed 7.6 ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]
+audit#352 killed 7.5 ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]
+audit#357 killed 9.7 FAILED test/session_layer_test.py::test_one_crash_log_editor_at_a_time - Asse...
+S1b killed 17.9 FAILED test/session_layer_test.py::test_overlapping_requests_of_one_save_wait_for_each_other[flash]
+setup-no-host-middleware killed 5.6 FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio
+setup-host-middleware-inside-socketio killed 5.4 FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio
+setup-no-save-lock killed 6.7 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+asset-gateway-exception killed 7.6 FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it
+{'NOT APPLIED (2 matches)': 1, 'survived': 1, 'killed': 27}

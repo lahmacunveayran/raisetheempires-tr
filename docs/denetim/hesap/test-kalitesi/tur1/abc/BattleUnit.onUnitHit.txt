@@ -1,0 +1,361 @@
+== BattleUnit.onUnitHit
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce Array
+    5 setlocal2 
+    6 pushnull 
+    7 coerce BattleUnit
+   10 setlocal3 
+   11 pushbyte 0
+   13 setlocal 4
+   15 pushnan 
+   16 setlocal 5
+   18 pushnull 
+   19 coerce Object
+   21 setlocal 6
+   23 pushnull 
+   24 coerce_s 
+   25 setlocal 7
+   27 pushnan 
+   28 setlocal 8
+   30 pushnull 
+   31 coerce Point
+   33 setlocal 9
+   35 pushnull 
+   36 coerce Array
+   38 setlocal 10
+   40 pushnull 
+   41 coerce_s 
+   42 setlocal 11
+   44 pushnull 
+   45 coerce Object
+   47 setlocal 12
+   49 getlocal1 
+   50 getproperty eventData
+   53 getproperty glancing
+   57 iffalse ->72
+   61 getlocal0 
+   62 getlocal1 
+   63 pushtrue 
+   64 callpropvoid onUnitMiss 2
+   68 jump ->861
+   72 getlocal1 
+   73 getproperty eventData
+   76 getproperty target
+   80 getlocal0 
+   81 getproperty m_battleObject
+   84 ifne ->861
+   88 getlex ExperimentsManager
+   91 getproperty instance
+   95 getlex ExperimentsManager
+   98 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+  102 callproperty getExperimentVariant 1
+  106 getlex ExperimentsManager
+  109 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+  113 equals 
+  114 dup 
+  115 iffalse ->140
+  119 pop 
+  120 getlocal1 
+  121 getproperty eventData
+  124 getproperty target
+  128 getproperty unit
+  132 getproperty shieldHit
+  136 pushbyte 0
+  138 equals 
+  139 not 
+  140 iffalse ->207
+  144 getlocal1 
+  145 getproperty eventData
+  148 getproperty attacker
+  152 pushnull 
+  153 ifne ->201
+  157 getlocal1 
+  158 getproperty eventData
+  161 getproperty consumable
+  165 convert_b 
+  166 dup 
+  167 iffalse ->187
+  171 pop 
+  172 getlocal1 
+  173 getproperty eventData
+  176 getproperty consumableItem
+  180 getproperty di
+  184 pushbyte 0
+  186 greaterthan 
+  187 iffalse ->197
+  191 getlocal0 
+  192 getlocal1 
+  193 callpropvoid breakShield 1
+  197 jump ->207
+  201 getlocal0 
+  202 getlocal1 
+  203 callpropvoid breakShield 1
+  207 pushnull 
+  208 coerce Array
+  210 setlocal2 
+  211 pushnull 
+  212 getlocal1 
+  213 getproperty eventData
+  216 getproperty attacker
+  220 ifeq ->279
+  224 getlocal0 
+  225 getlocal1 
+  226 getproperty eventData
+  229 getproperty attacker
+  233 callproperty getOtherUnit 1
+  237 coerce BattleUnit
+  240 setlocal3 
+  241 getlocal1 
+  242 getproperty eventData
+  245 getproperty attacker
+  249 getproperty unitItem
+  253 getlocal3 
+  254 getproperty m_animation
+  257 getlocal0 
+  258 getproperty m_battleObject
+  261 getproperty unitItem
+  264 getproperty subType
+  267 callproperty getWeapons 2
+  272 coerce Array
+  274 setlocal2 
+  275 jump ->305
+  279 pushnull 
+  280 getlocal1 
+  281 getproperty eventData
+  284 getproperty weapon
+  288 ifeq ->305
+  292 getlocal1 
+  293 getproperty eventData
+  296 getproperty weapon
+  300 newarray 1
+  302 coerce Array
+  304 setlocal2 
+  305 pushnull 
+  306 getlocal2 
+  307 ifeq ->861
+  311 getlocal2 
+  312 getproperty length
+  315 convert_i 
+  316 setlocal 4
+  318 pushbyte 0
+  320 convert_d 
+  321 setlocal 5
+  323 pushbyte 0
+  325 setlocal 13
+  327 getlocal2 
+  328 coerce_a 
+  329 setlocal 14
+  331 jump ->783
+  336 getlocal 14
+  338 getlocal 13
+  340 nextvalue 
+  341 coerce Object
+  343 setlocal 6
+  345 pushnull 
+  346 coerce_s 
+  347 setlocal 7
+  349 getlocal1 
+  350 getproperty eventData
+  353 getproperty consumableItem
+  357 convert_b 
+  358 dup 
+  359 iffalse ->377
+  363 pop 
+  364 getlocal1 
+  365 getproperty eventData
+  368 getproperty consumableItem
+  372 getproperty singleHit
+  376 convert_b 
+  377 iffalse ->389
+  381 pushnull 
+  382 coerce_s 
+  383 setlocal 7
+  385 jump ->436
+  389 getlocal1 
+  390 getproperty eventData
+  393 getproperty chipDamage
+  397 iffalse ->409
+  401 pushnull 
+  402 coerce_s 
+  403 setlocal 7
+  405 jump ->436
+  409 getlex WeaponManager
+  412 getproperty instance
+  416 getlocal 6
+  418 getproperty id
+  422 getlocal0 
+  423 getproperty m_battleObject
+  426 getproperty unitItem
+  429 callproperty getHitFX 2
+  433 coerce_s 
+  434 setlocal 7
+  436 getlocal 6
+  438 getproperty delay
+  442 pushshort 1000
+  445 multiply 
+  446 convert_d 
+  447 setlocal 8
+  449 getlocal 5
+  451 pushbyte 0
+  453 ifne ->484
+  457 getlocal 8
+  459 getlex WeaponManager
+  462 getproperty instance
+  466 getlocal 6
+  468 getproperty id
+  472 callproperty getHitDelay 1
+  476 pushshort 400
+  479 multiply 
+  480 add 
+  481 convert_d 
+  482 setlocal 5
+  484 getlocal 7
+  486 iffalse ->761
+  490 findpropstrict Point
+  492 pushbyte 0
+  494 dup 
+  495 constructprop Point 2
+  498 coerce Point
+  500 setlocal 9
+  502 getlocal 4
+  504 pushbyte 0
+  506 ifngt ->527
+  510 getlocal0 
+  511 getlocal1 
+  512 getproperty eventData
+  515 getproperty consumable
+  519 callproperty getUnitOffset 1
+  523 coerce Point
+  525 setlocal 9
+  527 getlocal 7
+  529 pushstring ','
+  532 callproperty split 1
+  537 coerce Array
+  539 setlocal 10
+  541 pushbyte 0
+  543 setlocal 15
+  545 getlocal 10
+  547 coerce_a 
+  548 setlocal 16
+  550 jump ->746
+  555 getlocal 16
+  557 getlocal 15
+  559 nextvalue 
+  560 coerce_s 
+  561 setlocal 11
+  563 findpropstrict Object
+  565 constructprop Object 0
+  568 coerce Object
+  570 dup 
+  571 setlocal 12
+  573 getlex FXManager
+  576 getproperty instance
+  580 getlocal 11
+  582 callproperty getFXAnim 1
+  586 setproperty anim
+  590 pushnull 
+  591 getlocal 12
+  593 getproperty anim
+  597 ifeq ->716
+  601 getlocal0 
+  602 getproperty m_dead
+  605 iftrue ->712
+  609 getlocal 12
+  611 getlex FXManager
+  614 getproperty instance
+  618 getlocal 11
+  620 callproperty getFXSound 1
+  624 setproperty sound
+  628 getlocal 12
+  630 getlex TRIGGERED_SOUND_HIT
+  634 setproperty trigger
+  638 getlocal 12
+  640 findpropstrict Pt
+  642 pushbyte 0
+  644 dup 
+  645 constructprop Pt 2
+  648 setproperty anchor
+  652 getlocal 12
+  654 getlocal 9
+  656 setproperty offset
+  660 getlocal 4
+  662 pushbyte 0
+  664 greaterthan 
+  665 dup 
+  666 iffalse ->677
+  670 pop 
+  671 getlocal 8
+  673 pushbyte 0
+  675 equals 
+  676 not 
+  677 iffalse ->705
+  681 getlex Zlab
+  684 getproperty processManager
+  688 getlocal 8
+  690 getlocal0 
+  691 getlocal0 
+  692 getproperty addUnitFX
+  695 getlocal 12
+  697 callpropvoid schedule 4
+  701 jump ->712
+  705 getlocal0 
+  706 getlocal 12
+  708 callpropvoid addUnitFX 1
+  712 jump ->746
+  716 getlex Logger
+  719 getlocal0 
+  720 pushstring 'onUnitHit'
+  723 pushstring 'no FX anim found for weapon.id: '
+  727 getlocal 6
+  729 getproperty id
+  733 add 
+  734 pushstring ' hitFX: '
+  738 add 
+  739 getlocal 7
+  741 add 
+  742 callpropvoid error 3
+  746 hasnext2 16 15
+  749 iftrue ->554
+  753 kill 16
+  755 kill 15
+  757 jump ->783
+  761 getlex Logger
+  764 getlocal0 
+  765 pushstring 'onUnitHit'
+  768 pushstring 'no hit FX found for weapon.id: '
+  772 getlocal 6
+  774 getproperty id
+  778 add 
+  779 callpropvoid error 3
+  783 hasnext2 14 13
+  786 iftrue ->335
+  790 kill 14
+  792 kill 13
+  794 getlocal1 
+  795 getproperty eventData
+  798 pushtrue 
+  799 setproperty hit
+  803 getlocal1 
+  804 getproperty eventData
+  807 getproperty attacker
+  811 iffalse ->839
+  815 getlocal1 
+  816 getproperty eventData
+  819 getlocal1 
+  820 getproperty eventData
+  823 getproperty attacker
+  827 getproperty unit
+  831 getproperty strength
+  835 setproperty attackerStrength
+  839 getlex Zlab
+  842 getproperty processManager
+  846 getlocal 5
+  848 getlocal0 
+  849 getlocal0 
+  850 getproperty playDamageXPReward
+  853 getlocal1 
+  854 getproperty eventData
+  857 callpropvoid schedule 4
+  861 returnvoid 

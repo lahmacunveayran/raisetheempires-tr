@@ -1,0 +1,1 @@
+{"id": "SANITY", "line": 109, "old": "damage = math.ceil(damage)", "new": "damage = math.floor(damage)", "kind": "sanity", "status": "killed", "seconds": 5.4, "first_failure": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (100, ..."}

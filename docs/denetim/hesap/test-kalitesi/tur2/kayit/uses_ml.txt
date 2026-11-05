@@ -1,0 +1,73 @@
+===== EXPERIMENT_MECH_LAB_MASTER
+-- MechLabConsumableAutoState.showDialog
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_MECH_LAB_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_MECH_LAB_ENABLED
+   27 ifnge ->174
+   31 getlex ExperimentsManager
+   34 getproperty instance
+-- MechLabPartsDialogState.showDialog
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_MECH_LAB_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_MECH_LAB_ENABLED
+   27 ifnge ->118
+   31 getlex stateMachine
+   34 getproperty propertyBag
+===== VARIANT_VALUE_MECH_LAB_ENABLED
+-- MechLabConsumableAutoState.showDialog
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_MECH_LAB_ENABLED
+   27 ifnge ->174
+   31 getlex ExperimentsManager
+   34 getproperty instance
+   38 getlex ExperimentsManager
+   41 getproperty EXPERIMENT_TITAN_FIGHT_MASTER
+   45 callproperty getExperimentVariant 1
+-- MechLabPartsDialogState.showDialog
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_MECH_LAB_ENABLED
+   27 ifnge ->118
+   31 getlex stateMachine
+   34 getproperty propertyBag
+   37 getproperty eventDispatcher
+   40 getlex MechLabPartsGather
+   44 getproperty FINISHED
+===== EXPERIMENT_SURVIVALMODE_MASTER
+-- SurvivalModeManager.<cinit>
+   58 constructprop EventDispatcher 0
+   61 setproperty eventDispatcher
+   64 findproperty EXPERIMENT_SURVIVALMODE_MASTER
+   68 pushstring 'empire_survivalMode_master'
+   72 initproperty EXPERIMENT_SURVIVALMODE_MASTER
+   76 findproperty EXPERIMENT_SURVIVALMODE_CONTINUE_COST
+   80 pushstring 'empire_survivalMode_continue_cost'
+   84 initproperty EXPERIMENT_SURVIVALMODE_CONTINUE_COST
+   88 findproperty EXPERIMENT_SURVIVALMODE_CARD_ACCESS
+-- SurvivalModeManager.<cinit>
+   64 findproperty EXPERIMENT_SURVIVALMODE_MASTER
+   68 pushstring 'empire_survivalMode_master'
+   72 initproperty EXPERIMENT_SURVIVALMODE_MASTER
+   76 findproperty EXPERIMENT_SURVIVALMODE_CONTINUE_COST
+   80 pushstring 'empire_survivalMode_continue_cost'
+   84 initproperty EXPERIMENT_SURVIVALMODE_CONTINUE_COST
+   88 findproperty EXPERIMENT_SURVIVALMODE_CARD_ACCESS
+   92 pushstring 'empire_survivalMode_card_access'
+   96 initproperty EXPERIMENT_SURVIVALMODE_CARD_ACCESS
+-- SurvivalModeManager.enabled
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_SURVIVALMODE_MASTER
+   16 callproperty getExperimentVariant 1
+   20 convert_i 
+   21 setlocal1 
+   22 getlocal1 
+   23 getlex ExperimentsManager
+   26 getproperty VARIANT_SURVIVALMODE_MASTER

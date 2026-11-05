@@ -1,0 +1,509 @@
+== EnemyUnit.playDamageXPReward
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce Object
+    5 setlocal2 
+    6 pushbyte 0
+    8 setlocal3 
+    9 pushnull 
+   10 coerce_s 
+   11 setlocal 4
+   13 pushbyte 0
+   15 setlocal 5
+   17 pushnan 
+   18 setlocal 6
+   20 pushnull 
+   21 coerce BattleObject
+   24 setlocal 7
+   26 pushbyte 0
+   28 setlocal 8
+   30 pushnull 
+   31 coerce BattleObject
+   34 setlocal 9
+   36 pushbyte 0
+   38 setlocal 10
+   40 pushnull 
+   41 coerce XML
+   43 setlocal 11
+   45 pushbyte 0
+   47 setlocal 12
+   49 pushnan 
+   50 setlocal 13
+   52 pushnull 
+   53 coerce Array
+   55 setlocal 14
+   57 pushnull 
+   58 coerce GameItem
+   60 setlocal 15
+   62 pushnull 
+   63 coerce Object
+   65 setlocal 16
+   67 pushbyte 0
+   69 setlocal 17
+   71 pushnull 
+   72 coerce XML
+   74 setlocal 18
+   76 pushbyte 0
+   78 setlocal 19
+   80 pushbyte 0
+   82 setlocal 20
+   84 pushnan 
+   85 setlocal 21
+   87 pushbyte 0
+   89 setlocal 22
+   91 getlocal1 
+   92 getproperty damage
+   96 iffalse ->1314
+  100 pushstring 'flags'
+  104 getlex RewardPickup
+  107 getproperty FLAG_LEFT_ONLY
+  111 pushstring 'delay'
+  114 pushshort 250
+  117 pushstring 'x'
+  120 getlex x
+  123 pushstring 'y'
+  126 getlex y
+  129 pushstring 'energyAmount'
+  133 pushbyte 1
+  135 newobject 5
+  137 coerce Object
+  139 setlocal2 
+  140 getlex battleObject
+  143 getproperty unitItem
+  146 getlex battleObject
+  149 getproperty fleet
+  152 callproperty getAttackStrength 1
+  156 convert_i 
+  157 setlocal3 
+  158 pushstring ''
+  160 setlocal 4
+  162 pushbyte 0
+  164 setlocal 5
+  166 getlocal1 
+  167 getproperty glancing
+  171 iffalse ->206
+  175 getlex battleObject
+  178 getproperty unit
+  181 getproperty dead
+  184 iffalse ->195
+  188 pushstring 'kill'
+  191 jump ->199
+  195 pushstring 'glancinghit'
+  199 coerce_s 
+  200 setlocal 4
+  202 jump ->445
+  206 getlocal1 
+  207 getproperty critical
+  211 iffalse ->384
+  215 getlex SoundEvent
+  218 pushstring 'CriticalHit'
+  222 callproperty getSoundEvent 1
+  227 callpropvoid play 0
+  231 getlocal2 
+  232 getlocal2 
+  233 getproperty flags
+  237 getlex RewardPickup
+  240 getproperty FLAG_HIGH_BOUNCE
+  244 bitor 
+  245 setproperty flags
+  249 getlocal2 
+  250 findpropstrict getCoinAmount
+  253 getlocal3 
+  254 getlocal1 
+  255 getproperty damage
+  259 callproperty getCoinAmount 2
+  263 setproperty coinAmount
+  267 getlocal2 
+  268 findpropstrict getRareType
+  271 getlocal1 
+  272 getproperty attackerStrength
+  276 callproperty getRareType 1
+  280 setproperty rareType
+  284 getlocal2 
+  285 findpropstrict getRareAmount
+  288 getlocal3 
+  289 getlocal1 
+  290 getproperty damage
+  294 callproperty getRareAmount 2
+  298 setproperty rareAmount
+  302 getlocal0 
+  303 callproperty allowManaLootDrops 0
+  308 iffalse ->316
+  312 pushbyte 1
+  314 setlocal 5
+  316 getlex battleObject
+  319 getproperty unit
+  322 getproperty dead
+  325 iffalse ->360
+  329 pushstring 'criticalkill'
+  333 setlocal 4
+  335 getlocal2 
+  336 pushbyte 3
+  338 setproperty numCoinLoot
+  342 getlocal2 
+  343 pushbyte 3
+  345 setproperty numRareLoot
+  349 getlocal2 
+  350 pushbyte 50
+  352 setproperty delay
+  356 jump ->380
+  360 pushstring 'criticalhit'
+  364 setlocal 4
+  366 getlocal2 
+  367 pushbyte 1
+  369 setproperty numCoinLoot
+  373 getlocal2 
+  374 pushbyte 1
+  376 setproperty numRareLoot
+  380 jump ->445
+  384 getlocal1 
+  385 getproperty hit
+  389 iffalse ->445
+  393 getlocal2 
+  394 pushbyte 1
+  396 setproperty numCoinLoot
+  400 getlocal2 
+  401 findpropstrict getCoinAmount
+  404 getlocal3 
+  405 getlocal1 
+  406 getproperty damage
+  410 callproperty getCoinAmount 2
+  414 setproperty coinAmount
+  418 getlex battleObject
+  421 getproperty unit
+  424 getproperty dead
+  427 iffalse ->438
+  431 pushstring 'kill'
+  434 jump ->442
+  438 pushstring 'directhit'
+  442 coerce_s 
+  443 setlocal 4
+  445 pushbyte 1
+  447 convert_d 
+  448 setlocal 6
+  450 getlocal1 
+  451 getproperty attacker
+  455 getlex BattleObject
+  458 astypelate 
+  459 coerce BattleObject
+  462 dup 
+  463 setlocal 7
+  465 iffalse ->482
+  469 getlocal 7
+  471 getproperty unitItem
+  474 getproperty tier
+  477 convert_i 
+  478 jump ->484
+  482 pushbyte 99
+  484 convert_i 
+  485 setlocal 8
+  487 getlocal1 
+  488 getproperty target
+  492 getlex BattleObject
+  495 astypelate 
+  496 coerce BattleObject
+  499 dup 
+  500 setlocal 9
+  502 iffalse ->519
+  506 getlocal 9
+  508 getproperty unitItem
+  511 getproperty tier
+  514 convert_i 
+  515 jump ->521
+  519 pushbyte 1
+  521 convert_i 
+  522 setlocal 10
+  524 pushbyte 0
+  526 setlocal 12
+  528 jump ->579
+  533 getlex ZGlobal
+  536 getproperty gameSettings
+  540 callproperty getXML 0
+  544 getproperty dooberCombatTable
+  548 getproperty playerTier
+  552 getlocal 12
+  554 getproperty 
+  558 coerce XML
+  560 dup 
+  561 setlocal 11
+  563 getproperty value
+  567 getlocal 8
+  569 ifne ->577
+  573 jump ->609
+  577 inclocal_i 12
+  579 getlocal 12
+  581 getlex ZGlobal
+  584 getproperty gameSettings
+  588 callproperty getXML 0
+  592 getproperty dooberCombatTable
+  596 getproperty playerTier
+  600 callproperty length 0
+  605 iflt ->532
+  609 getlocal 11
+  611 iffalse ->698
+  615 pushbyte 0
+  617 setlocal 12
+  619 jump ->657
+  624 getlocal 11
+  626 getproperty enemyTier
+  630 getlocal 12
+  632 getproperty 
+  636 coerce XML
+  638 dup 
+  639 setlocal 18
+  641 getproperty value
+  645 getlocal 10
+  647 ifne ->655
+  651 jump ->674
+  655 inclocal_i 12
+  657 getlocal 12
+  659 getlocal 11
+  661 getproperty enemyTier
+  665 callproperty length 0
+  670 iflt ->623
+  674 getlocal 18
+  676 iffalse ->698
+  680 findpropstrict parseFloat
+  684 getlocal 18
+  686 getproperty percent
+  690 callproperty parseFloat 1
+  695 convert_d 
+  696 setlocal 6
+  698 getlex ZGameRandom
+  701 getproperty rewardInstance
+  705 callproperty float 0
+  709 convert_d 
+  710 setlocal 13
+  712 getlex DooberManager
+  715 getproperty instance
+  719 getlocal 13
+  721 getlex DooberManager
+  724 getproperty COMBAT_ACTION_TYPE
+  728 pushstring 'default'
+  732 getlocal 6
+  734 callproperty getRandomRewards 4
+  738 coerce Array
+  740 setlocal 14
+  742 findpropstrict Array
+  744 constructprop Array 0
+  747 coerce Array
+  749 setlocal 14
+  751 getlocal0 
+  752 getlocal 14
+  754 getlex battleObject
+  757 getproperty unit
+  760 getproperty dead
+  763 callpropvoid addFixedRewards 2
+  768 getlocal2 
+  769 findpropstrict Array
+  771 constructprop Array 0
+  774 setproperty itemLoot
+  778 getlocal2 
+  779 pushbyte 0
+  781 setproperty numItemLoot
+  785 getlocal2 
+  786 pushbyte 0
+  788 setproperty scrap
+  792 pushbyte 0
+  794 setlocal 23
+  796 getlocal 14
+  798 coerce_a 
+  799 setlocal 24
+  801 jump ->880
+  806 getlocal 24
+  808 getlocal 23
+  810 nextvalue 
+  811 coerce Object
+  813 setlocal 16
+  815 getlex ZGlobal
+  818 getproperty gameSettings
+  822 getlocal 16
+  824 getproperty item
+  828 getlex GameItem
+  830 callproperty getItemByCode 2
+  834 getlex GameItem
+  836 astypelate 
+  837 coerce GameItem
+  839 setlocal 15
+  841 getlocal2 
+  842 getproperty itemLoot
+  846 getlocal 16
+  848 getproperty item
+  852 callpropvoid push 1
+  857 getlocal2 
+  858 dup 
+  859 setlocal 25
+  861 getproperty numItemLoot
+  865 increment 
+  866 setlocal 26
+  868 getlocal 25
+  870 getlocal 26
+  872 setproperty numItemLoot
+  876 kill 26
+  878 kill 25
+  880 hasnext2 24 23
+  883 iftrue ->805
+  887 kill 24
+  889 kill 23
+  891 getlocal 5
+  893 pushbyte 0
+  895 ifngt ->931
+  899 getlocal0 
+  900 getlocal 5
+  902 callproperty getManaLootDrop 1
+  907 convert_i 
+  908 dup 
+  909 setlocal 5
+  911 pushbyte 0
+  913 ifngt ->931
+  917 getlocal2 
+  918 getlocal 5
+  920 setproperty numManaLoot
+  924 getlocal2 
+  925 getlocal 5
+  927 setproperty manaAmount
+  931 getlex battleObject
+  934 getproperty unit
+  937 getproperty dead
+  940 iffalse ->1010
+  944 getlex ScrapManager
+  948 getproperty instance
+  952 getproperty scrapEnabled
+  956 iffalse ->1010
+  960 getlex Math
+  964 getlex ZGameRandom
+  967 getproperty scrapInstance
+  971 pushbyte 0
+  973 pushbyte 100
+  975 callproperty randBetween 2
+  979 callproperty ceil 1
+  983 convert_d 
+  984 dup 
+  985 setlocal 13
+  987 getlex ScrapManager
+  991 getproperty instance
+  995 getproperty scrapProb
+  999 ifnle ->1010
+ 1003 getlocal2 
+ 1004 pushbyte 1
+ 1006 setproperty scrap
+ 1010 pushbyte 1
+ 1012 setlocal 17
+ 1014 getlocal1 
+ 1015 getproperty attacker
+ 1019 pushnull 
+ 1020 ifeq ->1062
+ 1024 getlocal1 
+ 1025 getproperty attacker
+ 1029 getproperty unitItem
+ 1033 getproperty isBlueDevil
+ 1037 pushtrue 
+ 1038 ifne ->1062
+ 1042 getlex ZGlobal
+ 1045 getproperty gameSettings
+ 1049 pushstring 'bluedevilXPMultiplier'
+ 1053 pushbyte 1
+ 1055 callproperty getInt 2
+ 1059 convert_i 
+ 1060 setlocal 17
+ 1062 getlex ExperimentsManager
+ 1065 getproperty instance
+ 1069 pushstring 'empire_combat_double_xp'
+ 1073 callproperty getExperimentVariant 1
+ 1077 pushbyte 1
+ 1079 greaterthan 
+ 1080 dup 
+ 1081 iffalse ->1107
+ 1085 pop 
+ 1086 getlex ZRTManager
+ 1089 getproperty instance
+ 1093 getlex ZGlobal
+ 1096 getproperty player
+ 1099 getproperty COMBAT_DOUBLE_XP
+ 1102 callproperty isZRTOn 1
+ 1106 convert_b 
+ 1107 iffalse ->1151
+ 1111 pushbyte 0
+ 1113 setlocal 19
+ 1115 getlex ZGlobal
+ 1118 getproperty player
+ 1121 getproperty combatSpecialBits
+ 1124 convert_i 
+ 1125 dup 
+ 1126 setlocal 19
+ 1128 getlex Fleet
+ 1131 getproperty DOUBLE_XP
+ 1135 bitand 
+ 1136 dup 
+ 1137 setlocal 20
+ 1139 iffalse ->1151
+ 1143 pushbyte 2
+ 1145 getlocal 17
+ 1147 multiply 
+ 1148 convert_i 
+ 1149 setlocal 17
+ 1151 findpropstrict addRewards
+ 1154 getlocal 4
+ 1156 getlocal2 
+ 1157 getlocal 17
+ 1159 callpropvoid addRewards 3
+ 1163 getlocal1 
+ 1164 getproperty attacker
+ 1168 pushnull 
+ 1169 ifeq ->1299
+ 1173 getlex WhiteUnitManager
+ 1176 getproperty instance
+ 1180 getproperty whiteUnitsEnabled
+ 1184 iffalse ->1299
+ 1188 getlocal1 
+ 1189 getproperty attacker
+ 1193 getproperty unitItem
+ 1197 getproperty isWhiteUnit
+ 1201 pushtrue 
+ 1202 equals 
+ 1203 dup 
+ 1204 iffalse ->1215
+ 1208 pop 
+ 1209 getlocal1 
+ 1210 getproperty critical
+ 1214 not 
+ 1215 iffalse ->1299
+ 1219 getlex Math
+ 1223 getlex ZGameRandom
+ 1226 getproperty rewardInstance
+ 1230 pushbyte 0
+ 1232 pushbyte 100
+ 1234 callproperty randBetween 2
+ 1238 callproperty ceil 1
+ 1242 convert_d 
+ 1243 dup 
+ 1244 setlocal 21
+ 1246 getlex WhiteUnitManager
+ 1249 getproperty instance
+ 1253 getproperty whiteUnitProbabilityVariant
+ 1257 ifnle ->1299
+ 1261 pushbyte 1
+ 1263 setlocal 22
+ 1265 getlocal2 
+ 1266 getproperty numEnergyLoot
+ 1270 pushnull 
+ 1271 ifeq ->1292
+ 1275 getlocal2 
+ 1276 getlocal2 
+ 1277 getproperty numEnergyLoot
+ 1281 getlocal 22
+ 1283 add 
+ 1284 setproperty numEnergyLoot
+ 1288 jump ->1299
+ 1292 getlocal2 
+ 1293 getlocal 22
+ 1295 setproperty numEnergyLoot
+ 1299 findpropstrict spawnLoot
+ 1302 getlocal2 
+ 1303 pushtrue 
+ 1304 callpropvoid spawnLoot 2
+ 1308 getlocal0 
+ 1309 getlocal1 
+ 1310 callsupervoid playDamageXPReward 1
+ 1314 returnvoid 

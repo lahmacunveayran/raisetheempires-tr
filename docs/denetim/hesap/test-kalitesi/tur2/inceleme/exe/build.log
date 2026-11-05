@@ -1,0 +1,86 @@
+﻿python.exe : 642 INFO: PyInstaller: 6.17.0, contrib hooks: 2026.7
+At line:1 char:454
++ ... ocation $B; & "C:\Users\<user>\Desktop\Raise\venv312\Scr ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (642 INFO: PyIns...b hooks: 2026.7:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+643 INFO: Python: 3.12.10
+779 INFO: Platform: Windows-11-10.0.26200-SP0
+779 INFO: Python environment: C:\Users\<user>\Desktop\Raise\venv312
+791 INFO: Removing temporary files and cleaning cache in C:\Users\<user>\AppData\Local\pyinstaller
+796 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\<user> '
+ '<user>\\AppData\\Local\\Temp\\claude\\44db76dc85e0ce87\\6e027af0-22bc-435d-8563-59919183e99e\\scratchpad\\fix2\\ince
+leme\\exe',
+ 'C:\\Users\\<user> '
+ '<user>\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
+ 'C:\\Users\\<user> '
+ '<user>\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
+ 'C:\\Users\\<user> '
+ '<user>\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+ 'C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python312',
+ 'C:\\Users\\<user>\\Desktop\\Raise\\venv312',
+ 'C:\\Users\\<user>\\Desktop\\Raise\\venv312\\Lib\\site-packages',
+ 'C:\\Users\\<user> '
+ '<user>\\Desktop\\Raise\\raisetheempires-pr\\.claude\\worktrees\\agent-af55f7e566ce73807']
+2735 INFO: checking Analysis
+2735 INFO: Building Analysis because Analysis-00.toc is non existent
+2735 INFO: Looking for Python shared library...
+2735 INFO: Using Python shared library: C:\Users\<user>\AppData\Local\Programs\Python\Python312\python312.
+dll
+2736 INFO: Running Analysis Analysis-00.toc
+2736 INFO: Target bytecode optimization level: 0
+2736 INFO: Initializing module dependency graph...
+2742 INFO: Initializing module graph hook caches...
+2960 INFO: Analyzing modules for base_library.zip ...
+10467 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\venv3
+12\\Lib\\site-packages\\PyInstaller\\hooks'
+10828 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\v
+env312\\Lib\\site-packages\\PyInstaller\\hooks'
+16613 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\venv
+312\\Lib\\site-packages\\PyInstaller\\hooks'
+24219 INFO: Caching module dependency graph...
+24315 INFO: Analyzing C:\Users\<user>\Desktop\Raise\raisetheempires-pr\.claude\worktrees\agent-af55f7e566c
+e73807\empires-server.py
+24963 INFO: Processing standard module hook 'hook-platform.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\ve
+nv312\\Lib\\site-packages\\PyInstaller\\hooks'
+25019 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'C:\\Users\\<user>\\De
+sktop\\Raise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+25035 INFO: SetuptoolsInfo: initializing cached setuptools info...
+28950 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'C:\\Users\\<user>\\Deskto
+p\\Raise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks'
+29425 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\venv312
+\\Lib\\site-packages\\PyInstaller\\hooks'
+30617 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\ven
+v312\\Lib\\site-packages\\PyInstaller\\hooks'
+33714 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'C:\\Users\\<user>\\Desktop\\Raise
+\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+33943 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'
+!
+34103 INFO: Processing standard module hook 'hook-setuptools.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\
+venv312\\Lib\\site-packages\\PyInstaller\\hooks'
+34187 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'C:\\Users\\<user>\\Desktop\\R
+aise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+34557 INFO: Processing standard module hook 'hook-sysconfig.py' from 'C:\\Users\\<user>\\Desktop\\Raise\\v
+env312\\Lib\\site-packages\\PyInstaller\\hooks'
+34587 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'C:\\Users\\<user>\\Desktop\\Rais
+e\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+34590 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.
+jaraco'!
+34624 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'C:\\Users\\<user>\\Deskt
+op\\Raise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+34627 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vend
+or.more_itertools'!
+35111 INFO: Processing standard module hook 'hook-_osx_support.py' from 'C:\\Users\\<user>\\Desktop\\Raise
+\\venv312\\Lib\\site-packages\\PyInstaller\\hooks'
+35228 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'C:\\Users\\<user>\\Desktop\\R
+aise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+36415 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'C:\\Users\\<user> 
+du\\Desktop\\Raise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks'
+36421 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'C:\\Users\\<user>\\
+Desktop\\Raise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+37053 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'C:\\Users\\<user>\\Desktop\\R
+aise\\venv312\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+37054 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vend
+or.backports'!

@@ -1,0 +1,290 @@
+{
+ "0": {
+  "line": 14,
+  "original": "print(\"WARNING: no backup\", repr(message), error)",
+  "mutant": "print(\"XXWARNING: no backupXX\", repr(message), error)",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.90s\r\n",
+  "seconds": 18.6
+ },
+ "7": {
+  "line": 21,
+  "original": "if not q[\"complete\"]:",
+  "mutant": "if  q[\"complete\"]:",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.5
+ },
+ "12": {
+  "line": 23,
+  "original": "print(\"Reset quest completion\")",
+  "mutant": "print(\"XXReset quest completionXX\")",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.81s\r\n",
+  "seconds": 18.3
+ },
+ "23": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 8.1
+ },
+ "24": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.5
+ },
+ "26": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 8.1
+ },
+ "28": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 8.0
+ },
+ "30": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.6
+ },
+ "34": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.2
+ },
+ "37": {
+  "line": 27,
+  "original": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+  "mutant": "session['user_object'][\"userInfo\"][\"player\"][\"expansions\"][\"data\"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.1
+ },
+ "63": {
+  "line": 41,
+  "original": "if version == \"0.04a\" and version != target_version:",
+  "mutant": "if version == \"XX0.04aXX\" and version != target_version:",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.04a-0.05a-Update to 0.05a]",
+  "seconds": 7.9
+ },
+ "64": {
+  "line": 41,
+  "original": "if version == \"0.04a\" and version != target_version:",
+  "mutant": "if version == \"0.04a\" and version == target_version:",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.03a-0.04a-Update to 0.04a]",
+  "seconds": 7.5
+ },
+ "116": {
+  "line": 59,
+  "original": "session['save_version'] = version",
+  "mutant": "session['save_version'] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.06a-0.07a-Update to 0.07a]",
+  "seconds": 7.2
+ },
+ "126": {
+  "line": 66,
+  "original": "session['user_object'][\"experiments\"][\"empire_request2_master\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_request2_masterXX\"] = 2",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.5
+ },
+ "127": {
+  "line": 66,
+  "original": "session['user_object'][\"experiments\"][\"empire_request2_master\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_request2_master\"] = 3",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.5
+ },
+ "131": {
+  "line": 67,
+  "original": "session['user_object'][\"experiments\"][\"empire_mfs_uili\"] = 4",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_mfs_uiliXX\"] = 4",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.1
+ },
+ "133": {
+  "line": 67,
+  "original": "session['user_object'][\"experiments\"][\"empire_mfs_uili\"] = 4",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_mfs_uili\"] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.6
+ },
+ "136": {
+  "line": 68,
+  "original": "session['user_object'][\"experiments\"][\"empire_survivalmode3_master\"] = 3",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_survivalmode3_masterXX\"] = 3",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.7
+ },
+ "137": {
+  "line": 68,
+  "original": "session['user_object'][\"experiments\"][\"empire_survivalmode3_master\"] = 3",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_survivalmode3_master\"] = 4",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.3
+ },
+ "142": {
+  "line": 69,
+  "original": "session['user_object'][\"experiments\"][\"empire_survivalMode_master\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_survivalMode_master\"] = 3",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.4
+ },
+ "152": {
+  "line": 71,
+  "original": "session['user_object'][\"experiments\"][\"empire_mech_fight_master\"] = 3",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_mech_fight_master\"] = 4",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.5
+ },
+ "153": {
+  "line": 71,
+  "original": "session['user_object'][\"experiments\"][\"empire_mech_fight_master\"] = 3",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_mech_fight_master\"] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.2
+ },
+ "156": {
+  "line": 72,
+  "original": "session['user_object'][\"experiments\"][\"empire_mech_fight_gate_flat\"] = 5",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_mech_fight_gate_flatXX\"] = 5",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.4
+ },
+ "157": {
+  "line": 72,
+  "original": "session['user_object'][\"experiments\"][\"empire_mech_fight_gate_flat\"] = 5",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_mech_fight_gate_flat\"] = 6",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.1
+ },
+ "166": {
+  "line": 74,
+  "original": "session['user_object'][\"experiments\"][\"empire_titanresearch_master\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_titanresearch_masterXX\"] = 2",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.2
+ },
+ "167": {
+  "line": 74,
+  "original": "session['user_object'][\"experiments\"][\"empire_titanresearch_master\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_titanresearch_master\"] = 3",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.1
+ },
+ "171": {
+  "line": 75,
+  "original": "session['user_object'][\"experiments\"][\"empire_tier_8\"] = 4",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_tier_8XX\"] = 4",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.0
+ },
+ "181": {
+  "line": 77,
+  "original": "session['user_object'][\"experiments\"][\"empire_campaign_mastery\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"XXempire_campaign_masteryXX\"] = 2",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 8.7
+ },
+ "182": {
+  "line": 77,
+  "original": "session['user_object'][\"experiments\"][\"empire_campaign_mastery\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_campaign_mastery\"] = 3",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 7.3
+ },
+ "183": {
+  "line": 77,
+  "original": "session['user_object'][\"experiments\"][\"empire_campaign_mastery\"] = 2",
+  "mutant": "session['user_object'][\"experiments\"][\"empire_campaign_mastery\"] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text",
+  "seconds": 8.0
+ },
+ "198": {
+  "line": 89,
+  "original": "extra[\"yield\"] = 0",
+  "mutant": "extra[\"XXyieldXX\"] = 0",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 9.7
+ },
+ "199": {
+  "line": 89,
+  "original": "extra[\"yield\"] = 0",
+  "mutant": "extra[\"yield\"] = 1",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions",
+  "seconds": 7.4
+ }
+}

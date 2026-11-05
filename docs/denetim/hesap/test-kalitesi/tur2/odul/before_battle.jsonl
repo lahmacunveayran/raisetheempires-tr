@@ -1,0 +1,41 @@
+{"id": "34", "line": 124, "old": "if damage > 0:", "new": "if damage > 1:", "kind": "", "status": "survived", "seconds": 9.3, "first_failure": ""}
+{"id": "36", "line": 136, "old": "if damage > 0:", "new": "if damage >= 0:", "kind": "", "status": "survived", "seconds": 9.6, "first_failure": ""}
+{"id": "37", "line": 136, "old": "if damage > 0:", "new": "if damage > 1:", "kind": "", "status": "survived", "seconds": 6.9, "first_failure": ""}
+{"id": "128", "line": 1135, "old": "if damage <= 0:", "new": "if damage < 0:", "kind": "", "status": "survived", "seconds": 7.0, "first_failure": ""}
+{"id": "129", "line": 1135, "old": "if damage <= 0:", "new": "if damage <= 1:", "kind": "", "status": "survived", "seconds": 7.4, "first_failure": ""}
+{"id": "135", "line": 1141, "old": "get_unit_attack_strength(unit, False, params)", "new": "get_unit_attack_strength(unit, True, params)", "kind": "", "status": "survived", "seconds": 7.3, "first_failure": ""}
+{"id": "168", "line": 1395, "old": "attack_strength * damage * 0.0001", "new": "attack_strength / damage * 0.0001", "kind": "", "status": "survived", "seconds": 6.5, "first_failure": ""}
+{"id": "186", "line": 1403, "old": "xp = 0", "new": "xp = 1", "kind": "", "status": "survived", "seconds": 6.0, "first_failure": ""}
+{"id": "187", "line": 1403, "old": "xp = 0", "new": "xp = None", "kind": "", "status": "survived", "seconds": 7.6, "first_failure": ""}
+{"id": "215", "line": 1415, "old": "rare_amount *= math.ceil", "new": "rare_amount = math.ceil", "kind": "", "status": "survived", "seconds": 7.5, "first_failure": ""}
+{"id": "221", "line": 1443, "old": "get_unit_max_strength(unit, True)", "new": "get_unit_max_strength(unit, False)", "kind": "", "status": "survived", "seconds": 7.5, "first_failure": ""}
+{"id": "240", "line": 1448, "old": "\"-rare\": 0", "new": "\"XX-rareXX\": 0", "kind": "", "status": "survived", "seconds": 8.1, "first_failure": ""}
+{"id": "241", "line": 1448, "old": "\"-rare\": 0", "new": "\"-rare\": 1", "kind": "", "status": "survived", "seconds": 7.6, "first_failure": ""}
+{"id": "242", "line": 1448, "old": "\"-nrare0\": 0", "new": "\"XX-nrare0XX\": 0", "kind": "", "status": "survived", "seconds": 7.8, "first_failure": ""}
+{"id": "243", "line": 1448, "old": "\"-nrare0\": 0", "new": "\"-nrare0\": 1", "kind": "", "status": "survived", "seconds": 7.2, "first_failure": ""}
+{"id": "244", "line": 1448, "old": "\"-nrare1\": 1", "new": "\"XX-nrare1XX\": 1", "kind": "", "status": "survived", "seconds": 7.3, "first_failure": ""}
+{"id": "245", "line": 1448, "old": "\"-nrare1\": 1", "new": "\"-nrare1\": 2", "kind": "", "status": "survived", "seconds": 8.1, "first_failure": ""}
+{"id": "250", "line": 1448, "old": "\"-nrare4\": 4", "new": "\"XX-nrare4XX\": 4", "kind": "", "status": "survived", "seconds": 8.1, "first_failure": ""}
+{"id": "258", "line": 1451, "old": "] += 1", "new": "] = 1", "kind": "", "status": "survived", "seconds": 8.0, "first_failure": ""}
+{"id": "261", "line": 1452, "old": "\"Combat loss rewards\"", "new": "\"XXCombat loss rewardsXX\"", "kind": "print", "status": "survived", "seconds": 7.8, "first_failure": ""}
+{"id": "263", "line": 1452, "old": "\"coins:\"", "new": "\"XXcoins:XX\"", "kind": "print", "status": "survived", "seconds": 7.2, "first_failure": ""}
+{"id": "264", "line": 1452, "old": "strength * damage * 0.01", "new": "strength / damage * 0.01", "kind": "print", "status": "survived", "seconds": 8.5, "first_failure": ""}
+{"id": "265", "line": 1452, "old": "strength * damage * 0.01", "new": "strength * damage / 0.01", "kind": "print", "status": "survived", "seconds": 8.1, "first_failure": ""}
+{"id": "266", "line": 1452, "old": "strength * damage * 0.01", "new": "strength * damage * 1.01", "kind": "print", "status": "survived", "seconds": 8.4, "first_failure": ""}
+{"id": "267", "line": 1452, "old": "\"oil:\"", "new": "\"XXoil:XX\"", "kind": "print", "status": "survived", "seconds": 7.8, "first_failure": ""}
+{"id": "268", "line": 1453, "old": "strength * 0.001", "new": "strength / 0.001", "kind": "print", "status": "survived", "seconds": 7.8, "first_failure": ""}
+{"id": "269", "line": 1453, "old": "strength * 0.001", "new": "strength * 1.001", "kind": "print", "status": "survived", "seconds": 7.4, "first_failure": ""}
+{"id": "270", "line": 1453, "old": "\"rare\" + str", "new": "\"XXrareXX\" + str", "kind": "print", "status": "survived", "seconds": 7.4, "first_failure": ""}
+{"id": "273", "line": 1453, "old": "+ \":\"", "new": "+ \"XX:XX\"", "kind": "print", "status": "survived", "seconds": 7.7, "first_failure": ""}
+{"id": "274", "line": 1453, "old": "1 if rare is not None else 0", "new": "2 if rare is not None else 0", "kind": "print", "status": "survived", "seconds": 8.2, "first_failure": ""}
+{"id": "275", "line": 1453, "old": "1 if rare is not None else 0", "new": "1 if rare is  None else 0", "kind": "print", "status": "survived", "seconds": 7.3, "first_failure": ""}
+{"id": "276", "line": 1453, "old": "1 if rare is not None else 0", "new": "1 if rare is not None else 1", "kind": "print", "status": "survived", "seconds": 8.3, "first_failure": ""}
+{"id": "D32a", "line": 32, "old": "meta = {\"newPVE\": 0}", "new": "meta = {\"XXnewPVEXX\": 0}", "kind": "", "status": "survived", "seconds": 7.8, "first_failure": ""}
+{"id": "D32b", "line": 32, "old": "meta = {\"newPVE\": 0}", "new": "meta = {\"newPVE\": 1}", "kind": "", "status": "survived", "seconds": 8.0, "first_failure": ""}
+{"id": "D121a", "line": 121, "old": "\"battleKill\", 1,", "new": "\"XXbattleKillXX\", 1,", "kind": "", "status": "survived", "seconds": 8.0, "first_failure": ""}
+{"id": "D121b", "line": 121, "old": "\"battleKill\", 1,", "new": "\"battleKill\", 2,", "kind": "", "status": "survived", "seconds": 8.8, "first_failure": ""}
+{"id": "D126a", "line": 126, "old": "\"battleDamage\", damage,", "new": "\"XXbattleDamageXX\", damage,", "kind": "", "status": "survived", "seconds": 9.8, "first_failure": ""}
+{"id": "D126b", "line": 126, "old": "\"battleDamage\", damage,", "new": "\"battleDamage\", damage + 1,", "kind": "", "status": "survived", "seconds": 9.1, "first_failure": ""}
+{"id": "D245", "line": 245, "old": "if a <= combat_replay_reward_minimum", "new": "if a < combat_replay_reward_minimum", "kind": "", "status": "survived", "seconds": 8.1, "first_failure": ""}
+{"id": "D247", "line": 247, "old": "(lambda a: 0)", "new": "(lambda a: None)", "kind": "", "status": "survived", "seconds": 8.3, "first_failure": ""}
+{"id": "D484", "line": 484, "old": "e[\"complete\"] == False]", "new": "e[\"complete\"] == True]", "kind": "", "status": "survived", "seconds": 7.7, "first_failure": ""}

@@ -1,0 +1,67 @@
+== DooberManager.getRandomRewards
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce XML
+    5 setlocal 7
+    7 pushnull 
+    8 coerce XMLList
+   10 setlocal 8
+   12 findpropstrict Array
+   14 constructprop Array 0
+   17 coerce Array
+   19 setlocal 5
+   21 getlex ZGlobal
+   24 getproperty gameSettings
+   28 callproperty getXML 0
+   32 getproperty randomDoobers
+   36 getproperty doober
+   40 coerce XMLList
+   42 setlocal 6
+   44 pushbyte 0
+   46 setlocal 9
+   48 getlocal 6
+   50 coerce_a 
+   51 setlocal 10
+   53 jump ->153
+   58 getlocal 10
+   60 getlocal 9
+   62 nextvalue 
+   63 coerce XML
+   65 setlocal 7
+   67 getlocal0 
+   68 getlocal 7
+   70 getlocal2 
+   71 getlocal3 
+   72 callproperty getRelevantGameAction 3
+   76 coerce XMLList
+   78 setlocal 8
+   80 getlocal0 
+   81 getlocal1 
+   82 getlocal 8
+   84 getlocal 4
+   86 callproperty shouldGiveReward 3
+   90 iffalse ->153
+   94 getlex CriteriaUtil
+   97 getlocal 7
+   99 getproperty criteria
+  103 callproperty meetsCriteria 1
+  108 iffalse ->153
+  112 getlocal 5
+  114 pushstring 'item'
+  117 getlocal 7
+  119 getproperty item
+  123 callproperty toString 0
+  128 pushstring 'count'
+  131 findpropstrict parseInt
+  135 getlocal 8
+  137 getproperty count
+  141 callproperty parseInt 1
+  146 newobject 2
+  148 callpropvoid push 1
+  153 hasnext2 10 9
+  156 iftrue ->57
+  160 kill 10
+  162 kill 9
+  164 getlocal 5
+  166 returnvalue 

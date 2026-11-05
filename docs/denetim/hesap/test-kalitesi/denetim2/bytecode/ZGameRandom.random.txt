@@ -1,0 +1,63 @@
+﻿== ZGameRandom.random
+    0 getlocal0 
+    1 pushscope 
+    2 pushint 36969
+    5 getlocal0 
+    6 getproperty m_z
+    9 pushint 65535
+   12 bitand 
+   13 multiply 
+   14 convert_u 
+   15 setlocal1 
+   16 getlocal0 
+   17 getproperty m_z
+   20 pushbyte 16
+   22 rshift 
+   23 pushint 65535
+   26 bitand 
+   27 convert_u 
+   28 setlocal2 
+   29 getlocal0 
+   30 pushint 36969
+   33 getlocal0 
+   34 getproperty m_z
+   37 pushint 65535
+   40 bitand 
+   41 multiply 
+   42 getlocal0 
+   43 getproperty m_z
+   46 pushbyte 16
+   48 rshift 
+   49 pushint 65535
+   52 bitand 
+   53 add 
+   54 pushdouble 4294967295.0
+   56 bitand 
+   57 initproperty m_z
+   60 getlocal0 
+   61 pushshort 18000
+   65 getlocal0 
+   66 getproperty m_w
+   69 pushint 65535
+   72 bitand 
+   73 multiply 
+   74 getlocal0 
+   75 getproperty m_w
+   78 pushbyte 16
+   80 rshift 
+   81 pushint 65535
+   84 bitand 
+   85 add 
+   86 pushdouble 4294967295.0
+   88 bitand 
+   89 initproperty m_w
+   92 getlocal0 
+   93 getproperty m_z
+   96 pushbyte 16
+   98 lshift 
+   99 getlocal0 
+  100 getproperty m_w
+  103 add 
+  104 pushdouble 4294967295.0
+  106 bitand 
+  107 returnvalue 

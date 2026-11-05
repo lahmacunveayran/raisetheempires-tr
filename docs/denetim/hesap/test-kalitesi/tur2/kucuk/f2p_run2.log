@@ -1,0 +1,17 @@
+﻿{"mutant": "Q2", "description": "duplicate tree id keeps the first questTree", "file_line": "quest_trees.py:42", "new_tests": "test/quest_trees_test.py", "clean": "all pass (full suite run)", "mutant_new_result": "rc 1", "new_failed": ["test/quest_trees_test.py::test_trees_read_as_the_xml_has_them"], "mutant_old_result(cb00c06 tests)": "rc 0", "old_failed": [], "seconds": 19.9}
+{"mutant": "Q3", "description": "hook_spots land threshold 6 -> 5", "file_line": "quest_trees.py:310", "new_tests": "test/quest_trees_test.py", "clean": "all pass (full suite run)", "mutant_new_result": "rc 1", "new_failed": ["test/quest_trees_test.py::test_hook_spots_are_free_land_between_roads"], "mutant_old_result(cb00c06 tests)": "rc 0", "old_failed": [], "seconds": 18.9}
+python.exe : Traceback (most recent call last):
+At line:1 char:428
++ ... ix2\kucuk"; & "C:\Users\<user>\Desktop\Raise\venv312\Scr ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<HOME>\AppData\Local\Temp\claude\44db76dc85e0ce87\6e027af0-22bc-435d-8563-59919183e99e\scratchpad\fi
+x2\kucuk\f2p_harness.py", line 132, in <module>
+    
+  File "<HOME>\AppData\Local\Temp\claude\44db76dc85e0ce87\6e027af0-22bc-435d-8563-59919183e99e\scratchpad\fi
+x2\kucuk\f2p_harness.py", line 110, in main
+    lineno = line_of(path, old)  # text mode reads CRLF as \n
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('Q6', 0)

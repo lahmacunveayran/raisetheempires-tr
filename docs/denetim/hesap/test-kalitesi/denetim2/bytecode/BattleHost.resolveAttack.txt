@@ -1,0 +1,366 @@
+﻿== BattleHost.resolveAttack
+    0 getlocal0 
+    1 pushscope 
+    2 pushbyte 0
+    4 setlocal 5
+    6 pushnan 
+    7 setlocal 6
+    9 findpropstrict Object
+   11 constructprop Object 0
+   14 coerce Object
+   16 setlocal3 
+   17 getlocal3 
+   18 getlex m_ai
+   21 getlocal1 
+   22 getlocal2 
+   23 getlex BattleAI
+   26 getproperty STRENGTH_CURRENT
+   30 pushfalse 
+   31 callproperty GetAttackingHitValue 4
+   36 setproperty hitValue
+   40 getlocal3 
+   41 findpropstrict Number
+   43 getlocal0 
+   44 getlocal1 
+   45 getlocal2 
+   46 callproperty getDiceRoll 2
+   50 callproperty Number 1
+   53 setproperty unitRoll
+   57 getlex m_ai
+   60 getproperty allowMiss
+   64 iffalse ->97
+   68 getlocal3 
+   69 findpropstrict Boolean
+   71 getlocal3 
+   72 getproperty unitRoll
+   76 getlocal3 
+   77 getproperty hitValue
+   81 getproperty direct
+   85 greaterequals 
+   86 callproperty Boolean 1
+   89 setproperty hit
+   93 jump ->103
+   97 getlocal3 
+   98 pushtrue 
+   99 setproperty hit
+  103 getlex m_ai
+  106 getlocal1 
+  107 getlocal2 
+  108 callproperty GetAttackingDamage 2
+  113 coerce Object
+  115 setlocal 4
+  117 getlocal3 
+  118 getlocal 4
+  120 getproperty damage
+  124 setproperty damage
+  128 getlocal3 
+  129 getlocal 4
+  131 getproperty upgradeDamage
+  135 setproperty upgradeDamage
+  139 getlocal3 
+  140 pushfalse 
+  141 setproperty critical
+  145 getlocal3 
+  146 pushfalse 
+  147 setproperty glancing
+  151 getlocal1 
+  152 getlex m_playerUnit
+  155 equals 
+  156 dup 
+  157 iffalse ->177
+  161 pop 
+  162 getlocal1 
+  163 getproperty unitItem
+  166 getproperty subType
+  169 getlex UnitItem
+  172 getproperty ARMY
+  176 equals 
+  177 dup 
+  178 iffalse ->195
+  182 pop 
+  183 getlex CommandoManager
+  186 getproperty instance
+  190 callproperty isActive 0
+  194 convert_b 
+  195 iffalse ->236
+  199 getlex CommandoManager
+  202 getproperty instance
+  206 callproperty getDamageModifier 0
+  210 convert_i 
+  211 setlocal 5
+  213 getlocal3 
+  214 getlocal3 
+  215 getproperty damage
+  219 getlocal 5
+  221 add 
+  222 setproperty damage
+  226 getlocal3 
+  227 pushtrue 
+  228 setproperty commandoAssaultBonus
+  232 jump ->242
+  236 getlocal3 
+  237 pushfalse 
+  238 setproperty commandoAssaultBonus
+  242 getlex Logger
+  245 getlocal0 
+  246 pushstring 'resolveAttack'
+  249 pushstring 'att:'
+  253 getlocal1 
+  254 getproperty unitItem
+  257 getproperty code
+  260 add 
+  261 pushstring ' def:'
+  265 add 
+  266 getlocal2 
+  267 getproperty unitItem
+  270 getproperty code
+  273 add 
+  274 pushstring ' hitPercent: direct '
+  278 add 
+  279 getlocal3 
+  280 getproperty hitValue
+  284 getproperty direct
+  288 add 
+  289 pushstring ' critical '
+  293 add 
+  294 getlocal3 
+  295 getproperty hitValue
+  299 getproperty critical
+  303 add 
+  304 pushstring ' unitRoll: '
+  308 add 
+  309 getlocal3 
+  310 getproperty unitRoll
+  314 add 
+  315 pushstring ' hit '
+  319 add 
+  320 getlocal3 
+  321 getproperty hit
+  325 add 
+  326 callpropvoid info 3
+  330 pushnull 
+  331 getlocal1 
+  332 getproperty fleet
+  335 getproperty hitPercentageRecorder
+  338 ifeq ->372
+  342 getlocal1 
+  343 getproperty fleet
+  346 getproperty hitPercentageRecorder
+  349 getlocal1 
+  350 getproperty unit
+  353 getproperty id
+  356 getlocal2 
+  357 getproperty unit
+  360 getproperty id
+  363 getlocal3 
+  364 getproperty hit
+  368 callpropvoid update 3
+  372 getlocal3 
+  373 getproperty hit
+  377 iftrue ->470
+  381 getlex m_aiAttack
+  384 not 
+  385 dup 
+  386 iftrue ->399
+  390 pop 
+  391 getlex m_ai
+  394 getproperty AICanMiss
+  398 not 
+  399 iffalse ->466
+  403 getlex Logger
+  406 getlocal0 
+  407 pushstring 'resolveAttack'
+  410 pushstring 'glancing'
+  414 callpropvoid info 3
+  418 getlocal3 
+  419 getlocal3 
+  420 getproperty damage
+  424 getlex m_ai
+  427 getproperty glancingBlowMult
+  431 multiply 
+  432 setproperty damage
+  436 getlocal3 
+  437 getlocal3 
+  438 getproperty upgradeDamage
+  442 getlex m_ai
+  445 getproperty glancingBlowMult
+  449 multiply 
+  450 setproperty upgradeDamage
+  454 getlocal3 
+  455 pushtrue 
+  456 setproperty hit
+  460 getlocal3 
+  461 pushtrue 
+  462 setproperty glancing
+  466 jump ->580
+  470 getlocal3 
+  471 getproperty unitRoll
+  475 getlocal0 
+  476 getproperty STRONG_ROLL
+  479 ifeq ->580
+  483 getlex m_aiAttack
+  486 not 
+  487 dup 
+  488 iftrue ->501
+  492 pop 
+  493 getlex m_ai
+  496 getproperty AICanCritical
+  500 convert_b 
+  501 iffalse ->580
+  505 getlocal3 
+  506 getproperty unitRoll
+  510 getlocal3 
+  511 getproperty hitValue
+  515 getproperty critical
+  519 ifnge ->580
+  523 getlex Logger
+  526 getlocal0 
+  527 pushstring 'resolveAttack'
+  530 pushstring 'critical'
+  534 callpropvoid info 3
+  538 getlocal3 
+  539 getlocal3 
+  540 getproperty damage
+  544 getlex m_ai
+  547 getproperty criticalHitMult
+  551 multiply 
+  552 setproperty damage
+  556 getlocal3 
+  557 getlocal3 
+  558 getproperty upgradeDamage
+  562 getlex m_ai
+  565 getproperty criticalHitMult
+  569 multiply 
+  570 setproperty upgradeDamage
+  574 getlocal3 
+  575 pushtrue 
+  576 setproperty critical
+  580 getlocal3 
+  581 getproperty hit
+  585 iffalse ->739
+  589 getlocal3 
+  590 findpropstrict int
+  592 getlex Math
+  596 getlocal3 
+  597 getproperty damage
+  601 callproperty ceil 1
+  605 callproperty int 1
+  608 setproperty damage
+  612 getlocal3 
+  613 findpropstrict int
+  615 getlex Math
+  619 getlocal3 
+  620 getproperty upgradeDamage
+  624 callproperty ceil 1
+  628 callproperty int 1
+  631 setproperty upgradeDamage
+  635 getlocal3 
+  636 getproperty damage
+  640 getlocal3 
+  641 getproperty upgradeDamage
+  645 subtract 
+  646 pushbyte 0
+  648 ifne ->665
+  652 getlocal3 
+  653 getlocal3 
+  654 getproperty damage
+  658 pushbyte 1
+  660 add 
+  661 setproperty damage
+  665 getlex m_aiAttack
+  668 iftrue ->735
+  672 getlocal2 
+  673 getproperty unit
+  676 getproperty strength
+  679 getlocal3 
+  680 getproperty damage
+  684 subtract 
+  685 convert_d 
+  686 dup 
+  687 setlocal 6
+  689 pushbyte 0
+  691 greaterthan 
+  692 dup 
+  693 iffalse ->703
+  697 pop 
+  698 getlocal 6
+  700 pushbyte 1
+  702 lessequals 
+  703 iffalse ->735
+  707 getlex Logger
+  710 getlocal0 
+  711 pushstring 'resolveAttack'
+  714 pushstring 'Incing damage to prevent 1 strength.'
+  718 callpropvoid info 3
+  722 getlocal3 
+  723 getlocal3 
+  724 getproperty damage
+  728 pushbyte 1
+  730 add 
+  731 setproperty damage
+  735 jump ->753
+  739 getlocal3 
+  740 pushbyte 0
+  742 setproperty damage
+  746 getlocal3 
+  747 pushbyte 0
+  749 setproperty upgradeDamage
+  753 getlocal2 
+  754 getproperty unitItem
+  757 getproperty weaker
+  760 iffalse ->776
+  764 getlocal3 
+  765 getlocal2 
+  766 getproperty unit
+  769 getproperty strength
+  772 setproperty damage
+  776 getlocal3 
+  777 findpropstrict Boolean
+  779 getlocal2 
+  780 getproperty unit
+  783 getproperty strength
+  786 getlocal3 
+  787 getproperty damage
+  791 lessequals 
+  792 callproperty Boolean 1
+  795 setproperty kill
+  799 getlex Logger
+  802 getlocal0 
+  803 pushstring 'resolveAttack'
+  806 pushstring 's:'
+  810 getlocal2 
+  811 getproperty unit
+  814 getproperty strength
+  817 add 
+  818 pushstring ' c: '
+  822 add 
+  823 getlocal3 
+  824 getproperty critical
+  828 add 
+  829 pushstring ' d:'
+  833 add 
+  834 getlocal3 
+  835 getproperty damage
+  839 add 
+  840 pushstring ' ud:'
+  844 add 
+  845 getlocal3 
+  846 getproperty upgradeDamage
+  850 add 
+  851 pushstring ' kill:'
+  855 add 
+  856 getlocal3 
+  857 getproperty kill
+  861 add 
+  862 callpropvoid info 3
+  866 getlex ZGlobal
+  869 getproperty player
+  872 getlex WorldUpgradeManager
+  875 getproperty FIRST_RESEARCH_DIALOG
+  879 callproperty getSeenFlag 1
+  883 iftrue ->894
+  887 getlocal3 
+  888 pushbyte 0
+  890 setproperty upgradeDamage
+  894 getlocal3 
+  895 returnvalue 

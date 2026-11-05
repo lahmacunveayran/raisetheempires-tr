@@ -1,0 +1,636 @@
+===== EXPERIMENT_REQUEST2_MASTER
+-- ViralsManager.onTimeout
+  755 getproperty instance
+  759 getlex ExperimentsManager
+  762 getproperty EXPERIMENT_REQUEST2_MASTER
+  766 callproperty getExperimentVariant 1
+  770 getlex ExperimentsManager
+  773 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  777 ifne ->849
+  781 findpropstrict RequestNeighborDialog
+  784 getlex ViralsManager
+-- ViralsManager.onTimeout
+ 1076 getproperty instance
+ 1080 getlex ExperimentsManager
+ 1083 getproperty EXPERIMENT_REQUEST2_MASTER
+ 1087 callproperty getExperimentVariant 1
+ 1091 getlex ExperimentsManager
+ 1094 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+ 1098 ifne ->1180
+ 1102 findpropstrict RequestGiftDialog
+ 1105 pushstring 'mysterygift'
+-- ViralsManager.onTimeout
+ 1304 getproperty instance
+ 1308 getlex ExperimentsManager
+ 1311 getproperty EXPERIMENT_REQUEST2_MASTER
+ 1315 callproperty getExperimentVariant 1
+ 1319 getlex ExperimentsManager
+ 1322 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+ 1326 ifne ->1339
+ 1330 getlocal0 
+ 1331 pushtrue 
+-- QuestManagerPopup.onRequest
+  272 getproperty instance
+  276 getlex ExperimentsManager
+  279 getproperty EXPERIMENT_REQUEST2_MASTER
+  283 callproperty getExperimentVariant 1
+  287 getlex ExperimentsManager
+  290 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  294 ifne ->374
+  298 findpropstrict Array
+  300 constructprop Array 0
+-- QuestDetailsPopup.onInvite
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_REQUEST2_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->62
+   31 getlex PopupManager
+   33 getproperty instance
+-- QuestDetailsPopup.onRequest
+  266 getproperty instance
+  270 getlex ExperimentsManager
+  273 getproperty EXPERIMENT_REQUEST2_MASTER
+  277 callproperty getExperimentVariant 1
+  281 getlex ExperimentsManager
+  284 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  288 ifne ->367
+  292 findpropstrict Array
+  294 constructprop Array 0
+-- InviteNeighborSlot.onButtonClicked
+   28 getproperty instance
+   32 getlex ExperimentsManager
+   35 getproperty EXPERIMENT_REQUEST2_MASTER
+   39 callproperty getExperimentVariant 1
+   43 getlex ExperimentsManager
+   46 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   50 ifne ->82
+   54 getlex PopupManager
+   56 getproperty instance
+-- RecommendedNeighborSlot.onButtonClicked
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_REQUEST2_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->59
+   31 getlex PopupManager
+   33 getproperty instance
+-- AllianceQuestPopup.onRequest
+  278 getproperty instance
+  282 getlex ExperimentsManager
+  285 getproperty EXPERIMENT_REQUEST2_MASTER
+  289 callproperty getExperimentVariant 1
+  293 getlex ExperimentsManager
+  296 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  300 ifne ->381
+  304 findpropstrict Array
+  306 constructprop Array 0
+-- AddFriendSlot.doOnClick
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_REQUEST2_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->59
+   31 getlex PopupManager
+   33 getproperty instance
+-- ViralSurfacePopup.onClicked
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_REQUEST2_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->117
+   31 getlocal0 
+   32 getproperty m_xml
+-- GoldenStatuePopUp1.onRequest
+  276 getproperty instance
+  280 getlex ExperimentsManager
+  283 getproperty EXPERIMENT_REQUEST2_MASTER
+  287 callproperty getExperimentVariant 1
+  291 getlex ExperimentsManager
+  294 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  298 ifne ->378
+  302 findpropstrict Array
+  304 constructprop Array 0
+-- LEUnitPartsGather.onAskClick
+  146 getproperty instance
+  150 getlex ExperimentsManager
+  153 getproperty EXPERIMENT_REQUEST2_MASTER
+  157 callproperty getExperimentVariant 1
+  161 getlex ExperimentsManager
+  164 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  168 ifne ->208
+  172 getlex PopupManager
+  174 getproperty instance
+-- WorldGamesPopUp.onInvite
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_REQUEST2_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+   27 ifne ->62
+   31 getlex PopupManager
+   33 getproperty instance
+-- WorldGamesPopUp.onRequest
+  294 getproperty instance
+  298 getlex ExperimentsManager
+  301 getproperty EXPERIMENT_REQUEST2_MASTER
+  305 callproperty getExperimentVariant 1
+  309 getlex ExperimentsManager
+  312 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  316 ifne ->397
+  320 findpropstrict Array
+  322 constructprop Array 0
+-- RafflePopUp.onAskClicked
+  160 getproperty instance
+  164 getlex ExperimentsManager
+  167 getproperty EXPERIMENT_REQUEST2_MASTER
+  171 callproperty getExperimentVariant 1
+  175 getlex ExperimentsManager
+  178 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  182 ifne ->375
+  186 findpropstrict Array
+  188 constructprop Array 0
+-- TreasureVaultPopup.onAskButtonClicked
+   44 getproperty instance
+   48 getlex ExperimentsManager
+   51 getproperty EXPERIMENT_REQUEST2_MASTER
+   55 callproperty getExperimentVariant 1
+   59 convert_i 
+   60 setlocal 5
+   62 findpropstrict Array
+   64 constructprop Array 0
+   67 coerce Array
+-- PowerupPartsGather.onAskClick
+  160 getproperty instance
+  164 getlex ExperimentsManager
+  167 getproperty EXPERIMENT_REQUEST2_MASTER
+  171 callproperty getExperimentVariant 1
+  175 getlex ExperimentsManager
+  178 getproperty VARIANT_VALUE_REQUEST2_MASTER_ON
+  182 ifne ->218
+  186 getlex PopupManager
+  188 getproperty instance
+===== EXPERIMENT_MFS_UILI
+-- RequestDialog.<init>
+   15 getproperty instance
+   19 getlex ExperimentsManager
+   22 getproperty EXPERIMENT_MFS_UILI
+   26 callproperty getExperimentVariant 1
+   30 initproperty variant
+   33 getlocal0 
+   34 getlex ExperimentsManager
+   37 getproperty instance
+   41 getlex ExperimentsManager
+===== VARIANT_SURVIVALMODE_MASTER
+-- SurvivalModeManager.enabled
+   22 getlocal1 
+   23 getlex ExperimentsManager
+   26 getproperty VARIANT_SURVIVALMODE_MASTER
+   30 ifeq ->36
+   34 pushfalse 
+   35 returnvalue 
+   36 getlex ZGlobal
+   39 getproperty gameSettings
+   43 pushstring 'SurvivalModeMinLevel'
+===== EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+-- SurvivalModeManager.launchSurvivalMode
+  144 getproperty instance
+  148 getlex ExperimentsManager
+  151 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+  155 callproperty getExperimentVariant 1
+  159 getlex ExperimentsManager
+  162 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+  166 ifne ->203
+  170 getlex PopupManager
+  172 getproperty instance
+-- SurvivalModeManager.isInEliteSurvivalModeBattle
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+   27 ifne ->85
+   31 getlex ExperimentsManager
+   34 getproperty instance
+-- ViralSurfacingManager.showSurvialModeToaster
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+   27 ifeq ->33
+   31 pushfalse 
+   32 returnvalue 
+-- UnitContractsEnhancementScreen.checkExperiment
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+   27 ifne ->41
+   31 getlocal0 
+   32 pushtrue 
+-- WarRoomDialogState.overlayEnabled
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+   27 ifne ->33
+   31 pushtrue 
+   32 returnvalue 
+-- WarRoomDialogState.overlayXML
+   48 getproperty instance
+   52 getlex ExperimentsManager
+   55 getproperty EXPERIMENT_SURVIVALMODE_ENHANCEMENTS
+   59 callproperty getExperimentVariant 1
+   63 getlex ExperimentsManager
+   66 getproperty VARIANT_SURVIVALMODE_ENHANCEMENTS_ENABLED
+   70 ifne ->85
+   74 getlocal0 
+   75 getproperty OVERLAY_STATE_ACTIVE
+===== EXPERIMENT_TITAN_FIGHT_MASTER
+-- MechBattleSetup.isEnabled
+   13 getproperty instance
+   17 getlex ExperimentsManager
+   20 getproperty EXPERIMENT_TITAN_FIGHT_MASTER
+   24 callproperty getExperimentVariant 1
+   28 getlex ExperimentsManager
+   31 getproperty VARIANT_TITAN_FIGHT_ACTIVE
+   35 ifne ->41
+   39 pushtrue 
+   40 returnvalue 
+-- MechLabActivationAutoState.showDialog
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_TITAN_FIGHT_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_TITAN_FIGHT_ACTIVE
+   27 ifnge ->118
+   31 getlex stateMachine
+   34 getproperty propertyBag
+-- MechLabConsumableAutoState.showDialog
+   34 getproperty instance
+   38 getlex ExperimentsManager
+   41 getproperty EXPERIMENT_TITAN_FIGHT_MASTER
+   45 callproperty getExperimentVariant 1
+   49 getlex ExperimentsManager
+   52 getproperty VARIANT_TITAN_FIGHT_ACTIVE
+   56 ifnge ->87
+   60 findpropstrict clickNextState
+   63 callpropvoid clickNextState 0
+-- MechLabProductionAutoState.showDialog
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_TITAN_FIGHT_MASTER
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty VARIANT_TITAN_FIGHT_ACTIVE
+   27 ifnge ->63
+   31 findproperty window
+   34 getlex MechLabProductionScreen
+===== EXPERIMENT_CAMPV2_ENABLED
+-- QuestsUIItem.handleAcceptAction
+   34 getproperty instance
+   38 getlex ExperimentsManager
+   41 getproperty EXPERIMENT_CAMPV2_ENABLED
+   45 callproperty getExperimentVariant 1
+   49 getlex ExperimentsManager
+   52 getproperty EXPERIMENT_CAMPV2_ENABLED_VARIANT_ENABLED
+   56 equals 
+   57 iffalse ->100
+   61 getlex ZGlobal
+-- OptionUIItem.loadStrategicMapButtonIcon
+   17 getproperty instance
+   21 getlex ExperimentsManager
+   24 getproperty EXPERIMENT_CAMPV2_ENABLED
+   28 callproperty getExperimentVariant 1
+   32 getlex ExperimentsManager
+   35 getproperty EXPERIMENT_CAMPV2_ENABLED_VARIANT_ENABLED
+   39 ifne ->159
+   43 getlocal0 
+   44 getproperty m_strategicMapButtonIcon
+-- OptionUIItem.updateStrategicButton
+  202 getproperty instance
+  206 getlex ExperimentsManager
+  209 getproperty EXPERIMENT_CAMPV2_ENABLED
+  213 callproperty getExperimentVariant 1
+  217 getlex ExperimentsManager
+  220 getproperty EXPERIMENT_CAMPV2_ENABLED_VARIANT_ENABLED
+  224 equals 
+  225 iffalse ->282
+  229 getlocal0 
+-- PlayerCampaign.currentCampaignName
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_CAMPV2_ENABLED
+   16 callproperty getExperimentVariant 1
+   20 getlex ExperimentsManager
+   23 getproperty EXPERIMENT_CAMPV2_ENABLED_VARIANT_ENABLED
+   27 ifeq ->43
+   31 getlex CampaignManager
+   34 getproperty instance
+-- StrategicSWF2RendererComponent.onSWFLoadComplete
+  197 getproperty instance
+  201 getlex ExperimentsManager
+  204 getproperty EXPERIMENT_CAMPV2_ENABLED
+  208 callproperty getExperimentVariant 1
+  212 getlex ExperimentsManager
+  215 getproperty EXPERIMENT_CAMPV2_ENABLED_VARIANT_ENABLED
+  219 ifne ->248
+  223 getlex ZGlobal
+  226 getproperty player
+===== EXPERIMENT_CAMPAIGN_MASTERY
+-- OptionUIItem.onStrategicMapEntered
+   31 getproperty instance
+   35 getlex ExperimentsManager
+   38 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   42 callproperty getExperimentVariant 1
+   46 convert_i 
+   47 setlocal2 
+   48 getlocal2 
+   49 getlex ZGlobal
+   52 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- PlayerCampaign.calculateMasteryScalar
+  128 getproperty instance
+  132 getlex ExperimentsManager
+  135 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+  139 callproperty getExperimentVariant 1
+  143 convert_i 
+  144 setlocal2 
+  145 getlocal2 
+  146 getlex ZGlobal
+  149 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- PlayerCampaign.calculateMasteryScore
+   22 getproperty instance
+   26 getlex ExperimentsManager
+   29 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   33 callproperty getExperimentVariant 1
+   37 convert_i 
+   38 setlocal3 
+   39 getlocal3 
+   40 getlex ZGlobal
+   43 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- IslandItem.getUnits
+   38 getproperty instance
+   42 getlex ExperimentsManager
+   45 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   49 callproperty getExperimentVariant 1
+   53 convert_i 
+   54 setlocal3 
+   55 getlocal3 
+   56 getlex ZGlobal
+   59 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- StrategicSWF2RendererComponent.addCampaignMasteryIcons
+   21 getproperty instance
+   25 getlex ExperimentsManager
+   28 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   32 callproperty getExperimentVariant 1
+   36 convert_i 
+   37 setlocal1 
+   38 getlocal1 
+   39 getlex ZGlobal
+   42 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleCampaignWonPopup.setRewards
+  240 getproperty instance
+  244 getlex ExperimentsManager
+  247 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+  251 callproperty getExperimentVariant 1
+  255 convert_i 
+  256 setlocal3 
+  257 getlocal3 
+  258 getlex ZGlobal
+  261 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleSelectPopup.<init>
+    8 getproperty instance
+   12 getlex ExperimentsManager
+   15 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   19 callproperty getExperimentVariant 1
+   23 convert_i 
+   24 setlocal3 
+   25 getlocal3 
+   26 getlex ZGlobal
+   29 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleSelectPopup.initDialog
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   16 callproperty getExperimentVariant 1
+   20 convert_i 
+   21 setlocal1 
+   22 getlocal1 
+   23 getlex ZGlobal
+   26 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleSelectPopup.initPageButtons
+  236 getproperty instance
+  240 getlex ExperimentsManager
+  243 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+  247 callproperty getExperimentVariant 1
+  251 convert_i 
+  252 dup 
+  253 setlocal 13
+  255 getlex ZGlobal
+  258 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleSelectPopup.loadMap
+   79 getproperty instance
+   83 getlex ExperimentsManager
+   86 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   90 callproperty getExperimentVariant 1
+   94 convert_i 
+   95 setlocal2 
+   96 getlocal2 
+   97 getlex ZGlobal
+  100 getproperty EXPERIMENT_CAMPAIGN_MASTERY_ENABLED
+-- BattleSelectPopup.setBattleStatus
+   15 getproperty instance
+   19 getlex ExperimentsManager
+   22 getproperty EXPERIMENT_CAMPAIGN_MASTERY
+   26 callproperty getExperimentVariant 1
+   30 convert_i 
+   31 setlocal 4
+   33 getlocal0 
+   34 getproperty m_islandData
+   38 getlocal0 
+===== EXPERIMENT_DECORATIONS_MASTER
+-- DecorationsManager.enabled
+    5 getproperty instance
+    9 getlex ExperimentsManager
+   12 getproperty EXPERIMENT_DECORATIONS_MASTER
+   16 callproperty getExperimentVariant 1
+   20 convert_i 
+   21 setlocal1 
+   22 getlocal1 
+   23 pushbyte 2
+   25 equals 
+===== EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+-- WorldUpgradeManager.getNumCompletedUpgrades
+   39 getproperty instance
+   43 getlex ExperimentsManager
+   46 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   50 callproperty getExperimentVariant 1
+   54 getlex ExperimentsManager
+   57 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   61 ifeq ->78
+   65 getlocal0 
+   66 getlocal1 
+-- WorldUpgradeManager.getTotalUpgrades
+   68 getproperty instance
+   72 getlex ExperimentsManager
+   75 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   79 callproperty getExperimentVariant 1
+   83 getlex ExperimentsManager
+   86 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   90 ifeq ->109
+   94 getlocal0 
+   95 getlocal3 
+-- BattleHost.updateUnitHealth
+    9 getproperty instance
+   13 getlex ExperimentsManager
+   16 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   20 callproperty getExperimentVariant 1
+   24 getlex ExperimentsManager
+   27 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   31 ifne ->100
+   35 getlocal1 
+   36 getproperty unit
+-- BattleUnit.init
+  974 getproperty instance
+  978 getlex ExperimentsManager
+  981 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+  985 callproperty getExperimentVariant 1
+  989 getlex ExperimentsManager
+  992 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+  996 equals 
+  997 dup 
+  998 iffalse ->1016
+-- BattleUnit.doDamageUI
+   34 getproperty instance
+   38 getlex ExperimentsManager
+   41 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   45 callproperty getExperimentVariant 1
+   49 getlex ExperimentsManager
+   52 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   56 equals 
+   57 dup 
+   58 iffalse ->77
+-- BattleUnit.onUnitMiss
+   73 getproperty instance
+   77 getlex ExperimentsManager
+   80 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   84 callproperty getExperimentVariant 1
+   88 getlex ExperimentsManager
+   91 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   95 equals 
+   96 dup 
+   97 iffalse ->122
+-- BattleUnit.onUnitHit
+   91 getproperty instance
+   95 getlex ExperimentsManager
+   98 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+  102 callproperty getExperimentVariant 1
+  106 getlex ExperimentsManager
+  109 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+  113 equals 
+  114 dup 
+  115 iffalse ->140
+-- UpgradesDisplay.fillOutUpgrades
+  219 getproperty instance
+  223 getlex ExperimentsManager
+  226 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+  230 callproperty getExperimentVariant 1
+  234 getlex ExperimentsManager
+  237 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+  241 equals 
+  242 dup 
+  243 iffalse ->268
+-- UpgradesDisplay.fillOutTooltip
+   30 getproperty instance
+   34 getlex ExperimentsManager
+   37 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   41 callproperty getExperimentVariant 1
+   45 getlex ExperimentsManager
+   48 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   52 equals 
+   53 dup 
+   54 iffalse ->70
+-- ResearchUpgradeScreen.fillOutUpgrades
+   56 getproperty instance
+   60 getlex ExperimentsManager
+   63 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+   67 callproperty getExperimentVariant 1
+   71 getlex ExperimentsManager
+   74 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+   78 equals 
+   79 dup 
+   80 iffalse ->98
+-- ResearchUnitSlot.filloutStats
+ 2322 getproperty instance
+ 2326 getlex ExperimentsManager
+ 2329 getproperty EXPERIMENT_RESEARCH_SHIELD_UPGRADE
+ 2333 callproperty getExperimentVariant 1
+ 2337 getlex ExperimentsManager
+ 2340 getproperty VARIANT_RESEARCH_SHIELD_UPGRADE_ON
+ 2344 equals 
+ 2345 dup 
+ 2346 iffalse ->2372
+===== empire_survivalmode3_master
+-- SurvivalModeManager.<cinit>
+  120 initproperty EXPERIMENT_SURVIVALMODE_RETREAT
+  124 findproperty EXPERIMENT_SURVIVALMODE3_MASTER
+  128 pushstring 'empire_survivalmode3_master'
+  132 initproperty EXPERIMENT_SURVIVALMODE3_MASTER
+  136 findproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  140 pushbyte 3
+  142 initproperty VARIANT_SURVIVALMODE3_MASTER_ENABLED
+  146 findproperty EXPERIMENT_SURVIVALMODE_REFRESHREWARDS
+  150 pushstring 'empire_survivalmode_refreshrewards'
+===== empire_mech_fight_gate_flat
+===== empire_titanresearch_master
+===== empire_doober_pickup
+-- StreakBonus.rewardStreakBonus
+   14 getlex ExperimentsManager
+   17 getproperty instance
+   21 pushstring 'empire_doober_pickup'
+   25 callproperty getExperimentVariant 1
+   29 getlocal0 
+   30 getproperty USE_HOOBERS
+   33 ifne ->65
+   37 getlex Math
+   41 getlocal2 
+-- RewardPickup.init
+   59 getlex ExperimentsManager
+   62 getproperty instance
+   66 pushstring 'empire_doober_pickup'
+   70 callproperty getExperimentVariant 1
+   74 convert_i 
+   75 setlocal3 
+   76 getlocal3 
+   77 getlocal0 
+   78 getproperty USE_HOOBERS
+===== empires_consumable_2
+===== empires_support_units
+-- ZGlobal.<cinit>
+  878 initproperty EXPERIMENT_BUILDING_BUILDABLE_PARTS_V6
+  882 findproperty EXPERIMENT_SUPPORT_UNITS
+  886 pushstring 'empires_support_units'
+  890 initproperty EXPERIMENT_SUPPORT_UNITS
+  894 findproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  898 pushbyte 3
+  900 initproperty EXPERIMENT_SUPPORT_UNITS_ACTIVE
+  904 findproperty EXPERIMENT_POWERUP_BUILDABLE_PARTS_CONTROL
+  908 pushbyte 0
+===== empire_buildable_zrig_master

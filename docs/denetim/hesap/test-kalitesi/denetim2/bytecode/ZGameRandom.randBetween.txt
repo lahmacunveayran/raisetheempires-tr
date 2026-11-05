@@ -1,0 +1,12 @@
+﻿== ZGameRandom.randBetween
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 callproperty float 0
+    7 getlocal2 
+    8 getlocal1 
+    9 subtract 
+   10 multiply 
+   11 getlocal1 
+   12 add 
+   13 returnvalue 

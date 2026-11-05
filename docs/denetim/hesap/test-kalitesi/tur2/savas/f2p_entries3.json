@@ -1,0 +1,1 @@
+[{"mutant": "upgradeDamage not multiplied by the glancing multiplier", "file": "battle_engine.py", "old": "            upgrade_damage *= glance\n", "new": "", "tests": ["test/battle_turn_test.py::test_a_glancing_hit_with_damage_research_glances_the_research_too"]}]

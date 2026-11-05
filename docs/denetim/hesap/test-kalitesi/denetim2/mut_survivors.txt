@@ -1,0 +1,221 @@
+mut_battle_engine.json     sampled 200: killed by the file's tests 141 (70.5%); survivors 59, of which killed by the whole suite 0; left 59 = equivalent 22 + gaps 37
+                           score, whole suite, equivalents left out: 141/178 = 79.2% (95% CI 72.7-84.5%); scope 2201 mutants, 1584 on run lines; estimate over the whole scope 57.0% (CI 52.3-60.8%)
+   G  line   32  meta key newPVE: the answer's metadata of battle_complete_response is not asserted
+   G  line   32  meta newPVE 0->1: the client reads newPVE; not asserted
+   G  line   42  ally target of accuracy/evasion/shield consumables: no test with ally consumables in a turn
+   E  line   61  init_seed is only used in print() (lines 123, 139)
+   G  line   69  sign of the consumable accuracy: accuracy is always 0 in the turn tests
+   E  line  119  only a print() argument changes; prints are not part of the answer or the save
+   G  line  124  damage > 0 -> > 1: rewards of a 1-damage hit not asserted
+   G  line  126  quest progress name battleDamage: progress not asserted
+   G  line  173  DoT on all enemies: no DoT test (apply_dot_damage never runs)
+   G  line  181  DoT targeting of allies: no DoT test
+   G  line  192  consumable duration tries-2: remaining consumable turns not asserted
+   G  line  245  replay reward boundary a == combatReplayRewardMinimum (100) not tested
+   G  line  247  item rewards when replaying: replay path with item rewards not tested
+   G  line  281  invader (FleetName) win branch of handle_win not tested
+   E  line  413  only a print() argument changes; prints are not part of the answer or the save
+   G  line  484  open-quest filter of init_battle: the fallback gives the same enemies, the friendlies source is not told apart
+   E  line  485  task = '' vs None: only read by `if not task` (falsy both) before it is set
+   E  line  508  battle tuples are only ever made at 513, 521, 696 (None,None,None,ctx) and server 2959 (list,None,list,ctx); no state has [0] and [2] None with [1] set, so [1] is None adds nothing
+   E  line  546  get_last_fleet_name: with i=0 the second clause of the while is 'fleet1_'+zid, the same test as the first; the first value is overwritten in the loop
+   E  line  605  default '' -> 'XXXX' of a missing -poor: no unit type is called XXXX
+   G  line  744  campaign mastery (has_battle_context path) not tested
+   G  line  767  replay mastery not tested
+   G  line  767  get_min_island_mastery_from_battle / replay not tested
+   G  line  767  replay mastery not tested
+   E  line  902  targeted False -> None: only read by `if targeted` and `targeted and ...` (falsy both)
+   G  line  920  ally (A0A) power selection may pick secondary powers: list of valid ally powers not asserted
+   E  line  922  the clause c['-target'] == 'enemy' is written twice in the production code; the mutant changes the copy
+   E  line  950  'AI tried' markers: every read of active_consumables matches the target first (is_stunned 1170, get_consumable_int 1200, is_affected 1177, end turn 173-185 'enemy'/'ally', shield 1473/1478 .get); target[0]=='AI tried' never matches, so the dict is never read
+   E  line  956  only a print() argument changes; prints are not part of the answer or the save
+   G  line  972  type 'all' consumables (whole-side powers) not tested
+   G  line  997  random ally target with one live ally (ally power, not enemy turn) not tested
+   G  line 1000  target of ally-side powers (heal/buff duration) not asserted
+   G  line 1054  AI cast marker: the AI's second (targeted) assign after a cast is not tested (line 965 reads it)
+   G  line 1056  metadata key of assign_consumable_response not asserted
+   G  line 1079  shield with a 1-damage power not tested
+   G  line 1079  shield with a 0-damage power not tested
+   G  line 1082  power on a dead unit (0 strength) not tested
+   G  line 1084  secondary type-all powers with -percent not tested
+   G  line 1084  secondary type-all powers with -percent not tested
+   E  line 1096  only a print() argument changes; prints are not part of the answer or the save
+   E  line 1102  only a print() argument changes; prints are not part of the answer or the save
+   E  line 1102  only a print() argument changes; prints are not part of the answer or the save
+   E  line 1113  default of -di: all 4 consumables with -chipFactor in gameSettings_with_fixes.xml have di
+   E  line 1122  only a print() argument changes; prints are not part of the answer or the save
+   E  line 1123  <= 0 -> < 0: at exactly 0 the block only sets 0 again and prints
+   G  line 1123  collateral damage leaving an ally at 1 strength not tested
+   E  line 1154  diagonal of the adjacency table, as 1654
+   E  line 1154  diagonal of the adjacency table: unit_1 == unit_2 returns 0 at line 1149 before the table
+   G  line 1195  evasion (-defend) consumables not tested
+   G  line 1327  campaign 02 ('D' maps) not tested
+   G  line 1327  campaign 02 ('D' maps) not tested
+   E  line 1437  only a print() argument changes; prints are not part of the answer or the save
+   G  line 1448  loss reward of a unit whose cost has -rare: only one rare kind tested
+   G  line 1448  loss reward of -nrare4 not tested
+   G  line 1448  loss reward of -nrare1 not tested
+   E  line 1453  only a print() argument changes; prints are not part of the answer or the save
+   E  line 1453  only a print() argument changes; prints are not part of the answer or the save
+   G  line 1489  has_battle_context always False -> mastery/replay never run: not detected
+   G  line 1498  BattleContext.map_name default: campaign context not asserted
+mut_save_engine.json       sampled 167: killed by the file's tests 106 (63.5%); survivors 61, of which killed by the whole suite 5; left 56 = equivalent 10 + gaps 46
+                           score, whole suite, equivalents left out: 111/157 = 70.7% (95% CI 63.2-77.3%); scope 208 mutants, 167 on run lines; estimate over the whole scope 56.8% (CI 50.7-62.0%)
+   G  line   28  crash_log default True: the tests turn it off (conftest) and nothing checks the default
+   G  line   28  crash_log default, as 0
+   K2 line   43  lookup_objects_by_item_name: not used by the save tests
+   K2 line   43  lookup_objects_by_item_name: not used by the save tests
+   K2 line   43  lookup_objects_by_item_name: not used by the save tests
+   K2 line   43  lookup_objects_by_item_name: not used by the save tests
+   G  line   43  lookup_objects_by_item_name: not used by the save tests
+   K2 line   43  lookup_objects_by_item_name: not used by the save tests
+   G  line   55  CIRCULAR: empires_test.py:414-420 takes the expected count from backup_db.MAX_BACKUPS itself
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   56  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   57  BACKUP_KEYS: the content of a restored backup (quests, battle, fleets, population, saved, saved_on, original_save_version) is not asserted
+   G  line   74  _save_id of saves read from the database (session_id key) not tested
+   G  line   74  _save_id fallback 'local' not tested
+   G  line   75  _save_id of a save read from the database (prefix 'session:') not compared with create_backup's id
+   G  line   75  _save_id prefix cut: store and list use the same function, so a wrong cut is consistent; not tested against the real session id
+   G  line   82  replaced_on column of a backup not asserted
+   G  line   82  saved_on column of a backup not asserted
+   G  line   83  default message of a backup without message (nested chain) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line   96  list_backups metadata (saved_on, replaced_on, save_version) not asserted
+   G  line  112  nested chain: a stored backup still holding its own chain is not detected
+   G  line  122  backup timestamps not asserted
+   E  line  123  deepcopy -> copy: store_backup pickles the backup at once (line 83), before the session can change
+   G  line  124  replaced_on of create_backup not asserted
+   G  line  124  replaced_on of create_backup not asserted
+   G  line  127  session saved_on after create_backup not asserted
+   G  line  127  session saved_on after create_backup not asserted
+   G  line  130  save_database_uri: the tests set their own database URI, the real one is never checked
+   G  line  133  save_database_uri: running-from-source path not tested
+   G  line  133  save_database_uri: running-from-source path not tested
+   G  line  147  save_database_uri: running-from-source path not tested
+   E  line  149  only a print() argument changes; prints are not part of the answer or the save
+   E  line  149  only a print() argument changes; prints are not part of the answer or the save
+   G  line  151  save_database_uri: the returned URI is never checked
+   G  line  163  base_path of the frozen exe not tested
+   G  line  177  set_crash_log(True) not tested (the tests only call it with False)
+   G  line  199  name of the log file (the 500 handler opens log.txt) not checked
+   G  line  201  exception_handler (uses logger) not tested
+   G  line  225  get_saves with a save without user_object not tested
+   G  line  229  enrich_save session_id not asserted
+   E  line  252  pending_saves left in g: guarded_call (empires-server.py:988) sets a new list for every call and no store_session runs after the block in the same request [inferred]
+   E  line  269  converted is only printed; with 1 at the start a no-op commit is added
+   E  line  276  converted 2n: only the print changes
+   E  line  276  converted is only printed and tested for != 0, which holds for 1 as for n >= 1
+   E  line  276  converted -n is != 0 too; only the print changes
+   E  line  281  only a print() argument changes; prints are not part of the answer or the save
+   E  line  281  only a print() argument changes; prints are not part of the answer or the save
+   G  line  284  validate_save default: a save without user_object must be refused; not tested
+   G  line  295  validate_save: level int AND the others -> OR; a save with a good level and a bad other field is not tested (the mutant is on line 286, the statement starts there)
+   G  line  296  validate_save blank_allowed path not tested
+   G  line  296  validate_save blank_allowed path not tested
+   G  line  296  validate_save blank_allowed path not tested
+mut_server_save.json       sampled 150: killed by the file's tests 90 (60.0%); survivors 60, of which killed by the whole suite 0; left 60 = equivalent 12 + gaps 48
+                           score, whole suite, equivalents left out: 90/138 = 65.2% (95% CI 57.0-72.7%); scope 387 mutants, 352 on run lines; estimate over the whole scope 59.3% (CI 51.8-66.1%)
+   G  line  103  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   G  line  103  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   G  line  103  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   G  line  103  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   G  line  104  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   G  line  104  ASSET_PATH_PREFIXES: only some asset paths are tested to skip the save (and its lock)
+   E  line  152  only a print() argument changes; prints are not part of the answer or the save
+   E  line  157  HTTPONLY None: werkzeug set_cookie adds HttpOnly only `if httponly`, None and False give the same cookie
+   G  line  157  SESSION_COOKIE_HTTPONLY: cookie flag not asserted
+   G  line  162  MAX_FORM_MEMORY_SIZE (5 MB save editor form) not tested
+   G  line  162  MAX_FORM_MEMORY_SIZE not tested
+   G  line  167  SECURITY: cross-site block tested for /wipe_session and /save-editor only (empires_test.py:378-382); /gazillionaire, /deprogress, /complete_quest/, /chooseavatar/ ... not
+   G  line  167  SECURITY: cross-site block tested for /wipe_session and /save-editor only (empires_test.py:378-382); /gazillionaire, /deprogress, /complete_quest/, /chooseavatar/ ... not
+   G  line  168  SECURITY: cross-site block tested for /wipe_session and /save-editor only (empires_test.py:378-382); /gazillionaire, /deprogress, /complete_quest/, /chooseavatar/ ... not
+   G  line  169  SECURITY: cross-site block tested for /wipe_session and /save-editor only (empires_test.py:378-382); /gazillionaire, /deprogress, /complete_quest/, /chooseavatar/ ... not
+   E  line  191  no HTTP_HOST and no SERVER_NAME: '' and 'XXXX' are both refused by is_known_host
+   G  line  194  content type of the 403 answer not asserted (cosmetic)
+   E  line  202  only a print() argument changes; prints are not part of the answer or the save
+   G  line  203  body of the 403 answer not asserted (cosmetic)
+   E  line  211  only a print() argument changes; prints are not part of the answer or the save
+   G  line  212  body of the 403 answer not asserted (cosmetic)
+   G  line  301  POST /wipe_session not tested
+   G  line  306  redirect target of /wipe_session not asserted (status only)
+   E  line  528  only a print() argument changes; prints are not part of the answer or the save
+   G  line  530  save editor page: quest lists not asserted
+   G  line  531  save editor page: quest lists not asserted
+   G  line  531  save editor page: quest lists not asserted
+   G  line  536  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  538  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  539  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  540  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  541  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  543  save editor page: the save JSON shown (profilePic, battle, last_battle, fleets, population, save_version) not asserted
+   G  line  545  save editor page: value that can't be shown not tested
+   G  line  546  save editor page: valid flag not asserted
+   E  line  555  only a print() argument changes; prints are not part of the answer or the save
+   G  line  556  save editor: restoring a backup (form key restore<n>) not tested by the save tests
+   G  line  572  save editor: backup message not asserted
+   G  line  572  save editor: backup message 'before <message>' not asserted
+   G  line  582  save editor: session['saved'] marker not asserted
+   G  line  582  save editor: session['saved'] marker not asserted
+   G  line  582  save editor: session['saved'] marker not asserted
+   G  line  584  save editor: profilePic handling not tested
+   G  line  584  save editor: profilePic handling not tested
+   G  line  584  save editor: profilePic handling not tested
+   G  line  589  save editor: battle/fleets/population written by the editor not asserted
+   G  line  589  save editor: battle/fleets/population written by the editor not asserted
+   G  line  590  save editor: battle/fleets/population written by the editor not asserted
+   G  line  591  save editor: battle/fleets/population written by the editor not asserted
+   E  line  913  only a print() argument changes; prints are not part of the answer or the save
+   G  line  937  Ruffle gateway route /127.0.0.1flashservices/gateway.php not tested
+   G  line  938  transactional_session removed: no test of a request failing outside guarded_call (e.g. a broken AMF body) restoring the save
+   E  line  940  only a print() argument changes; prints are not part of the answer or the save
+   E  line  966  logger=True/False of pyamf remoting.encode only changes logging, not the bytes
+   E  line  996  only a print() argument changes; prints are not part of the answer or the save
+   G  line 1003  'data' key of the CALL_FAILED answer not asserted
+   G  line 3205  500 handler registration: the tests call server_error_page() directly (session_layer_test.py:527), no real failing request goes through it
+   G  line 3205  500 handler registration, as 351
+   G  line 3211  file name the crash editor opens not asserted
+   E  line 3217  crash_log_editor '' vs None: only read by `crash_log_editor and ...is_alive()` (falsy both)
+mut_save_migration.json    sampled 60: killed by the file's tests 28 (46.7%); survivors 32, of which killed by the whole suite 0; left 32 = equivalent 2 + gaps 30
+                           score, whole suite, equivalents left out: 28/58 = 48.3% (95% CI 35.9-60.8%); scope 260 mutants, 163 on run lines; estimate over the whole scope 30.3% (CI 22.5-38.1%)
+   E  line   14  only a print() argument changes; prints are not part of the answer or the save
+   G  line   21  0.02a step: only quests not complete are reset; not asserted
+   E  line   23  only a print() argument changes; prints are not part of the answer or the save
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   27  0.02a step: the reset expansion list is not asserted (only the unlocked ones)
+   G  line   41  no test migrates a 0.04a save (the step is skipped and the save stays 0.04a)
+   G  line   41  no test migrates a 0.04a save
+   G  line   59  0.06a -> 0.07a step: save_version not asserted
+   G  line   66  0.08a step: the experiment values it sets are not asserted
+   G  line   66  0.08a step: the experiment values it sets are not asserted
+   G  line   67  0.08a step: the experiment values it sets are not asserted
+   G  line   67  0.08a step: the experiment values it sets are not asserted
+   G  line   68  0.08a step: the experiment values it sets are not asserted
+   G  line   68  0.08a step: the experiment values it sets are not asserted
+   G  line   69  0.08a step: the experiment values it sets are not asserted
+   G  line   71  0.08a step: the experiment values it sets are not asserted
+   G  line   71  0.08a step: the experiment values it sets are not asserted
+   G  line   72  0.08a step: the experiment values it sets are not asserted
+   G  line   72  0.08a step: the experiment values it sets are not asserted
+   G  line   74  0.08a step: the experiment values it sets are not asserted
+   G  line   74  0.08a step: the experiment values it sets are not asserted
+   G  line   75  0.08a step: the experiment values it sets are not asserted
+   G  line   77  0.08a step: the experiment values it sets are not asserted
+   G  line   77  0.08a step: the experiment values it sets are not asserted
+   G  line   77  0.08a step: the experiment values it sets are not asserted
+   G  line   89  0.02a step: zero_yield of quest progress not asserted
+   G  line   89  0.02a step: zero_yield of quest progress not asserted
+ALL: sampled 577, killed 365 + 5 by the whole suite, equivalent 46, gaps 161 -> 69.7%

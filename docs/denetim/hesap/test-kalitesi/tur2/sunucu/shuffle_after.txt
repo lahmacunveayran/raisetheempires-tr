@@ -1,0 +1,12 @@
+== SHUFFLE_SEED=11
+[shuffle] order seed 11 first: test/battle_turn_test.py::test_killed_support_units_cast_no_more
+258 passed in 45.83s
+== SHUFFLE_SEED=22
+[shuffle] order seed 22 first: test/event_buildings_test.py::test_activating_with_parts_lost_on_the_server_still_gives_the_reward
+258 passed in 36.02s
+== SHUFFLE_SEED=33
+[shuffle] order seed 33 first: test/battle_turn_test.py::test_losing_a_unit_pays_the_first_rare_of_its_cost
+258 passed in 47.08s
+== SHUFFLE_SEED=reverse
+[shuffle] order seed reverse first: test/treasure_vault_test.py::test_every_vault_can_give_each_of_its_prizes
+258 passed in 48.70s

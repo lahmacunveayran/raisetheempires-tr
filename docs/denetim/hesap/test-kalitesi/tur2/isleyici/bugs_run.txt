@@ -1,0 +1,9 @@
+﻿
+FAILED test/zz_server_bugs_test.py::test_bought_expansion_keys_go_to_the_inventory
+FAILED test/zz_server_bugs_test.py::test_the_first_expansion_costs_its_xml_price
+FAILED test/zz_server_bugs_test.py::test_using_an_energy_item_gives_its_energy
+FAILED test/zz_server_bugs_test.py::test_an_energy_refill_is_paid - assert (2...
+FAILED test/zz_server_bugs_test.py::test_buying_without_enough_cash_changes_nothing
+5 failed, 21 passed, 95 warnings in 5.70s
+
+

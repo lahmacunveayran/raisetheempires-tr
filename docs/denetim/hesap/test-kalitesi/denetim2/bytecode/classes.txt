@@ -1,0 +1,163 @@
+﻿class ZGameRandom extends Object
+    0 m_w uint
+    0 m_z uint
+    method init 
+    method random 
+    getter initialisers 
+    method float 
+    method randBetween 
+    static 0 ACCURACY int
+    static 0 instance ZGameRandom
+    static 0 rewardInstance ZGameRandom
+    static 0 ransomInstance ZGameRandom
+    static 0 scrapInstance ZGameRandom
+class BattleHost extends Battle
+    6 WEAK_ROLL Number
+    6 STRONG_ROLL Number
+    6 EXPERIMENT_AI_FOCUSFIRE_MINVARIANT int
+    0 m_userExitBattle Boolean
+    0 m_battleResult int
+    0 m_selector BattleSelector
+    0 m_selectedUnit BattleObject
+    0 m_battleOver Boolean
+    0 m_deferredConsumable ConsumableItem
+    0 m_noEnergy int
+    0 m_turnEnded Boolean
+    getter battleResult 
+    method dispose 
+    method initSetup 
+    method onRecreatePlayerGroup 
+    method setupStateMachine 
+    method onContinueFromConsumable 
+    method restartSequenceFromConsumable 
+    method allUnitsStunned 
+    method initStateDictionary 
+    method onStartBattle 
+    method startSequence 
+    method startPlayer 
+    method getBestObject 
+    setter selector 
+    method state_ChoosePlayerAttacker 
+    method state_ChooseEnemyTarget 
+    method onUnitPowerUsed 
+    method playerUnitFloatingText 
+    method manaUI 
+    method energyUI 
+    method ammoUI 
+    method libertyBondUI 
+    method kickOffBattleSequence 
+    method state_StartAISequence 
+    method state_UseSecondaryAbility 
+    method onExecuteSecondaryAbility 
+    getter shouldAIFocusFire 
+    method state_ChoosePlayerTarget 
+    method state_Resolve 
+    method state_CheckResults 
+    method getFirstAliveUnit 
+    method updateConsumableSkipped 
+    method state_SequenceComplete 
+    method stunnedSkipPlayerTurn 
+    method skipPlayerTurn 
+    method skipToPlayer 
+    method state_WaitForInput 
+    method checkExitBattle 
+    method getDiceRoll 
+    method resolveAttack 
+    method updateUnitHealth 
+    method onCancelConsumable 
+    method setupGroupsByFleets 
+    method endBattleWithRetreat 
+    method endBattleWithCancel 
+    method battleOver 
+    method isPVEChallenge 
+    method isAllianceBattle 
+    method setBattleResult 
+    method removeFleets 
+    method canUseObject 
+    setter player 
+    setter playerOver 
+    setter enemy 
+    setter enemyOver 
+    setter consumable 
+    method activateConsumableFromMercOrAlly 
+    method activateConsumableFromQuestPower 
+    method onTriggerConsumable 
+    setter ally 
+    setter merc 
+    setter questPower 
+    method onEnergyPopupClosed 
+    method onContinueCheck 
+    method onUnitUsedConsumableEnergy 
+    static 6 INVALID_OK int
+    static 6 INVALID_ENERGY int
+    static 6 INVALID_AMMO int
+    static 6 INVALID_MANA int
+class BattleAI extends Object
+    0 m_combatChain CombatChain
+    0 m_defenders Array
+    0 m_attackers Array
+    0 m_switchRatio Number
+    0 m_switchPercent Number
+    0 m_glancingBlowMult Number
+    0 m_criticalHitMult Number
+    0 m_criticalHitPercent Number
+    0 m_AICanMiss Boolean
+    0 m_AICanCritical Boolean
+    0 m_allowMiss Boolean
+    0 m_shouldFocusFire Boolean
+    setter attackers 
+    setter shouldFocusFire 
+    getter glancingBlowMult 
+    getter criticalHitMult 
+    getter criticalHitPercent 
+    getter AICanMiss 
+    getter AICanCritical 
+    getter allowMiss 
+    method dispose 
+    method FindBestDefendingUnit 
+    method FindBestAttacker 
+    method FindBestDefendingUnitAgainstBestAttacker 
+    method pickBestFocusFireAttacker 
+    method FindBestDefendingUnitAgainstAttackers 
+    method firstGoodUnit 
+    method pickBestFocusFireDefender 
+    method findBestUnit 
+    method GetAttackingHitChance 
+    method GetAttackingHitValue 
+    method getMostDamagedUnit 
+    method getBestUnitForAttackingPower 
+    method getBestUnitForFriendlyPower 
+    method SecondaryAbilityHueristicsTarget 
+    method getHitPercentModifier 
+    method GetDamageBase 
+    method GetAttackingDamage 
+    method GetAttackingDamageFromAbsoluteValue 
+    method GetAttackingStrengthAgainst 
+    method GetAttackingStrengthAgainstFromAbsoluteValue 
+    static 6 STRENGTH_CURRENT int
+    static 6 STRENGTH_MAX int
+class CombatChain extends Object
+    0 m_combatChain Dictionary
+    0 m_hitValues Dictionary
+    0 m_chanceValues Dictionary
+    method dispose 
+    method GetAttackingHitValue 
+    method GetAttackingHitChance 
+    method getChain 
+    method getHitValue 
+    method init 
+    static 6 POOR uint
+    static 6 GOOD uint
+    static 6 GREAT uint
+class Chain extends Object
+    0 m_great Array
+    0 m_poor Array
+    method getHitValue 
+    getter great 
+    setter great 
+    getter poor 
+    setter poor 
+    method isIn 
+    static 6 POOR String
+    static 6 GOOD String
+    static 6 GREAT String

@@ -1,0 +1,69 @@
+baseline 12.5 s
+empires-server.py 68 line 169 survived -> killed 6.4 FAILED test/save_server_test.py::test_cross_site_requests_change_nothing[GET /chooseavatar/evil.png]
+empires-server.py 86 line 191 survived -> survived 11.1 ........................................................................ [ 38%]
+.............................
+empires-server.py 93 line 194 survived -> survived 11.5 ........................................................................ [ 38%]
+.............................
+empires-server.py 97 line 202 survived -> survived 12.2 ........................................................................ [ 38%]
+.............................
+empires-server.py 98 line 203 survived -> survived 11.9 ........................................................................ [ 38%]
+.............................
+empires-server.py 107 line 211 survived -> survived 13.7 ........................................................................ [ 38%]
+.............................
+empires-server.py 109 line 212 survived -> survived 12.5 ........................................................................ [ 38%]
+.............................
+empires-server.py 113 line 301 survived -> killed 7.7 FAILED test/save_server_test.py::test_requests_from_the_servers_own_pages_get_through[POST /wipe_session]
+empires-server.py 118 line 306 survived -> killed 10.2 FAILED test/save_server_test.py::test_deleting_the_save_backs_it_up_and_goes_to_the_login_page
+empires-server.py 126 line 528 survived -> survived 16.8 ........................................................................ [ 38%]
+.............................
+empires-server.py 131 line 530 survived -> killed 11.0 FAILED test/save_server_test.py::test_the_save_editor_links_the_quests_by_their_state
+empires-server.py 133 line 531 survived -> killed 11.1 ERROR    empires-server:app.py:875 Exception on /save-editor [GET]
+empires-server.py 134 line 531 survived -> killed 10.5 FAILED test/save_server_test.py::test_the_save_editor_links_the_quests_by_their_state
+empires-server.py 143 line 536 survived -> killed 10.6 ERROR    empires-server:app.py:875 Exception on /save-editor [GET]
+empires-server.py 151 line 538 survived -> killed 10.7 ERROR    empires-server:app.py:875 Exception on /save-editor [GET]
+empires-server.py 155 line 539 survived -> killed 11.2 ERROR    empires-server:app.py:875 Exception on /save-editor [GET]
+empires-server.py 159 line 540 survived -> killed 12.7 ERROR    empires-server:app.py:875 Exception on /save-editor [GET]
+empires-server.py 164 line 541 survived -> killed 12.8 FAILED test/save_server_test.py::test_the_save_editor_shows_every_part_of_the_save
+empires-server.py 172 line 543 survived -> killed 12.9 FAILED test/save_server_test.py::test_the_save_editor_shows_every_part_of_the_save
+empires-server.py 178 line 545 survived -> killed 10.2 FAILED test/save_server_test.py::test_the_save_editor_shows_every_part_of_the_save
+empires-server.py 182 line 546 survived -> survived 15.0 ........................................................................ [ 38%]
+.............................
+empires-server.py 191 line 555 survived -> survived 14.2 ........................................................................ [ 38%]
+.............................
+empires-server.py 193 line 556 survived -> killed 10.5 FAILED test/save_server_test.py::test_a_backup_restored_in_the_save_editor_brings_the_save_back
+empires-server.py 217 line 572 survived -> killed 10.9 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 218 line 572 survived -> killed 11.0 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 229 line 582 survived -> killed 10.4 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 230 line 582 survived -> survived 13.5 ........................................................................ [ 38%]
+.............................
+empires-server.py 233 line 582 survived -> killed 9.9 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 238 line 584 survived -> killed 9.4 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 239 line 584 survived -> killed 9.7 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 241 line 584 survived -> killed 9.6 ERROR    empires-server:app.py:875 Exception on /save-editor [POST]
+empires-server.py 248 line 589 survived -> killed 10.1 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 250 line 589 survived -> killed 9.7 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 253 line 590 survived -> killed 11.5 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 255 line 591 survived -> killed 12.3 FAILED test/save_server_test.py::test_the_save_editor_writes_what_it_was_given
+empires-server.py 288 line 913 survived -> survived 16.2 ........................................................................ [ 38%]
+.............................
+empires-server.py 299 line 937 survived -> survived 12.0 ........................................................................ [ 38%]
+.............................
+empires-server.py 301 line 938 survived -> survived 11.4 ........................................................................ [ 38%]
+.............................
+empires-server.py 302 line 940 survived -> survived 11.1 ........................................................................ [ 38%]
+.............................
+empires-server.py 326 line 966 survived -> survived 11.2 ........................................................................ [ 38%]
+.............................
+empires-server.py 340 line 996 survived -> survived 12.6 ........................................................................ [ 38%]
+.............................
+empires-server.py 350 line 1003 survived -> survived 15.5 ........................................................................ [ 38%]
+.............................
+empires-server.py 351 line 3205 survived -> survived 16.3 ........................................................................ [ 38%]
+.............................
+empires-server.py 352 line 3205 survived -> survived 14.9 ........................................................................ [ 38%]
+.............................
+empires-server.py 357 line 3211 survived -> survived 14.9 ........................................................................ [ 38%]
+.............................
+empires-server.py 361 line 3217 survived -> survived 15.9 ........................................................................ [ 38%]
+.............................
+ALL DONE

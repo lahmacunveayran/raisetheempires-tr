@@ -1,0 +1,47 @@
+﻿........................................................................ [ 31%]
+........................................................................ [ 62%]
+........................................................................ [ 93%]
+..............                                                           [100%]
+============================== warnings summary ===============================
+..\venv312\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+..\venv312\Lib\site-packages\pyamf\util\__init__.py:217
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\pyamf\util\__init__.py:217: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    datetime.datetime.utcfromtimestamp(-31536000.0)
+
+test/empires_test.py::test_post_gateway
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\pyamf\util\__init__.py:207: DeprecationWarning: defusedxml.lxml is no longer supported and will be removed in a future release.
+    mod = __import__(mod_name)
+
+test/empires_test.py::test_post_gateway
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\pyamf\util\__init__.py:207: DeprecationWarning: defusedxml.cElementTree is deprecated, import from defusedxml.ElementTree instead.
+    mod = __import__(mod_name)
+
+test/session_layer_test.py: 36 warnings
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\flask_session\sqlalchemy\sqlalchemy.py:168: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    storage_expiration_datetime = datetime.utcnow() + session_lifetime
+
+test/session_layer_test.py: 18 warnings
+  C:\Users\<user>\Desktop\Raise\venv312\Lib\site-packages\flask_session\sqlalchemy\sqlalchemy.py:141: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    if record and (record.expiry is None or record.expiry <= datetime.utcnow()):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================ slowest 15 durations =============================
+8.61s call     test/bot_empires_test.py::test_the_easy_bots_are_beaten_more_often
+4.98s call     test/treasure_vault_test.py::test_every_vault_can_give_each_of_its_prizes
+2.67s call     test/bot_empires_test.py::test_the_battles_played_here_are_the_engines
+1.39s call     test/battle_turn_test.py::test_turns_follow_the_client
+0.68s call     test/quest_trees_test.py::test_finished_tree_makes_room_for_the_next
+0.55s call     test/session_layer_test.py::test_init_user_migrates_a_0_08a_preview_save
+0.54s call     test/session_layer_test.py::test_overlapping_requests_of_one_save_wait_for_each_other
+0.54s call     test/client_patches_test.py::test_hook_placement_patch_applies_to_the_served_client
+0.47s call     test/quest_trees_test.py::test_login_offers_one_tree_and_starts_its_first_quest
+0.38s call     test/empires_test.py::test_create_backup_keeps_save_small_and_bounded
+0.37s call     test/session_layer_test.py::test_the_settings_files_are_served_without_a_mod
+0.36s call     test/event_buildings_test.py::test_settings_carry_the_dates_and_working_assets
+0.34s call     test/quest_trees_test.py::test_reset_replays_tree
+0.31s call     test/megaseries_test.py::test_no_series_without_water_or_below_level
+0.30s call     test/bot_empires_test.py::test_defenders_are_regular_army_units_of_the_bots_level
+230 passed, 58 warnings in 30.99s

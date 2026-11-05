@@ -1,0 +1,23 @@
+﻿== BattleHost.getDiceRoll
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal1 
+    3 getproperty unitItem
+    6 getproperty weak
+    9 iffalse ->18
+   13 getlocal0 
+   14 getproperty WEAK_ROLL
+   17 returnvalue 
+   18 getlocal2 
+   19 getproperty unitItem
+   22 getproperty weak
+   25 iffalse ->34
+   29 getlocal0 
+   30 getproperty STRONG_ROLL
+   33 returnvalue 
+   34 getlex ZGameRandom
+   37 getproperty instance
+   41 pushdouble 0.0
+   43 pushbyte 1
+   45 callproperty randBetween 2
+   49 returnvalue 

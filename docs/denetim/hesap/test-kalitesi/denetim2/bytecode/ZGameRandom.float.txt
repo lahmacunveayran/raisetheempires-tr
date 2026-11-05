@@ -1,0 +1,23 @@
+﻿== ZGameRandom.float
+    0 getlocal0 
+    1 pushscope 
+    2 findpropstrict Number
+    4 getlocal0 
+    5 callproperty random 0
+    9 callproperty Number 1
+   12 convert_d 
+   13 setlocal1 
+   14 getlocal1 
+   15 getlex uint
+   17 getproperty MAX_VALUE
+   21 divide 
+   22 convert_d 
+   23 setlocal1 
+   24 getlex MathUtils
+   27 getlocal1 
+   28 getlex ACCURACY
+   32 callproperty roundTo 2
+   37 convert_d 
+   38 setlocal1 
+   39 getlocal1 
+   40 returnvalue 

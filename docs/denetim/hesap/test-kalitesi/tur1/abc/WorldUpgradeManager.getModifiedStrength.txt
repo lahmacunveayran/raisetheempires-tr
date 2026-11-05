@@ -1,0 +1,63 @@
+== WorldUpgradeManager.getModifiedStrength
+    0 getlocal0 
+    1 pushscope 
+    2 pushnull 
+    3 coerce_s 
+    4 setlocal3 
+    5 pushnull 
+    6 coerce UpgradeItem
+    9 setlocal 4
+   11 pushbyte 0
+   13 setlocal 5
+   15 getlocal1 
+   16 coerce_a 
+   17 setlocal 6
+   19 jump ->113
+   24 getlocal 6
+   26 getlocal 5
+   28 nextvalue 
+   29 coerce_s 
+   30 setlocal3 
+   31 getlex ZGlobal
+   34 getproperty gameSettings
+   38 getlocal3 
+   39 getlex UpgradeItem
+   42 callproperty getItemByCode 2
+   46 getlex UpgradeItem
+   49 astypelate 
+   50 coerce UpgradeItem
+   53 dup 
+   54 setlocal 4
+   56 callproperty modifiesStrength 0
+   60 iffalse ->113
+   64 getlocal 4
+   66 callproperty isPercentageModifier 0
+   70 iffalse ->92
+   74 getlocal2 
+   75 getlocal2 
+   76 getlocal 4
+   78 getproperty strengthModifier
+   81 multiply 
+   82 pushbyte 100
+   84 divide 
+   85 add 
+   86 convert_d 
+   87 setlocal2 
+   88 jump ->101
+   92 getlocal2 
+   93 getlocal 4
+   95 getproperty strengthModifier
+   98 add 
+   99 convert_d 
+  100 setlocal2 
+  101 getlex Math
+  105 getlocal2 
+  106 callproperty round 1
+  111 convert_d 
+  112 setlocal2 
+  113 hasnext2 6 5
+  116 iftrue ->23
+  120 kill 6
+  122 kill 5
+  124 getlocal2 
+  125 returnvalue 

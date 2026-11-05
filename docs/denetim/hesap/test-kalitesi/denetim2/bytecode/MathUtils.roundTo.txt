@@ -1,0 +1,35 @@
+﻿== MathUtils.roundTo
+    0 getlocal0 
+    1 pushscope 
+    2 pushbyte 1
+    4 setlocal3 
+    5 jump ->19
+   10 getlocal3 
+   11 pushbyte 10
+   13 multiply 
+   14 convert_i 
+   15 setlocal3 
+   16 getlocal2 
+   17 decrement_i 
+   18 setlocal2 
+   19 getlocal2 
+   20 pushbyte 0
+   22 ifgt ->9
+   26 getlex int
+   28 getglobalscope 
+   29 getlocal1 
+   30 getlocal3 
+   31 multiply 
+   32 call 1
+   34 convert_i 
+   35 setlocal 4
+   37 getlex Number
+   39 getglobalscope 
+   40 getlocal 4
+   42 call 1
+   44 getlocal3 
+   45 divide 
+   46 convert_d 
+   47 setlocal1 
+   48 getlocal1 
+   49 returnvalue 

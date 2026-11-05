@@ -1,0 +1,174 @@
+{
+ "audit#1": {
+  "desc": "line 103: ASSET_PATH_PREFIXES = (\"/img/\", \"XX/js/XX\", \"/css/\", \"/nullassets/\", \"/assets/\", \"/127.0.0.1\", \"/gameSettings.xml\",",
+  "status": "killed",
+  "seconds": 7.6,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#2": {
+  "desc": "line 103: ASSET_PATH_PREFIXES = (\"/img/\", \"/js/\", \"XX/css/XX\", \"/nullassets/\", \"/assets/\", \"/127.0.0.1\", \"/gameSettings.xml\",",
+  "status": "killed",
+  "seconds": 7.9,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#4": {
+  "desc": "line 103: ASSET_PATH_PREFIXES = (\"/img/\", \"/js/\", \"/css/\", \"/nullassets/\", \"XX/assets/XX\", \"/127.0.0.1\", \"/gameSettings.xml\",",
+  "status": "killed",
+  "seconds": 7.8,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#6": {
+  "desc": "line 103: ASSET_PATH_PREFIXES = (\"/img/\", \"/js/\", \"/css/\", \"/nullassets/\", \"/assets/\", \"/127.0.0.1\", \"XX/gameSettings.xmlXX\",",
+  "status": "killed",
+  "seconds": 8.4,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#7": {
+  "desc": "line 104: \"XX/changelog.txtXX\", \"/favicon.ico\", \"/files/empire-s.assets.zgncdn.com/assets/109338/ZGame\")",
+  "status": "killed",
+  "seconds": 8.6,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#8": {
+  "desc": "line 104: \"/changelog.txt\", \"XX/favicon.icoXX\", \"/files/empire-s.assets.zgncdn.com/assets/109338/ZGame\")",
+  "status": "killed",
+  "seconds": 8.6,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#44": {
+  "desc": "line 157: app.config['SESSION_COOKIE_HTTPONLY'] = True",
+  "status": "killed",
+  "seconds": 6.5,
+  "detail": "FAILED test/server_setup_test.py::test_the_save_cookie_can_be_replaced_by_the_pages_and_is_not_sent_by_other_sites"
+ },
+ "audit#52": {
+  "desc": "line 162: app.config['MAX_FORM_MEMORY_SIZE'] = 5 * 1025 * 1024  # 5 MB",
+  "status": "killed",
+  "seconds": 6.7,
+  "detail": "FAILED test/server_setup_test.py::test_the_save_editor_takes_a_form_of_5_mb_but_not_more"
+ },
+ "audit#55": {
+  "desc": "line 162: app.config['MAX_FORM_MEMORY_SIZE'] = None  # 5 MB",
+  "status": "killed",
+  "seconds": 6.4,
+  "detail": "FAILED test/server_setup_test.py::test_the_save_editor_takes_a_form_of_5_mb_but_not_more"
+ },
+ "audit#60": {
+  "desc": "line 167: SAVE_CHANGING_PATH_PREFIXES = (\"/wipe_session\", \"/list_session\", \"XX/gazillionaireXX\", \"/deprogress\", \"/seed/\", \"/patch/\",",
+  "status": "killed",
+  "seconds": 5.5,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /gazillionaire [GET]"
+ },
+ "audit#61": {
+  "desc": "line 167: SAVE_CHANGING_PATH_PREFIXES = (\"/wipe_session\", \"/list_session\", \"/gazillionaire\", \"XX/deprogressXX\", \"/seed/\", \"/patch/\",",
+  "status": "killed",
+  "seconds": 5.4,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /deprogress [GET]"
+ },
+ "audit#65": {
+  "desc": "line 168: \"/unlock_quest/\", \"XX/complete_quest/XX\", \"/remove_quest/\", \"/save-editor\",",
+  "status": "killed",
+  "seconds": 5.1,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /complete_quest/Q0516 [GET]"
+ },
+ "audit#68": {
+  "desc": "line 169: \"XX/chooseavatar/XX\", \"/login.html\", \"/new.html\")",
+  "status": "killed",
+  "seconds": 5.5,
+  "detail": "FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/chooseavatar/img/avatars/a.png]"
+ },
+ "audit#93": {
+  "desc": "line 194: start_response(\"403 Forbidden\", [(\"Content-Type\", \"XXtext/plainXX\")])",
+  "status": "killed",
+  "seconds": 4.7,
+  "detail": "FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio"
+ },
+ "audit#98": {
+  "desc": "line 203: return \"XXUnknown hostXX\", 403",
+  "status": "killed",
+  "seconds": 4.8,
+  "detail": "FAILED test/server_setup_test.py::test_flask_itself_also_refuses_other_hosts"
+ },
+ "audit#109": {
+  "desc": "line 212: return \"XXCross-site request blockedXX\", 403",
+  "status": "killed",
+  "seconds": 4.7,
+  "detail": "FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/wipe_session]"
+ },
+ "audit#113": {
+  "desc": "line 301: @app.route(\"/wipe_session\", methods=['GET', 'XXPOSTXX'])",
+  "status": "survived",
+  "seconds": 10.2,
+  "detail": "........................................................................ [ 75%]\r\n.......................                                                  [100%]\r\n95 passed in 8.09s\r\n"
+ },
+ "audit#118": {
+  "desc": "line 306: response = make_response(redirect('XX/login.htmlXX'))",
+  "status": "killed",
+  "seconds": 6.1,
+  "detail": "FAILED test/server_setup_test.py::test_deleting_a_save_goes_to_the_login_page"
+ },
+ "audit#299": {
+  "desc": "line 937: @app.route('/127.0.0.1flashservices/gateway.php', methods=['XXPOSTXX'])  # Ruffle needs an absolute app_url",
+  "status": "killed",
+  "seconds": 7.9,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "audit#301": {
+  "desc": "line 938: @transactional_session removed",
+  "status": "killed",
+  "seconds": 7.6,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]"
+ },
+ "audit#350": {
+  "desc": "line 1003: \"XXdataXX\": None}",
+  "status": "NOT APPLIED (2 matches)"
+ },
+ "audit#351": {
+  "desc": "line 3205: @app.errorhandler(501)",
+  "status": "killed",
+  "seconds": 7.6,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]"
+ },
+ "audit#352": {
+  "desc": "line 3205: @app.errorhandler(500) removed",
+  "status": "killed",
+  "seconds": 7.5,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php [POST]"
+ },
+ "audit#357": {
+  "desc": "line 3211: crash_log_editor = threading.Thread(target=editor.edit, kwargs={\"filename\": os.path.join(log_path(), \"XXlog.txtXX\")},",
+  "status": "killed",
+  "seconds": 9.7,
+  "detail": "FAILED test/session_layer_test.py::test_one_crash_log_editor_at_a_time - Asse..."
+ },
+ "S1b": {
+  "desc": "save lock removed cleanly (no acquire, no release)",
+  "status": "killed",
+  "seconds": 17.9,
+  "detail": "FAILED test/session_layer_test.py::test_overlapping_requests_of_one_save_wait_for_each_other[flash]"
+ },
+ "setup-no-host-middleware": {
+  "desc": "configure_app without KnownHostsOnly",
+  "status": "killed",
+  "seconds": 5.6,
+  "detail": "FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio"
+ },
+ "setup-host-middleware-inside-socketio": {
+  "desc": "KnownHostsOnly put inside the Socket.IO middleware",
+  "status": "killed",
+  "seconds": 5.4,
+  "detail": "FAILED test/server_setup_test.py::test_the_server_refuses_other_hosts_before_flask_and_socketio"
+ },
+ "setup-no-save-lock": {
+  "desc": "configure_app without AssetSkippingSessionInterface",
+  "status": "killed",
+  "seconds": 6.7,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ },
+ "asset-gateway-exception": {
+  "desc": "is_asset without the Ruffle gateway exception",
+  "status": "killed",
+  "seconds": 7.6,
+  "detail": "FAILED test/server_setup_test.py::test_assets_are_served_without_the_save_and_the_gateways_with_it"
+ }
+}

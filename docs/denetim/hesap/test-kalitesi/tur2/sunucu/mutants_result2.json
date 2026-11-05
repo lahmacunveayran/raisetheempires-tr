@@ -1,0 +1,44 @@
+{
+ "audit#60": {
+  "desc": "line 167: SAVE_CHANGING_PATH_PREFIXES = (\"/wipe_session\", \"/list_session\", \"XX/gazillionaireXX\", \"/deprogress\", \"/seed/\", \"/patch/\",",
+  "status": "killed",
+  "seconds": 5.9,
+  "detail": "FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/gazillionaire]"
+ },
+ "audit#61": {
+  "desc": "line 167: SAVE_CHANGING_PATH_PREFIXES = (\"/wipe_session\", \"/list_session\", \"/gazillionaire\", \"XX/deprogressXX\", \"/seed/\", \"/patch/\",",
+  "status": "killed",
+  "seconds": 5.9,
+  "detail": "FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/deprogress]"
+ },
+ "audit#65": {
+  "desc": "line 168: \"/unlock_quest/\", \"XX/complete_quest/XX\", \"/remove_quest/\", \"/save-editor\",",
+  "status": "killed",
+  "seconds": 6.3,
+  "detail": "FAILED test/server_setup_test.py::test_requests_of_other_sites_change_no_save[GET-/complete_quest/Q0516]"
+ },
+ "audit#301": {
+  "desc": "line 938: @transactional_session removed",
+  "status": "killed",
+  "seconds": 8.0,
+  "detail": "FAILED test/server_setup_test.py::test_a_batch_whose_answer_fails_changes_no_save[flash]"
+ },
+ "audit#350": {
+  "desc": "line 1003: \"XXdataXX\": None}",
+  "status": "killed",
+  "seconds": 8.5,
+  "detail": "FAILED test/session_layer_test.py::test_a_failing_call_is_undone_and_the_other_calls_are_kept[flash]"
+ },
+ "audit#351": {
+  "desc": "line 3205: @app.errorhandler(501)",
+  "status": "killed",
+  "seconds": 7.7,
+  "detail": "FAILED test/server_setup_test.py::test_a_broken_request_gets_the_error_page_and_changes_no_save[flash]"
+ },
+ "audit#352": {
+  "desc": "line 3205: @app.errorhandler(500) removed",
+  "status": "killed",
+  "seconds": 7.7,
+  "detail": "FAILED test/server_setup_test.py::test_a_broken_request_gets_the_error_page_and_changes_no_save[flash]"
+ }
+}

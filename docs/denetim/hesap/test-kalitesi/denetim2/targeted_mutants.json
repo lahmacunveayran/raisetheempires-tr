@@ -1,0 +1,177 @@
+{
+ "B1": {
+  "file": "battle_engine.py",
+  "what": "Math.round of the client replaced by Python's round (halves to even)",
+  "status": "killed",
+  "seconds": 5.4,
+  "detail": "FAILED test/battle_turn_test.py::test_ai_attacks_the_most_dangerous_unit - as..."
+ },
+ "B2": {
+  "file": "battle_engine.py",
+  "what": "every matching <against> of a power multiplies (no first-match)",
+  "status": "killed",
+  "seconds": 5.5,
+  "detail": "FAILED test/battle_turn_test.py::test_only_the_first_matching_against_of_a_power_counts"
+ },
+ "B3": {
+  "file": "battle_engine.py",
+  "what": "an enemy unit can be left at 1 strength",
+  "status": "killed",
+  "seconds": 6.9,
+  "detail": "FAILED test/bot_empires_test.py::test_the_battles_played_here_are_the_engines"
+ },
+ "B4": {
+  "file": "battle_engine.py",
+  "what": "a STRONG_ROLL (weak defender) also counts as a critical hit",
+  "status": "killed",
+  "seconds": 3.8,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (24, 3..."
+ },
+ "B5": {
+  "file": "battle_engine.py",
+  "what": "damage no longer cut to 3 digits before ceil",
+  "status": "killed",
+  "seconds": 4.2,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (60, 5..."
+ },
+ "B6": {
+  "file": "battle_engine.py",
+  "what": "glancing multiplier 0.15 instead of combatGlancingBlowMultiplier 0.10",
+  "status": "killed",
+  "seconds": 3.6,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (100, ..."
+ },
+ "B7": {
+  "file": "battle_engine.py",
+  "what": "combatAISwitchPercent 0.25 instead of 0.2",
+  "status": "killed",
+  "seconds": 3.7,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (0, 3,..."
+ },
+ "B8": {
+  "file": "battle_engine.py",
+  "what": "switch ratio boundary: <= instead of < (combatAISwitchRatio, exactly 0.5)",
+  "status": "killed",
+  "seconds": 3.8,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (0, 0,..."
+ },
+ "B9": {
+  "file": "battle_engine.py",
+  "what": "critical multiplier 1.4 instead of combatCriticalHitMultiplier 1.5",
+  "status": "killed",
+  "seconds": 3.5,
+  "detail": "FAILED test/battle_turn_test.py::test_turns_follow_the_client - assert (47, 3..."
+ },
+ "B10": {
+  "file": "battle_engine.py",
+  "what": "research strength rounded up instead of Math.round",
+  "status": "killed",
+  "seconds": 4.9,
+  "detail": "FAILED test/battle_turn_test.py::test_research_strength_is_rounded - Assertio..."
+ },
+ "S1": {
+  "file": "empires-server.py",
+  "what": "no lock: two requests of one save run at the same time",
+  "status": "killed",
+  "seconds": 3.2,
+  "detail": "FAILED test/session_layer_test.py::test_a_failing_call_is_undone_and_the_other_calls_are_kept"
+ },
+ "S2": {
+  "file": "empires-server.py",
+  "what": "a failed call's changes are kept",
+  "status": "killed",
+  "seconds": 3.2,
+  "detail": "ERROR    empires-server:empires-server.py:998 Call WorldService.addFleet failed, its changes are undone"
+ },
+ "S3": {
+  "file": "save_engine.py",
+  "what": "other saves are written also when the call fails",
+  "status": "killed",
+  "seconds": 3.3,
+  "detail": "ERROR    empires-server:empires-server.py:998 Call WorldService.addFleet failed, its changes are undone"
+ },
+ "S4": {
+  "file": "empires-server.py",
+  "what": "any host name with localhost in it is accepted (DNS rebinding)",
+  "status": "killed",
+  "seconds": 4.1,
+  "detail": "FAILED test/session_layer_test.py::test_answers_only_ip_addresses_and_localhost"
+ },
+ "S5": {
+  "file": "empires-server.py",
+  "what": "the Origin header is no longer checked",
+  "status": "killed",
+  "seconds": 6.1,
+  "detail": "ERROR    empires-server:app.py:875 Exception on /wipe_session [GET]"
+ },
+ "S6": {
+  "file": "empires-server.py",
+  "what": "the save editor writes an invalid user_object",
+  "status": "killed",
+  "seconds": 4.6,
+  "detail": "FAILED test/session_layer_test.py::test_save_editor_writes_nothing_of_an_invalid_user_object"
+ },
+ "S7": {
+  "file": "empires-server.py",
+  "what": "a value the save can't hold is not caught by the call",
+  "status": "killed",
+  "seconds": 7.5,
+  "detail": "ERROR    empires-server:base.py:134 Failed to serialize session data: "
+ },
+ "S8": {
+  "file": "save_engine.py",
+  "what": "one backup more than MAX_BACKUPS is kept",
+  "status": "killed",
+  "seconds": 5.9,
+  "detail": "FAILED test/empires_test.py::test_create_backup_keeps_save_small_and_bounded"
+ },
+ "S9": {
+  "file": "empires-server.py",
+  "what": "a world name can end the page's script",
+  "status": "killed",
+  "seconds": 5.1,
+  "detail": "FAILED test/session_layer_test.py::test_world_names_cannot_end_the_home_page_script"
+ },
+ "S10": {
+  "file": "save_engine.py",
+  "what": "pickled saves are not converted (and msgpack ones are tried as pickles)",
+  "status": "killed",
+  "seconds": 4.0,
+  "detail": "FAILED test/session_layer_test.py::test_pickled_saves_are_converted_once - As..."
+ },
+ "S11": {
+  "file": "empires-server.py",
+  "what": "the save lock is never released",
+  "status": "timeout",
+  "seconds": 240.2,
+  "detail": ""
+ },
+ "S12": {
+  "file": "empires-server.py",
+  "what": "asset requests load and write the whole save",
+  "status": "killed",
+  "seconds": 7.1,
+  "detail": "FAILED test/empires_test.py::test_asset_requests_skip_server_side_session - A..."
+ },
+ "S13": {
+  "file": "save_engine.py",
+  "what": "nested backups moved newest first (ids in the wrong order)",
+  "status": "killed",
+  "seconds": 6.3,
+  "detail": "FAILED test/empires_test.py::test_move_nested_backups_keeps_order - Assertion..."
+ },
+ "S14": {
+  "file": "empires-server.py",
+  "what": "the save editor keeps the old save_version",
+  "status": "killed",
+  "seconds": 4.6,
+  "detail": "FAILED test/session_layer_test.py::test_save_editor_takes_an_old_backup_without_battle_fleets_and_population"
+ },
+ "S1b": {
+  "file": "empires-server.py",
+  "what": "no lock at all: two requests of one save run at the same time",
+  "status": "killed",
+  "seconds": 3.6,
+  "detail": "FAILED test/session_layer_test.py::test_overlapping_requests_of_one_save_wait_for_each_other"
+ }
+}

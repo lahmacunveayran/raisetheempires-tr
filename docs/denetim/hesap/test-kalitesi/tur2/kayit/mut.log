@@ -1,0 +1,173 @@
+baseline 16.2 s
+save_engine.py 0 line 28 survived -> survived 16.8 ........................................................................ [ 38%]
+.............................
+save_engine.py 1 line 28 survived -> survived 16.3 ........................................................................ [ 38%]
+.............................
+save_engine.py 22 line 43 survived -> survived 16.4 ........................................................................ [ 38%]
+.............................
+save_engine.py 40 line 55 survived -> killed 5.6 FAILED test/save_backup_test.py::test_twenty_backups_are_kept_per_save - Asse...
+save_engine.py 43 line 56 survived -> killed 5.4 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 44 line 56 survived -> killed 4.8 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 45 line 56 survived -> killed 4.7 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 46 line 56 survived -> killed 4.9 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 47 line 56 survived -> killed 5.0 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 48 line 56 survived -> killed 4.9 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 50 line 57 survived -> killed 5.0 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 58 line 74 survived -> killed 5.4 FAILED test/save_backup_test.py::test_twenty_backups_are_kept_per_save - Asse...
+save_engine.py 59 line 74 survived -> killed 5.7 FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save4-local]
+save_engine.py 62 line 75 survived -> killed 6.0 FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save1-abc]
+save_engine.py 63 line 75 survived -> killed 5.6 FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save1-abc]
+save_engine.py 66 line 82 survived -> killed 4.8 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 67 line 82 survived -> killed 5.1 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 70 line 83 survived -> killed 5.5 FAILED test/save_backup_test.py::test_an_old_backup_chain_moves_out_without_the_chain
+save_engine.py 78 line 96 survived -> killed 5.2 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 79 line 96 survived -> killed 5.3 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 80 line 96 survived -> killed 5.7 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 81 line 96 survived -> killed 5.2 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 82 line 96 survived -> killed 5.2 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 83 line 96 survived -> killed 5.4 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 95 line 112 survived -> killed 5.5 FAILED test/save_backup_test.py::test_an_old_backup_chain_moves_out_without_the_chain
+save_engine.py 101 line 122 survived -> killed 5.3 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 102 line 123 survived -> survived 16.3 ........................................................................ [ 38%]
+.............................
+save_engine.py 105 line 124 survived -> killed 5.5 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 106 line 124 survived -> killed 5.4 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 109 line 127 survived -> killed 5.1 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 110 line 127 survived -> killed 5.5 FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates
+save_engine.py 111 line 130 survived -> killed 6.6 FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder
+save_engine.py 113 line 133 survived -> killed 5.6 FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder
+save_engine.py 114 line 133 survived -> killed 6.2 FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder
+save_engine.py 124 line 147 survived -> killed 6.2 FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder
+save_engine.py 125 line 149 survived -> survived 17.5 ........................................................................ [ 38%]
+.............................
+save_engine.py 126 line 149 survived -> survived 17.0 ........................................................................ [ 38%]
+.............................
+save_engine.py 127 line 151 survived -> killed 6.1 FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder
+save_engine.py 132 line 163 survived -> killed 6.1 FAILED test/save_backup_test.py::test_the_frozen_program_runs_from_its_exe_folder
+save_engine.py 136 line 177 survived -> killed 6.5 ERROR    save_engine:save_engine.py:185 Uncaught exception
+save_engine.py 142 line 199 survived -> killed 6.3 ERROR    save_engine:save_engine.py:185 Uncaught exception
+save_engine.py 143 line 201 survived -> killed 6.1 FAILED test/save_backup_test.py::test_a_crash_opens_the_log_the_server_writes
+save_engine.py 153 line 225 survived -> killed 12.4 FAILED test/save_server_test.py::test_a_backup_made_in_a_request_is_found_from_the_saves_list
+save_engine.py 155 line 229 survived -> killed 11.8 FAILED test/save_server_test.py::test_a_backup_made_in_a_request_is_found_from_the_saves_list
+save_engine.py 161 line 252 survived -> survived 16.5 ........................................................................ [ 38%]
+.............................
+save_engine.py 168 line 269 survived -> survived 16.4 ........................................................................ [ 38%]
+.............................
+save_engine.py 175 line 276 survived -> survived 17.4 ........................................................................ [ 38%]
+.............................
+save_engine.py 176 line 276 survived -> survived 17.7 ........................................................................ [ 38%]
+.............................
+save_engine.py 177 line 276 survived -> survived 18.0 ........................................................................ [ 38%]
+.............................
+save_engine.py 179 line 281 survived -> survived 18.8 ........................................................................ [ 38%]
+.............................
+save_engine.py 180 line 281 survived -> survived 18.4 ........................................................................ [ 38%]
+.............................
+save_engine.py 181 line 284 survived -> killed 7.1 FAILED test/save_backup_test.py::test_a_blank_save_is_only_valid_where_one_is_allowed
+save_engine.py 202 line 295 survived -> killed 6.2 FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']
+save_engine.py 203 line 296 survived -> killed 6.6 FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']
+save_engine.py 204 line 296 survived -> killed 6.5 FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']
+save_engine.py 205 line 296 survived -> killed 6.1 FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']
+baseline 17.7 s
+save_migration.py 0 line 14 survived -> survived 18.6 ........................................................................ [ 38%]
+.............................
+save_migration.py 7 line 21 survived -> killed 7.5 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 12 line 23 survived -> survived 18.3 ........................................................................ [ 38%]
+.............................
+save_migration.py 23 line 27 survived -> killed 8.1 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 24 line 27 survived -> killed 7.5 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 26 line 27 survived -> killed 8.1 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 28 line 27 survived -> killed 8.0 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 30 line 27 survived -> killed 7.6 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 34 line 27 survived -> killed 7.2 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 37 line 27 survived -> killed 7.1 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 63 line 41 survived -> killed 7.9 FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.04a-0.05a-Update to 0.05a]
+save_migration.py 64 line 41 survived -> killed 7.5 FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.03a-0.04a-Update to 0.04a]
+save_migration.py 116 line 59 survived -> killed 7.2 FAILED test/save_migration_test.py::test_steps_that_only_change_the_version[0.06a-0.07a-Update to 0.07a]
+save_migration.py 126 line 66 survived -> killed 7.5 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 127 line 66 survived -> killed 7.5 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 131 line 67 survived -> killed 7.1 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 133 line 67 survived -> killed 7.6 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 136 line 68 survived -> killed 7.7 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 137 line 68 survived -> killed 7.3 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 142 line 69 survived -> killed 7.4 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 152 line 71 survived -> killed 7.5 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 153 line 71 survived -> killed 7.2 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 156 line 72 survived -> killed 7.4 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 157 line 72 survived -> killed 7.1 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 166 line 74 survived -> killed 7.2 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 167 line 74 survived -> killed 7.1 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 171 line 75 survived -> killed 7.0 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 181 line 77 survived -> killed 8.7 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 182 line 77 survived -> killed 7.3 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 183 line 77 survived -> killed 8.0 FAILED test/save_migration_test.py::test_0_07a_turns_the_0_08a_features_on_and_writes_crews_as_text
+save_migration.py 198 line 89 survived -> killed 9.7 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+save_migration.py 199 line 89 survived -> killed 7.4 FAILED test/save_migration_test.py::test_0_02a_resets_the_open_quests_and_the_expansions
+baseline 18.1 s
+empires-server.py 1 line 103 survived -> survived 17.9 ........................................................................ [ 38%]
+.............................
+empires-server.py 2 line 103 survived -> survived 17.9 ........................................................................ [ 38%]
+.............................
+empires-server.py 4 line 103 survived -> survived 17.6 ........................................................................ [ 38%]
+.............................
+empires-server.py 6 line 103 survived -> survived 17.5 ........................................................................ [ 38%]
+.............................
+empires-server.py 7 line 104 survived -> survived 17.7 ........................................................................ [ 38%]
+.............................
+empires-server.py 8 line 104 survived -> survived 16.8 ........................................................................ [ 38%]
+.............................
+empires-server.py 32 line 152 survived -> survived 17.2 ........................................................................ [ 38%]
+.............................
+empires-server.py 44 line 157 survived -> survived 18.0 ........................................................................ [ 38%]
+.............................
+empires-server.py 45 line 157 survived -> survived 17.4 ........................................................................ [ 38%]
+.............................
+empires-server.py 52 line 162 survived -> survived 16.7 ........................................................................ [ 38%]
+.............................
+empires-server.py 55 line 162 survived -> survived 14.6 ........................................................................ [ 38%]
+.............................
+empires-server.py 60 line 167 survived -> killed 6.1 FAILED test/save_server_test.py::test_cross_site_requests_change_nothing[GET /gazillionaire]
+empires-server.py 61 line 167 survived -> killed 7.2 FAILED test/save_server_test.py::test_cross_site_requests_change_nothing[GET /deprogress]
+empires-server.py 65 line 168 survived -> killed 10.2 FAILED test/save_server_test.py::test_cross_site_requests_change_nothing[GET /complete_quest/Q0516]
+empires-server.py 68 line 169 survived -> error 0.0 
+empires-server.py 86 line 191 survived -> error 0.0 
+empires-server.py 93 line 194 survived -> error 0.0 
+empires-server.py 97 line 202 survived -> error 0.0 
+empires-server.py 98 line 203 survived -> error 0.0 
+empires-server.py 107 line 211 survived -> error 0.0 
+empires-server.py 109 line 212 survived -> error 0.0 
+empires-server.py 113 line 301 survived -> error 0.0 
+empires-server.py 118 line 306 survived -> error 0.0 
+empires-server.py 126 line 528 survived -> error 0.0 
+empires-server.py 131 line 530 survived -> error 0.0 
+empires-server.py 133 line 531 survived -> error 0.0 
+empires-server.py 134 line 531 survived -> error 0.0 
+empires-server.py 143 line 536 survived -> error 0.0 
+empires-server.py 151 line 538 survived -> error 0.0 
+empires-server.py 155 line 539 survived -> error 0.0 
+empires-server.py 159 line 540 survived -> error 0.0 
+empires-server.py 164 line 541 survived -> error 0.0 
+empires-server.py 172 line 543 survived -> error 0.0 
+empires-server.py 178 line 545 survived -> error 0.0 
+empires-server.py 182 line 546 survived -> error 0.0 
+empires-server.py 191 line 555 survived -> error 0.0 
+empires-server.py 193 line 556 survived -> error 0.0 
+empires-server.py 217 line 572 survived -> error 0.0 
+empires-server.py 218 line 572 survived -> error 0.0 
+empires-server.py 229 line 582 survived -> error 0.0 
+empires-server.py 230 line 582 survived -> error 0.0 
+empires-server.py 233 line 582 survived -> error 0.0 
+empires-server.py 238 line 584 survived -> error 0.0 
+empires-server.py 239 line 584 survived -> error 0.0 
+empires-server.py 241 line 584 survived -> error 0.0 
+empires-server.py 248 line 589 survived -> error 0.0 
+empires-server.py 250 line 589 survived -> error 0.0 
+empires-server.py 253 line 590 survived -> error 0.0 
+empires-server.py 255 line 591 survived -> error 0.0 
+empires-server.py 288 line 913 survived -> error 0.0 
+empires-server.py 299 line 937 survived -> error 0.0 
+empires-server.py 301 line 938 survived -> error 0.0 
+empires-server.py 302 line 940 survived -> error 0.0 
+empires-server.py 326 line 966 survived -> error 0.0 
+empires-server.py 340 line 996 survived -> error 0.0 
+ALL DONE

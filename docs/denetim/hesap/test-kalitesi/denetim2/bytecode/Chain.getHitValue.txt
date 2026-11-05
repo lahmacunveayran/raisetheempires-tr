@@ -1,0 +1,21 @@
+﻿== Chain.getHitValue
+    0 getlocal0 
+    1 pushscope 
+    2 getlocal0 
+    3 getlocal0 
+    4 getproperty m_poor
+    8 getlocal1 
+    9 callproperty isIn 2
+   14 iffalse ->23
+   18 getlex POOR
+   22 returnvalue 
+   23 getlocal0 
+   24 getlocal0 
+   25 getproperty m_great
+   29 getlocal1 
+   30 callproperty isIn 2
+   35 iffalse ->44
+   39 getlex GREAT
+   43 returnvalue 
+   44 getlex GOOD
+   48 returnvalue 

@@ -244,3 +244,9 @@ sanılmıştı, oysa istemci yalnız öldürmede veriyor. Düzeltme oyunun kodun
 - **Hâlâ denenmeyenler:** gerçek Flash istemcisi otomatik olarak çalıştırılmadı; istemcinin tepkileri bytecode'dan
   okundu. DNS rebinding tarayıcıda denenmedi. Açık kalan beş nokta (CEK-07, CEK-12, CEK-13, CEK-15, YC-03) düşük ya da
   orta önemde ve oyunu bozmuyor; sonraki bir turda ele alınabilir.
+
+## 8. Sonraki tur (5-6 Kasım 2026): test kalitesi
+
+"Yapay zekâ testleri öylesine, geçsin diye mi yazılmış?" sorusu üzerine testler mutasyon testi, fail-to-pass ve
+bağımsız denetimle ölçüldü ve düzeltildi: [`denetim/test-kalitesi.md`](denetim/test-kalitesi.md). Yarım kalan işler ve
+sıradaki adımlar: [`DEVIR.md`](DEVIR.md).

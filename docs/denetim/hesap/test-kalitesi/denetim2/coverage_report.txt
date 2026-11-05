@@ -1,0 +1,26 @@
+﻿Name                    Stmts   Miss Branch BrPart  Cover
+---------------------------------------------------------
+battle_engine.py          900    233    374     56    70%
+bot_empires.py            140      7     20      2    93%
+bounty_center.py           63      4      6      0    94%
+client_patches.py          16      3      8      2    79%
+empires-server.py        1749    869    726     91    43%
+event_buildings.py        276     12     82     10    94%
+game_settings.py          193     66     52      3    63%
+init_settings.py           39     26     22      0    21%
+language_settings.py        7      0      0      0   100%
+logger.py                  54     16     10      0    59%
+megaseries.py             133     13     54     10    88%
+mod_engine.py             107     60     46      9    39%
+quest_engine.py           363     61    120     13    78%
+quest_settings.py          27      0      4      0   100%
+quest_trees.py            252     13     82     15    92%
+save_engine.py            183     29     34      3    81%
+save_migration.py          85     23     28      5    70%
+slot_machine.py            44      0      6      0   100%
+state_machine.py          210     61     86     18    62%
+titan_lab.py               94      3     26      3    95%
+treasure_vault.py          67      1     14      1    98%
+turkce\araclar\swf.py     262    218     94      2    14%
+---------------------------------------------------------
+TOTAL                    5264   1718   1894    243    62%

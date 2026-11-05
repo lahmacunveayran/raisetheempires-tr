@@ -1,0 +1,506 @@
+{
+ "0": {
+  "line": 28,
+  "original": "crash_log = True",
+  "mutant": "crash_log = False",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.27s\r\n",
+  "seconds": 16.8
+ },
+ "1": {
+  "line": 28,
+  "original": "crash_log = True",
+  "mutant": "crash_log = None",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.15s\r\n",
+  "seconds": 16.3
+ },
+ "22": {
+  "line": 43,
+  "original": "return [e for e in session['user_object'][\"userInfo\"][\"world\"][\"objects\"] if e['itemName'] == id]",
+  "mutant": "return [e for e in session['user_object'][\"userInfo\"][\"world\"][\"objects\"] if e['itemName'] != id]",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.15s\r\n",
+  "seconds": 16.4
+ },
+ "40": {
+  "line": 55,
+  "original": "MAX_BACKUPS = 20",
+  "mutant": "MAX_BACKUPS = 21",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_twenty_backups_are_kept_per_save - Asse...",
+  "seconds": 5.6
+ },
+ "43": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'XXquestsXX', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.4
+ },
+ "44": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'quests', 'XXbattleXX', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 4.8
+ },
+ "45": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'XXfleetsXX', 'population', 'saved', 'saved_on', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 4.7
+ },
+ "46": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'XXpopulationXX', 'saved', 'saved_on', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 4.9
+ },
+ "47": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'XXsavedXX', 'saved_on', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.0
+ },
+ "48": {
+  "line": 56,
+  "original": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',",
+  "mutant": "BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'XXsaved_onXX', 'save_version',",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 4.9
+ },
+ "50": {
+  "line": 57,
+  "original": "'original_save_version']",
+  "mutant": "'XXoriginal_save_versionXX']",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.0
+ },
+ "58": {
+  "line": 74,
+  "original": "sid = str(getattr(save, \"sid\", None) or save.get(\"session_id\") or \"local\")",
+  "mutant": "sid = str(getattr(save, \"sid\", None) or save.get(\"XXsession_idXX\") or \"local\")",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_twenty_backups_are_kept_per_save - Asse...",
+  "seconds": 5.4
+ },
+ "59": {
+  "line": 74,
+  "original": "sid = str(getattr(save, \"sid\", None) or save.get(\"session_id\") or \"local\")",
+  "mutant": "sid = str(getattr(save, \"sid\", None) or save.get(\"session_id\") or \"XXlocalXX\")",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save4-local]",
+  "seconds": 5.7
+ },
+ "62": {
+  "line": 75,
+  "original": "return sid[len(\"session:\"):] if sid.startswith(\"session:\") else sid",
+  "mutant": "return sid[len(\"XXsession:XX\"):] if sid.startswith(\"session:\") else sid",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save1-abc]",
+  "seconds": 6.0
+ },
+ "63": {
+  "line": 75,
+  "original": "return sid[len(\"session:\"):] if sid.startswith(\"session:\") else sid",
+  "mutant": "return sid[len(\"session:\"):] if sid.startswith(\"XXsession:XX\") else sid",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_the_id_backups_are_kept_under[save1-abc]",
+  "seconds": 5.6
+ },
+ "66": {
+  "line": 82,
+  "original": "(save_id, backup.get('saved_on'), backup.get('replaced_on'), str(backup.get('save_version')),",
+  "mutant": "(save_id, backup.get('XXsaved_onXX'), backup.get('replaced_on'), str(backup.get('save_version')),",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 4.8
+ },
+ "67": {
+  "line": 82,
+  "original": "(save_id, backup.get('saved_on'), backup.get('replaced_on'), str(backup.get('save_version')),",
+  "mutant": "(save_id, backup.get('saved_on'), backup.get('XXreplaced_onXX'), str(backup.get('save_version')),",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.1
+ },
+ "70": {
+  "line": 83,
+  "original": "str(backup.get('message', '')), zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))",
+  "mutant": "str(backup.get('message', 'XXXX')), zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_backup_chain_moves_out_without_the_chain",
+  "seconds": 5.5
+ },
+ "78": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'XXsaved_onXX': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.2
+ },
+ "79": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'saved_on': r[2], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.3
+ },
+ "80": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'saved_on': r[1], 'XXreplaced_onXX': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.7
+ },
+ "81": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[3], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.2
+ },
+ "82": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'XXsave_versionXX': r[3], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.2
+ },
+ "83": {
+  "line": 96,
+  "original": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]",
+  "mutant": "return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[4], 'message': r[4]}) for r in rows]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.4
+ },
+ "95": {
+  "line": 112,
+  "original": "chain.append({k: v for k, v in node.items() if k != \"backup\"})",
+  "mutant": "chain.append({k: v for k, v in node.items() if k != \"XXbackupXX\"})",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_backup_chain_moves_out_without_the_chain",
+  "seconds": 5.5
+ },
+ "101": {
+  "line": 122,
+  "original": "timestamp = datetime.now().timestamp()",
+  "mutant": "timestamp = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.3
+ },
+ "102": {
+  "line": 123,
+  "original": "backup = copy.deepcopy({k: v for k, v in session.items() if k in BACKUP_KEYS})",
+  "mutant": "backup = copy.copy({k: v for k, v in session.items() if k in BACKUP_KEYS})",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.15s\r\n",
+  "seconds": 16.3
+ },
+ "105": {
+  "line": 124,
+  "original": "backup['replaced_on'] = timestamp",
+  "mutant": "backup['XXreplaced_onXX'] = timestamp",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.5
+ },
+ "106": {
+  "line": 124,
+  "original": "backup['replaced_on'] = timestamp",
+  "mutant": "backup['replaced_on'] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.4
+ },
+ "109": {
+  "line": 127,
+  "original": "session['saved_on'] = timestamp",
+  "mutant": "session['XXsaved_onXX'] = timestamp",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.1
+ },
+ "110": {
+  "line": 127,
+  "original": "session['saved_on'] = timestamp",
+  "mutant": "session['saved_on'] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_backup_holds_the_save_with_its_dates",
+  "seconds": 5.5
+ },
+ "111": {
+  "line": 130,
+  "original": "save_db_path = os.path.join(my_games_path(), \"save.db\")",
+  "mutant": "save_db_path = os.path.join(my_games_path(), \"XXsave.dbXX\")",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder",
+  "seconds": 6.6
+ },
+ "113": {
+  "line": 133,
+  "original": "new_save_db_path = os.path.join(instance_path, \"save.db\")",
+  "mutant": "new_save_db_path = os.path.join(instance_path, \"XXsave.dbXX\")",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder",
+  "seconds": 5.6
+ },
+ "114": {
+  "line": 133,
+  "original": "new_save_db_path = os.path.join(instance_path, \"save.db\")",
+  "mutant": "new_save_db_path = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder",
+  "seconds": 6.2
+ },
+ "124": {
+  "line": 147,
+  "original": "save_db_path = new_save_db_path",
+  "mutant": "save_db_path = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder",
+  "seconds": 6.2
+ },
+ "125": {
+  "line": 149,
+  "original": "print(\"SQLITE\", f\"sqlite:///{save_db_path}\")",
+  "mutant": "print(\"XXSQLITEXX\", f\"sqlite:///{save_db_path}\")",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.16s\r\n",
+  "seconds": 17.5
+ },
+ "126": {
+  "line": 149,
+  "original": "print(\"SQLITE\", f\"sqlite:///{save_db_path}\")",
+  "mutant": "print(\"SQLITE\", f\"XXsqlite:///{save_db_path}XX\")",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.63s\r\n",
+  "seconds": 17.0
+ },
+ "127": {
+  "line": 151,
+  "original": "return f\"sqlite:///{save_db_path}\"",
+  "mutant": "return f\"XXsqlite:///{save_db_path}XX\"",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_an_old_save_db_is_moved_to_the_instance_folder",
+  "seconds": 6.1
+ },
+ "132": {
+  "line": 163,
+  "original": "return Path(sys.executable).parent if getattr(sys, 'frozen', False) else Path(__file__).parent",
+  "mutant": "return Path(sys.executable).parent if getattr(sys, 'XXfrozenXX', False) else Path(__file__).parent",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_the_frozen_program_runs_from_its_exe_folder",
+  "seconds": 6.1
+ },
+ "136": {
+  "line": 177,
+  "original": "crash_log = toggle",
+  "mutant": "crash_log = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "ERROR    save_engine:save_engine.py:185 Uncaught exception",
+  "seconds": 6.5
+ },
+ "142": {
+  "line": 199,
+  "original": "daiquiri.output.File(os.path.join(log_path(), \"log.txt\"), formatter=daiquiri.formatter.TEXT_FORMATTER),",
+  "mutant": "daiquiri.output.File(os.path.join(log_path(), \"XXlog.txtXX\"), formatter=daiquiri.formatter.TEXT_FORMATTER),",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "ERROR    save_engine:save_engine.py:185 Uncaught exception",
+  "seconds": 6.3
+ },
+ "143": {
+  "line": 201,
+  "original": "logger = daiquiri.getLogger(__name__)",
+  "mutant": "logger = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_crash_opens_the_log_the_server_writes",
+  "seconds": 6.1
+ },
+ "153": {
+  "line": 225,
+  "original": "return [enrich_save(save, record) for record in get_all_sessions() for save in [decode_save(want_bytes(record.data))] if save is not None and 'user_object' in save]",
+  "mutant": "return [enrich_save(save, record) for record in get_all_sessions() for save in [decode_save(want_bytes(record.data))] if save is not None or 'user_object' in save]",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_server_test.py::test_a_backup_made_in_a_request_is_found_from_the_saves_list",
+  "seconds": 12.4
+ },
+ "155": {
+  "line": 229,
+  "original": "save[\"session_id\"] = record.session_id",
+  "mutant": "save[\"session_id\"] = None",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_server_test.py::test_a_backup_made_in_a_request_is_found_from_the_saves_list",
+  "seconds": 11.8
+ },
+ "161": {
+  "line": 252,
+  "original": "g.pop(\"pending_saves\", None)",
+  "mutant": "g.pop(\"XXpending_savesXX\", None)",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.37s\r\n",
+  "seconds": 16.5
+ },
+ "168": {
+  "line": 269,
+  "original": "converted = 0",
+  "mutant": "converted = 1",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 14.27s\r\n",
+  "seconds": 16.4
+ },
+ "175": {
+  "line": 276,
+  "original": "converted += 1",
+  "mutant": "converted = 1",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.18s\r\n",
+  "seconds": 17.4
+ },
+ "176": {
+  "line": 276,
+  "original": "converted += 1",
+  "mutant": "converted -= 1",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.28s\r\n",
+  "seconds": 17.7
+ },
+ "177": {
+  "line": 276,
+  "original": "converted += 1",
+  "mutant": "converted += 2",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.56s\r\n",
+  "seconds": 18.0
+ },
+ "179": {
+  "line": 281,
+  "original": "print(\"Converted\", converted, \"saves from pickle to msgpack\")",
+  "mutant": "print(\"XXConvertedXX\", converted, \"saves from pickle to msgpack\")",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 16.00s\r\n",
+  "seconds": 18.8
+ },
+ "180": {
+  "line": 281,
+  "original": "print(\"Converted\", converted, \"saves from pickle to msgpack\")",
+  "mutant": "print(\"Converted\", converted, \"XXsaves from pickle to msgpackXX\")",
+  "audit": "survived",
+  "now": "survived",
+  "detail": "........................................................................ [ 38%]\r\n........................................................................ [ 77%]\r\n..........................................                               [100%]\r\n186 passed in 15.73s\r\n",
+  "seconds": 18.4
+ },
+ "181": {
+  "line": 284,
+  "original": "def validate_save(save, blank_allowed = False):",
+  "mutant": "def validate_save(save, blank_allowed = True):",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_a_blank_save_is_only_valid_where_one_is_allowed",
+  "seconds": 7.1
+ },
+ "202": {
+  "line": 295,
+  "original": "isinstance(player.get(\"socialLevelBad\", {}), int)) or \\",
+  "mutant": "isinstance(player.get(\"socialLevelBad\", {}), int)) or \\",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']",
+  "seconds": 6.2
+ },
+ "203": {
+  "line": 296,
+  "original": "(blank_allowed and 'user_object' not in save)",
+  "mutant": "(blank_allowed and 'XXuser_objectXX' not in save)",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']",
+  "seconds": 6.6
+ },
+ "204": {
+  "line": 296,
+  "original": "(blank_allowed and 'user_object' not in save)",
+  "mutant": "(blank_allowed and 'user_object'  in save)",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']",
+  "seconds": 6.5
+ },
+ "205": {
+  "line": 296,
+  "original": "(blank_allowed and 'user_object' not in save)",
+  "mutant": "(blank_allowed or 'user_object' not in save)",
+  "audit": "survived",
+  "now": "killed",
+  "detail": "FAILED test/save_backup_test.py::test_one_wrong_field_makes_the_save_invalid[level='5']",
+  "seconds": 6.1
+ }
+}
