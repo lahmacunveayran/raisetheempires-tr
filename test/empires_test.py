@@ -411,13 +411,16 @@ def test_create_backup_keeps_save_small_and_bounded(backup_db):
     with app.test_request_context():
         with open(TEST_DIR / 'init_user.json', 'r') as f:
             session['user_object'] = json.load(f)
-        for i in range(backup_db.MAX_BACKUPS + 4):
+        # 20 backups a save are kept, the save editor lists them on one page: the number chosen when backups moved
+        # out of the save into backups.db (save_engine, the comment above MAX_BACKUPS); written out, not read from
+        # MAX_BACKUPS, so a change of the number is a decision this test has to be told about
+        for i in range(24):
             backup_db.create_backup("Level %d" % i)
 
         assert backup_chain_length(dict(session)) == 0
         backups = backup_db.list_backups(session)
-        assert len(backups) == backup_db.MAX_BACKUPS
-        assert backups[0][1]["message"] == "Level %d" % (backup_db.MAX_BACKUPS + 3)
+        assert len(backups) == 20
+        assert [info["message"] for _, info in backups] == ["Level %d" % i for i in range(23, 3, -1)]
         assert backup_db.load_backup(session, backups[0][0])["user_object"] == session['user_object']
 
 
@@ -522,11 +525,17 @@ def test_click_on_dormant_tree_is_ignored():
         objects.append({"id": tree_id, "itemName": "tree43", "position": "52,62,0", "referenceItem": None,
                         "state": "3", "lastUpdated": time.time() * 1000})  # just cut, dormant for 1-4 days
         world_object = types.SimpleNamespace(id=tree_id, position="52,62,0", itemName="tree43")
+        player = session['user_object']["userInfo"]["player"]
+        resources = session['user_object']["userInfo"]["world"]["resources"]
+        before = (json.loads(json.dumps(objects[-1])), dict(resources),
+                  {k: player[k] for k in ("energy", "xp", "level", "lastEnergyCheck", "cash")})
 
         res = empires_server.perform_world_response(["setState", world_object, []])
 
         assert res["errorType"] == 0
-        assert objects[-1]["state"] == "3"
+        # ignored: the tree stays as it is and the click costs and gives nothing (no energy spent, so the energy
+        # clock is not touched either)
+        assert (objects[-1], resources, {k: player[k] for k in before[2]}) == before
 
 
 def test_place_item_without_cost():
