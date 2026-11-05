@@ -504,7 +504,7 @@ def do_rewards(label, raw_rewards, meta, inc_modifier=lambda a: a, item_modifier
         if "reward" in level and level["reward"]["-type"] == "cash":
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
-        create_backup("Level " + level["-num"])
+        create_backup("Level " + level["-num"], automatic=True)
 
     if inc:
         print(label, "rewards:", ", ".join(

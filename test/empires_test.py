@@ -409,13 +409,13 @@ def test_create_backup_keeps_save_small_and_bounded(backup_db):
     with app.test_request_context():
         with open(TEST_DIR / 'init_user.json', 'r') as f:
             session['user_object'] = json.load(f)
-        for i in range(backup_db.MAX_BACKUPS + 4):
-            backup_db.create_backup("Level %d" % i)
+        for i in range(20 + 4):
+            backup_db.create_backup("Level %d" % i, automatic=True)
 
         assert backup_chain_length(dict(session)) == 0
         backups = backup_db.list_backups(session)
-        assert len(backups) == backup_db.MAX_BACKUPS
-        assert backups[0][1]["message"] == "Level %d" % (backup_db.MAX_BACKUPS + 3)
+        assert len(backups) == 20  # default of --max-backups
+        assert backups[0][1]["message"] == "Level %d" % (20 + 3)
         assert backup_db.load_backup(session, backups[0][0])["user_object"] == session['user_object']
 
 

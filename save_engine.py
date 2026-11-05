@@ -18,8 +18,12 @@ import logging
 from flask_session.sqlalchemy import SqlAlchemySessionInterface
 from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import want_bytes
-from sqlalchemy import Column, Float, Index, Integer, LargeBinary, String, Text, create_engine, delete, insert, select
+from sqlalchemy import Boolean, Column, Float, Index, Integer, LargeBinary, String, Text, create_engine, delete, \
+    false, insert, inspect, select, text
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.schema import CreateColumn
+
+import init_settings as settings
 try:
     import cPickle as pickle
 except ImportError:
@@ -52,8 +56,8 @@ def lookup_objects_save_by_position(save, x, y, r):
 
 # Backups used to be stored inside the save as a chain (session["backup"]["backup"]...), so every level up added a
 # full copy of the save to it and the whole chain was rewritten on every request. They now live in a separate
-# database and only the newest MAX_BACKUPS per save are kept.
-MAX_BACKUPS = 20
+# database. Backups made on purpose (save editor, cheats, quest routes, ...) are all kept, of the automatic ones (level
+# ups) only the newest settings.max_backups per save (--max-backups, 0 keeps all).
 BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',
                'original_save_version']
 
@@ -72,6 +76,7 @@ class Backup(BackupBase):
     replaced_on = Column(Float)
     save_version = Column(String(64))
     message = Column(Text)
+    automatic = Column(Boolean, nullable=False, default=False, server_default=false())  # level ups
     data = Column(LargeBinary, nullable=False)  # zlib-compressed pickle of the BACKUP_KEYS of the save
 
 
@@ -114,6 +119,11 @@ def _backup_db():
                 raise RuntimeError("No backup database, call use_backup_database() first")
             _backup_engine = create_engine(backup_db_uri)
             BackupBase.metadata.create_all(_backup_engine)
+            if "automatic" not in [c["name"] for c in inspect(_backup_engine).get_columns("backups")]:
+                # backups.db from before automatic backups were told apart, its backups count as made on purpose
+                column = CreateColumn(Backup.__table__.c.automatic).compile(dialect=_backup_engine.dialect)
+                with _backup_engine.begin() as con:
+                    con.execute(text(f"ALTER TABLE backups ADD COLUMN {column}"))
         return _backup_engine
 
 
@@ -123,16 +133,17 @@ def _save_id(save):
     return sid[len("session:"):] if sid.startswith("session:") else sid
 
 
-def store_backup(save_id, backup):
+def store_backup(save_id, backup, automatic=False):
     with _backup_db().begin() as con:
         con.execute(insert(Backup).values(
             save_id=save_id, saved_on=backup.get('saved_on'), replaced_on=backup.get('replaced_on'),
             save_version=str(backup.get('save_version')), message=str(backup.get('message', '')),
-            data=zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))
-        old_ids = con.scalars(select(Backup.id).where(Backup.save_id == save_id)
-                              .order_by(Backup.id.desc()).offset(MAX_BACKUPS)).all()
-        if old_ids:
-            con.execute(delete(Backup).where(Backup.id.in_(old_ids)))
+            automatic=automatic, data=zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))
+        if automatic and settings.max_backups:
+            old_ids = con.scalars(select(Backup.id).where(Backup.save_id == save_id, Backup.automatic)
+                                  .order_by(Backup.id.desc()).offset(settings.max_backups)).all()
+            if old_ids:
+                con.execute(delete(Backup).where(Backup.id.in_(old_ids)))
 
 
 def list_backups(save):
@@ -159,18 +170,19 @@ def move_nested_backups(save):
         chain.append({k: v for k, v in node.items() if k != "backup"})
     if "backup" not in save:
         return False
-    for backup in reversed(chain[:MAX_BACKUPS]):  # oldest first, so ids keep the original order
-        store_backup(_save_id(save), backup)
+    for backup in reversed(chain):  # oldest first, so ids keep the original order
+        store_backup(_save_id(save), backup, str(backup.get("message", "")).startswith("Level "))
     del save["backup"]
     return True
 
 
-def create_backup(message):
+def create_backup(message, automatic=False):
+    """automatic: made without the player asking for it (level ups), only the newest settings.max_backups are kept."""
     timestamp = datetime.now().timestamp()
     backup = copy.deepcopy({k: v for k, v in session.items() if k in BACKUP_KEYS})
     backup['replaced_on'] = timestamp
     backup['message'] = message
-    store_backup(_save_id(session), backup)
+    store_backup(_save_id(session), backup, automatic)
     session['saved_on'] = timestamp
 
 def save_database_path(root_path, instance_path):

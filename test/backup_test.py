@@ -1,3 +1,4 @@
+import json
 import pickle
 import sqlite3
 import sys
@@ -5,7 +6,19 @@ import zlib
 from contextlib import closing
 from pathlib import Path
 
+import pytest
+from flask import Flask, session
+
+import init_settings
 import save_engine
+
+empires_server = __import__('empires-server')
+import quest_engine
+
+app = Flask(__name__)
+app.secret_key = 'test'
+
+TEST_DIR = Path(__file__).parent
 
 
 def database_paths(monkeypatch, my_games, root):
@@ -102,3 +115,48 @@ def test_backups_db_written_with_the_sqlite3_module_still_works(backup_db, tmp_p
     backups = backup_db.list_backups(save)
     assert [info["message"] for _, info in backups] == ["seed", "Level 5"]
     assert backup_db.load_backup(save, backups[1][0])["user_object"] == {"n": 5}
+
+
+def test_level_ups_do_not_push_out_backups_made_on_purpose(backup_db):
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        player = session['user_object']["userInfo"]["player"]
+        player["lastEnergyCheck"] = 0
+        player["level"] = 1
+        backup_db.create_backup("before cheat")
+        # the experience cheat: enough xp for level 85 at once, which levels up 84 times
+        levels = empires_server.game_settings['settings']['levels']['level']
+        player["xp"] = int(next(l for l in levels if l["-num"] == "85")["-requiredXP"])
+
+        quest_engine.do_rewards("Quest", [{"_type": "xp", "_count": "1"}], {"newPVE": 0})
+
+        assert player["level"] == 85
+        backups = backup_db.list_backups(session)
+        assert [info["message"] for _, info in backups] == \
+            ["Level %d" % n for n in range(85, 65, -1)] + ["before cheat"]
+        assert backup_db.load_backup(session, backups[-1][0])["user_object"]["userInfo"]["player"]["level"] == 1
+
+
+def test_max_backups_option_limits_automatic_backups(backup_db, monkeypatch):
+    for name in ("max_backups", "open_browser"):
+        monkeypatch.setattr(init_settings, name, getattr(init_settings, name))
+    save = {"session_id": "session:abc"}
+
+    monkeypatch.setattr(sys, "argv", ["empires-server.py", "--no-popup", "--max-backups=3"])
+    init_settings.read_ops()
+    backup_db.store_backup("abc", {"message": "seed"})
+    for n in range(2, 8):
+        backup_db.store_backup("abc", {"message": "Level %d" % n}, automatic=True)
+    assert [info["message"] for _, info in backup_db.list_backups(save)] == ["Level 7", "Level 6", "Level 5", "seed"]
+
+    monkeypatch.setattr(sys, "argv", ["empires-server.py", "--max-backups=0"])
+    init_settings.read_ops()
+    for n in range(8, 33):
+        backup_db.store_backup("abc", {"message": "Level %d" % n}, automatic=True)
+    assert len(backup_db.list_backups(save)) == 3 + 25 + 1
+
+    monkeypatch.setattr(sys, "argv", ["empires-server.py", "--max-backups=-1"])
+    with pytest.raises(SystemExit):
+        init_settings.read_ops()

@@ -219,7 +219,7 @@ def do_state_rewards(state, reference_item, meta, playback_tend=False):
         if "reward" in level and level["reward"]["-type"] == "cash":
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
-        create_backup("Level " + level["-num"])
+        create_backup("Level " + level["-num"], automatic=True)
 
     log_rewards = ", ".join(
         [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for

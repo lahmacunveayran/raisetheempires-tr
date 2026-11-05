@@ -31,6 +31,7 @@ python empires-server.py --host <host_IP> --port <port_number>
 |``--no-compression``       | Disables compression                                           | Default: compression is used<br /> Not recommended for servers |
 |``--no-caching``           | Disables caching of modded files                               | Default: caching is used<br /> Not recommended for servers |
 |``--no-app_mode``          | Disables app mode in chromium and hides UI elements            | Default: app mode is used<br /> App mode prevents using outdated browsers for other purposes|
+|``--max-backups <number>`` | Number of automatic save backups (made on every level up) kept per save, `0` keeps all | Default: `number = 20`<br /> Backups made on purpose (save editor, cheats, quest commands) are always kept |
 
 
 :fax: Setup your router and firewall configuration

@@ -12,11 +12,12 @@ crash_log = True
 compression = True
 caching = True
 app_mode = True
+max_backups = 20  # automatic (level up) backups kept per save, 0 keeps all; backups made on purpose are always kept
 
 def read_ops():
-    global host, port, http_host, http_path, debug, open_browser, crash_log, compression, caching, app_mode
+    global host, port, http_host, http_path, debug, open_browser, crash_log, compression, caching, app_mode, max_backups
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "", ["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log", "no-compression", "no-caching", "no-app_mode"])
+        opts, args = getopt.getopt(sys.argv[1:], "", ["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log", "no-compression", "no-caching", "no-app_mode", "max-backups="])
     except getopt.GetoptError as e:
         print("Error:", e.msg)
         exit(1)
@@ -42,3 +43,8 @@ def read_ops():
             caching = False
         elif o == '--no-app_mode':
             app_mode = False
+        elif o == '--max-backups':
+            if not a.isdigit():
+                print("Error: --max-backups needs a number, 0 keeps all backups")
+                exit(1)
+            max_backups = int(a)
