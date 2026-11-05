@@ -4,7 +4,9 @@ import save_engine
 
 
 @pytest.fixture(autouse=True)
-def backup_db(monkeypatch, tmp_path):
+def backup_db(tmp_path):
     """Keep save game backups made during tests out of the real backups.db."""
-    monkeypatch.setattr(save_engine, "backup_db_file", str(tmp_path / "backups.db"))
-    return save_engine
+    previous = save_engine.backup_db_uri
+    save_engine.use_backup_database(f"sqlite:///{tmp_path / 'backups.db'}")
+    yield save_engine
+    save_engine.use_backup_database(previous)

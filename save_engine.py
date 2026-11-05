@@ -1,8 +1,7 @@
 import copy
 import configparser
-import sqlite3
+import threading
 import zlib
-from contextlib import closing
 import json
 import os
 import shutil
@@ -19,6 +18,8 @@ import logging
 from flask_session.sqlalchemy import SqlAlchemySessionInterface
 from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import want_bytes
+from sqlalchemy import Column, Float, Index, Integer, LargeBinary, String, Text, create_engine, delete, insert, select
+from sqlalchemy.orm import declarative_base
 try:
     import cPickle as pickle
 except ImportError:
@@ -57,16 +58,34 @@ BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved
                'original_save_version']
 
 
-backup_db_file = None  # set at startup by use_backup_database()
+BackupBase = declarative_base()
 
 
-def backup_db_path():
-    return backup_db_file
+class Backup(BackupBase):
+    """A save game backup. Same table and columns as the backups.db files written before with the sqlite3 module."""
+    __tablename__ = "backups"
+    __table_args__ = (Index("backups_save_id", "save_id", "id"), {"sqlite_autoincrement": True})
+
+    id = Column(Integer, primary_key=True)
+    save_id = Column(String(255), nullable=False)
+    saved_on = Column(Float)
+    replaced_on = Column(Float)
+    save_version = Column(String(64))
+    message = Column(Text)
+    data = Column(LargeBinary, nullable=False)  # zlib-compressed pickle of the BACKUP_KEYS of the save
 
 
-def use_backup_database(path):
-    global backup_db_file
-    backup_db_file = path
+backup_db_uri = None  # SQLAlchemy database URL of the backups, set at startup by use_backup_database()
+_backup_engine = None
+_backup_engine_lock = threading.Lock()
+
+
+def use_backup_database(uri):
+    global backup_db_uri, _backup_engine
+    with _backup_engine_lock:
+        if _backup_engine is not None:
+            _backup_engine.dispose()
+        backup_db_uri, _backup_engine = uri, None
 
 
 def backup_database_path(save_db_path):
@@ -88,11 +107,14 @@ def backup_database_path(save_db_path):
 
 
 def _backup_db():
-    con = sqlite3.connect(backup_db_path())
-    con.execute("CREATE TABLE IF NOT EXISTS backups (id INTEGER PRIMARY KEY AUTOINCREMENT, save_id TEXT NOT NULL, "
-                "saved_on REAL, replaced_on REAL, save_version TEXT, message TEXT, data BLOB NOT NULL)")
-    con.execute("CREATE INDEX IF NOT EXISTS backups_save_id ON backups (save_id, id)")
-    return con
+    global _backup_engine
+    with _backup_engine_lock:
+        if _backup_engine is None:
+            if backup_db_uri is None:
+                raise RuntimeError("No backup database, call use_backup_database() first")
+            _backup_engine = create_engine(backup_db_uri)
+            BackupBase.metadata.create_all(_backup_engine)
+        return _backup_engine
 
 
 def _save_id(save):
@@ -102,31 +124,30 @@ def _save_id(save):
 
 
 def store_backup(save_id, backup):
-    with closing(_backup_db()) as con, con:
-        con.execute("INSERT INTO backups (save_id, saved_on, replaced_on, save_version, message, data) "
-                    "VALUES (?, ?, ?, ?, ?, ?)",
-                    (save_id, backup.get('saved_on'), backup.get('replaced_on'), str(backup.get('save_version')),
-                     str(backup.get('message', '')), zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))
-        con.execute("DELETE FROM backups WHERE save_id = ? AND id NOT IN "
-                    "(SELECT id FROM backups WHERE save_id = ? ORDER BY id DESC LIMIT ?)",
-                    (save_id, save_id, MAX_BACKUPS))
+    with _backup_db().begin() as con:
+        con.execute(insert(Backup).values(
+            save_id=save_id, saved_on=backup.get('saved_on'), replaced_on=backup.get('replaced_on'),
+            save_version=str(backup.get('save_version')), message=str(backup.get('message', '')),
+            data=zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))
+        old_ids = con.scalars(select(Backup.id).where(Backup.save_id == save_id)
+                              .order_by(Backup.id.desc()).offset(MAX_BACKUPS)).all()
+        if old_ids:
+            con.execute(delete(Backup).where(Backup.id.in_(old_ids)))
 
 
 def list_backups(save):
     """Newest first: [(id, {'saved_on', 'replaced_on', 'save_version', 'message'})]."""
-    if not os.path.exists(backup_db_path()):
-        return []
-    with closing(_backup_db()) as con:
-        rows = con.execute("SELECT id, saved_on, replaced_on, save_version, message FROM backups "
-                           "WHERE save_id = ? ORDER BY id DESC", (_save_id(save),)).fetchall()
-    return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]
+    with _backup_db().connect() as con:
+        rows = con.execute(select(Backup.id, Backup.saved_on, Backup.replaced_on, Backup.save_version, Backup.message)
+                           .where(Backup.save_id == _save_id(save)).order_by(Backup.id.desc())).all()
+    return [(r.id, {'saved_on': r.saved_on, 'replaced_on': r.replaced_on, 'save_version': r.save_version,
+                    'message': r.message}) for r in rows]
 
 
 def load_backup(save, backup_id):
-    with closing(_backup_db()) as con:
-        row = con.execute("SELECT data FROM backups WHERE save_id = ? AND id = ?",
-                          (_save_id(save), backup_id)).fetchone()
-    return pickle.loads(zlib.decompress(row[0])) if row else None
+    with _backup_db().connect() as con:
+        data = con.scalar(select(Backup.data).where(Backup.save_id == _save_id(save), Backup.id == backup_id))
+    return pickle.loads(zlib.decompress(data)) if data is not None else None
 
 
 def move_nested_backups(save):

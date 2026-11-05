@@ -120,7 +120,7 @@ print("Instance folder", app.instance_path)
 app.config['SESSION_TYPE'] = 'sqlalchemy'
 save_db_path = save_database_path(app.root_path, app.instance_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{save_db_path}"
-use_backup_database(backup_database_path(save_db_path))
+use_backup_database(f"sqlite:///{backup_database_path(save_db_path)}")  # any SQLAlchemy database URL works
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False

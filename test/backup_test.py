@@ -1,4 +1,8 @@
+import pickle
+import sqlite3
 import sys
+import zlib
+from contextlib import closing
 from pathlib import Path
 
 import save_engine
@@ -63,3 +67,38 @@ def test_backups_db_next_to_save_db_is_never_overwritten(monkeypatch, tmp_path):
 
     assert backups.read_bytes() == b"current backups"
     assert (tmp_path / "backups.db").read_bytes() == b"old backups"
+
+
+def test_backups_are_stored_in_the_configured_database_url(backup_db, tmp_path):
+    db_file = tmp_path / "elsewhere" / "my-backups.sqlite"
+    db_file.parent.mkdir()
+    backup_db.use_backup_database(f"sqlite:///{db_file}")
+    save = {"session_id": "session:abc"}
+
+    backup_db.store_backup("abc", {"message": "seed", "user_object": {"n": 1}})
+
+    [(backup_id, info)] = backup_db.list_backups(save)
+    assert info["message"] == "seed"
+    assert backup_db.load_backup(save, backup_id)["user_object"] == {"n": 1}
+    assert db_file.exists()
+
+
+def test_backups_db_written_with_the_sqlite3_module_still_works(backup_db, tmp_path):
+    legacy = tmp_path / "legacy-backups.db"
+    with closing(sqlite3.connect(legacy)) as con, con:
+        # the schema backups.db files were created with before the backups were stored through SQLAlchemy
+        con.execute("CREATE TABLE IF NOT EXISTS backups (id INTEGER PRIMARY KEY AUTOINCREMENT, save_id TEXT NOT NULL, "
+                    "saved_on REAL, replaced_on REAL, save_version TEXT, message TEXT, data BLOB NOT NULL)")
+        con.execute("CREATE INDEX IF NOT EXISTS backups_save_id ON backups (save_id, id)")
+        con.execute("INSERT INTO backups (save_id, saved_on, replaced_on, save_version, message, data) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    ("abc", 1.0, 2.0, "0.08a", "Level 5",
+                     zlib.compress(pickle.dumps({"message": "Level 5", "user_object": {"n": 5}}))))
+    backup_db.use_backup_database(f"sqlite:///{legacy}")
+    save = {"session_id": "session:abc"}
+
+    backup_db.store_backup("abc", {"message": "seed", "user_object": {"n": 6}})
+
+    backups = backup_db.list_backups(save)
+    assert [info["message"] for _, info in backups] == ["seed", "Level 5"]
+    assert backup_db.load_backup(save, backups[1][0])["user_object"] == {"n": 5}
