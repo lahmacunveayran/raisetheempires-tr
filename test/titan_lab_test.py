@@ -69,6 +69,14 @@ def test_no_part_unlocked_without_the_cash():
         assert user["userInfo"]["player"]["cash"] == 19 and not lab(user).get("data", {}).get("partUnlocks")
 
 
+def test_part_unlocked_with_exactly_its_cost():
+    with app.test_request_context():
+        user = setup_session()
+        user["userInfo"]["player"]["cash"] = 20  # B280: <part code="B280" ... locked="true" unlockCost="20"> in gameSettings
+        titan_lab.action_response("partUnlock", LAB_ID, {"partCode": "B280"}, {})
+        assert user["userInfo"]["player"]["cash"] == 0 and lab(user)["data"]["partUnlocks"] == {"B280": True}
+
+
 def test_collecting_a_part_unlocks_the_next():
     with app.test_request_context():
         user = setup_session()

@@ -1072,9 +1072,10 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     # pirateship04(npc), pirateship03(npc), pirateinfantry02 PU2(npc), pirateInfantry02 PU4(npc), pirateAntiAir02(npc), pirateAntiAir03(npc),
     # pirateBalloon01(npc), pirateFighter01, pirateBomber01, pirateFighter02, pirateBomber02, pirateFighter03,pirateBomber03, pirateFighter05, pirateBomber05,
     # pirateUBoat03, pirateCaptainKrunsch and many more
-    for a in against:
-        if a['-type'] in (get_unit_type(units[targeted_unit]), get_unit_terrain(units[targeted_unit])):
+    for a in against:  # like the client (UnitItem.getModifier): the first one of any of the unit's types counts
+        if a['-type'] in get_unit_types(units[targeted_unit]):
             damage *= float(a['-mod'])
+            break
     if damage > 0 and is_shielded(("ally" if ally else "enemy",targeted_unit), active_consumables) == True:
         consume_shield(("ally" if ally else "enemy",targeted_unit), active_consumables)
 

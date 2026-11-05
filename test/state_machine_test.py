@@ -77,3 +77,27 @@ def test_click_next_state_finish_building():
                                      {'name': 'QRUX1', 'complete': False, 'expired': False, 'progress': [1, 0], 'completedTasks': 1}]
         session['user_object']["userInfo"]["player"]['lastEnergyCheck'] = 0
         assert session['user_object']["userInfo"]["player"] == {'xp': 1, 'energy': 25.0, 'cash': 0, 'socialXpGood': 0, 'socialXpBad': 0, 'level': 1, 'energyMax': 25, 'playerResourceType': 3, 'lastEnergyCheck': 0, 'inventory': {'items': {}}}
+
+
+def test_a_backup_that_cannot_be_written_does_not_undo_the_level_up(monkeypatch):
+    """click_next_state: "a backup that can't be written (backups.db locked, disk full) must not undo the level up"."""
+    def locked(message):
+        raise OSError("disk full")
+    monkeypatch.setattr(state_machine, "create_backup", locked)
+    with app.test_request_context():
+        session['user_object'] = {"userInfo": {
+            "world": {"rewardRandSeedZ": 0, "rewardRandSeedW": 0, "research": {},
+                      "objects": [{"id": 10000, "itemName": "Small Island Hut", "position": "50,50,0",
+                                   "referenceItem": None, "state": 0}],
+                      "resources": {"coins": 0, "energy": 0, "oil": 0, "wood": 0, "aluminum": 0, "copper": 0,
+                                    "gold": 0, "iron": 0, "uranium": 0},
+                      "resourceOrder": ["aluminum", "copper", "gold", "iron", "uranium"]},
+            "player": {"xp": 0, "energy": 0, "cash": 0, "socialXpGood": 0, "socialXpBad": 0, "level": 0,
+                       "energyMax": 0, "playerResourceType": 3, "lastEnergyCheck": 0, "inventory": {"items": {}}}},
+            "experiments": {}}
+        session["quests"] = []
+        state_machine.click_next_state(True, 10000, {}, "place", None, cancel=None)
+
+        # gameSettings: <level num="1" requiredXP="0"/> is reached with 0 xp, <energycap level="1" cap="25"/>
+        player = session['user_object']["userInfo"]["player"]
+        assert (player["level"], player["energyMax"]) == (1, 25)

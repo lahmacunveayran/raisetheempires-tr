@@ -11,6 +11,7 @@ import random
 from flask import Flask, session
 
 import battle_engine
+import client_settings as client
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -61,20 +62,25 @@ class ClientRandom:
         return math.floor(((self.z << 16) + self.w & 0xFFFFFFFF) / 0xFFFFFFFF * 1000) / 1000
 
 
-def kind(code):
-    return item(code)["unit"]["-type"].split(",")[0]
+# the units, the combat chain and the hit values as the client reads them from gameSettings_with_fixes.xml
+strength = client.strength
+chance = client.chance
 
 
-def strength(code):
-    return int(item(code)["unit"]["-strength"])
-
-
-def chance(attacker, defender):  # CombatChain.GetAttackingHitChance
-    return {"poor": 0, "good": 1, "great": 2}[battle_engine.get_combat_chain_grade(kind(attacker), kind(defender))]
-
-
-def client_round(x):  # Math.round
+def client_round(x):  # Math.round: halves go up (ECMA-262), Math.round(0.5) is 1
     return math.floor(x + 0.5)
+
+
+def round_to_3(x):  # MathUtils.roundTo(x, ZGameRandom.ACCURACY 3): int(x * 1000) / 1000
+    return math.floor(x * 1000) / 1000
+
+
+WEAK_ROLL, STRONG_ROLL = -2.0, 2.0  # BattleHost constants
+
+
+def client_roll(attacker, defender, rand):
+    """BattleHost.getDiceRoll: no random number when one of the units is weak."""
+    return WEAK_ROLL if client.weak(attacker) else STRONG_ROLL if client.weak(defender) else rand.float()
 
 
 def find_best_unit(units, left, other, r, stunned=()):
@@ -122,18 +128,28 @@ def client_ai(rand, enemies, enemy_left, players, player_left, stunned_players=(
     return basic if use_basic else (defender_2, attacker)
 
 
-def client_damage(attacker, defender, defender_left, r):
-    """BattleAI.GetAttackingDamage and the hit roll of resolveAttack (no weak units, no powers, no research)."""
-    critical, direct = battle_engine.get_hit_value(kind(attacker), kind(defender))
-    damage = 25 * (3 * strength(attacker) + defender_left) / (3 * defender_left + strength(attacker))
-    damage = math.floor(damage / 100 * strength(defender) * 1000) / 1000
-    damage *= 0.10 if r < direct else 1.5 if r >= critical else 1
+def client_damage(attacker, defender, defender_left, r, level=1):
+    """BattleAI.GetAttackingDamage and BattleHost.resolveAttack (no powers, no research, no weaker units):
+    the attacker's attack strength against what the defender has left, times the defender's attack strength / 100
+    (GetDamageBase 25: combatDamageBase, the first tier increment is 0), cut to 3 digits; a roll below direct is a
+    glancing hit (combatGlancingBlowMultiplier), from critical on a critical one (combatCriticalHitMultiplier) but
+    never with the STRONG_ROLL; then Math.ceil."""
+    critical, direct = client.hit_value(attacker, defender)
+    attack = client.attack_strength(attacker, level)
+    damage = 25 * (3 * attack + defender_left) / (3 * defender_left + attack)
+    damage = round_to_3(damage / 100 * client.attack_strength(defender, level))
+    if r < direct:
+        damage *= client.game_number("combatGlancingBlowMultiplier")
+    elif r != STRONG_ROLL and r >= critical:
+        damage *= client.game_number("combatCriticalHitMultiplier")
     return math.ceil(damage)
 
 
 # --- turns --------------------------------------------------------------------------------------------------------
 
-POOL = ["U01", "U04", "U05", "V03", "V61", "V62"]  # army units: antitank, tank, artillery, none weak
+# army units: antitank, tank, artillery; a Titan arm (ML11: strength 1200, attackStrength 150 at level 1) and a weak
+# pirate tank (PU3, weak="1": no roll)
+POOL = ["U01", "U04", "U05", "V03", "V61", "V62", "ML11", "PU3"]
 
 
 def test_turns_follow_the_client(monkeypatch):
@@ -147,25 +163,25 @@ def test_turns_follow_the_client(monkeypatch):
             user = setup(monkeypatch, players, enemies)
             world = user["userInfo"]["world"]
             world["randSeedW"], world["randSeedZ"] = rng.randrange(1, 2 ** 32), rng.randrange(1, 2 ** 32)
-            client = ClientRandom(world["randSeedW"], world["randSeedZ"])
+            rand = ClientRandom(world["randSeedW"], world["randSeedZ"])
             player_left, enemy_left = [strength(c) for c in players], [strength(c) for c in enemies]
             for turn in range(60):
                 if turn % 2 == 0:
                     a = rng.choice([i for i, s in enumerate(player_left) if s > 0])
                     d = rng.choice([i for i, s in enumerate(enemy_left) if s > 0])
                     r = battle_engine.battle_complete_response(dict(PARAMS, id=[a, d]))["data"]
-                    roll = client.float()
+                    roll = client_roll(players[a], enemies[d], rand)
                     enemy_left[d] -= client_damage(players[a], enemies[d], enemy_left[d], roll)
                     enemy_left[d] = 0 if enemy_left[d] <= 1 else enemy_left[d]  # not left at 1
                 else:
                     r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
-                    d, a = client_ai(client, enemies, enemy_left, players, player_left)
-                    roll = client.float()
+                    d, a = client_ai(rand, enemies, enemy_left, players, player_left)
+                    roll = client_roll(enemies[d], players[a], rand)
                     player_left[a] = max(0, player_left[a] - client_damage(enemies[d], players[a], player_left[a], roll))
                 turns += 1
                 assert (r["playerUnit"], r["enemyUnit"], r["ur"]) == (a, d, roll)
                 assert (r["ps"], r["es"]) == (player_left[a], enemy_left[d])
-                assert r["seeds"] == {"w": client.w, "z": client.z}
+                assert r["seeds"] == {"w": rand.w, "z": rand.z}
                 if not any(player_left) or not any(enemy_left):
                     assert session["battle"] is None  # handle_win / handle_loss closed it
                     break
@@ -178,12 +194,12 @@ def test_ai_turn_rolls_like_the_client(monkeypatch):
     with app.test_request_context():
         user = setup(monkeypatch, ["U05"], ["U01"])
         world = user["userInfo"]["world"]
-        client = ClientRandom(world["randSeedW"], world["randSeedZ"])
+        rand = ClientRandom(world["randSeedW"], world["randSeedZ"])
         r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
         for _ in range(3):
-            client.float()
-        roll = client.float()
-        assert r["ur"] == roll and r["seeds"] == {"w": client.w, "z": client.z}
+            rand.float()
+        roll = rand.float()
+        assert r["ur"] == roll and r["seeds"] == {"w": rand.w, "z": rand.z}
         # antitank on tank is poor: below 0.75 a glancing hit, else a direct one
         assert r["ps"] == 100 - (2 if roll < 0.75 else 15)
 
@@ -244,16 +260,19 @@ def test_titans_hit_with_their_attack_strength(monkeypatch):
         setup(monkeypatch, ["V06"], ["ML11"], level=25)
         assert battle_engine.get_unit_attack_strength(item("ML11"), False) == 300
         assert battle_engine.get_unit_max_strength(item("ML11"), False) == 2400
-        critical, direct = battle_engine.get_hit_value("antitank", "mega_arm")
+        critical, direct = client.hit_value("V06", "ML11")  # antitank on mega_arm: poor, direct 0.75
         fixed_rolls(monkeypatch, direct)  # a direct hit
         coins = resources()["coins"]
         r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
-        assert r["es"] == 2400 - math.ceil(25 * (3 * 150 + 2400) / (3 * 2400 + 150) / 100 * 300)  # 30, not 233
-        assert resources()["coins"] == coins + math.ceil(300 * 30 * 0.01)  # getCoinAmount of its attackStrength
-        critical, direct = battle_engine.get_hit_value("mega_arm", "antitank")
+        # 25 * (3 * 150 + 2400) / (3 * 2400 + 150) = 9.69387..; / 100 * 300 = 29.0816.. cut to 29.081, ceil 30
+        # (with its strength, 2400, instead of the attackStrength: 233)
+        assert r["es"] == 2400 - 30 == 2400 - client_damage("V06", "ML11", 2400, direct, level=25)
+        assert resources()["coins"] == coins + 90  # getCoinAmount of its attackStrength: ceil(300 * 30 * 0.01)
+        critical, direct = client.hit_value("ML11", "V06")  # mega_arm on antitank: great, direct 0
         fixed_rolls(monkeypatch, direct)
         r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
-        assert r["ps"] == 150 - math.ceil(25 * (3 * 300 + 150) / (3 * 150 + 300) / 100 * 150)  # 53, not 97
+        # 25 * (3 * 300 + 150) / (3 * 150 + 300) = 35; / 100 * 150 = 52.5, ceil 53 (97 with its strength 2400)
+        assert r["ps"] == 150 - 53 == 150 - client_damage("ML11", "V06", 150, direct, level=25)
 
 
 def test_research_strength_is_rounded():
@@ -270,7 +289,9 @@ def test_units_of_no_kind_in_the_chain_hit_good():
     """The NPC anti air (antiairland, antiairship) is not in combatChain: CombatChain.getHitValue gives GOOD."""
     with app.test_request_context():
         assert battle_engine.get_combat_chain_grade("antiairland", "tank") == "good"
-        assert battle_engine.get_hit_value("antiairship", "fighter") == battle_engine.get_hit_value("tank", "tank")
+        # <combatHitValues><value type="good" critical="0.99" direct="0.25"/>
+        assert battle_engine.get_hit_value("antiairship", "fighter") == client.settings()["hit_values"]["good"] == \
+            (0.99, 0.25)
 
 
 # --- rewards ------------------------------------------------------------------------------------------------------
@@ -310,8 +331,10 @@ def test_mastery_rewards_roll_no_energy(monkeypatch):
         coins, xp = resources()["coins"], user["userInfo"]["player"]["xp"]
         battle_engine.doBattleRewards("criticalkill", 30, 7, 100)
         assert len(rolls) == 1
-        assert resources()["coins"] == coins + 3 * battle_engine.as3_round(math.ceil(30 * 7 * 0.01) * 1.5)
-        assert user["userInfo"]["player"]["xp"] == xp + math.ceil(3 * 1.5)
+        # getCoinAmount: ceil(30 * 7 * 0.01) = 3; spawnLoot: each of the 3 coin loots of a criticalkill is
+        # Math.round(3 * 1.5) = Math.round(4.5) = 5 (halves up)
+        assert resources()["coins"] == coins + 15
+        assert user["userInfo"]["player"]["xp"] == xp + 5  # the 3 xp of a criticalkill: ceil(3 * 1.5)
 
 
 def record_progress(monkeypatch):
@@ -461,7 +484,7 @@ def test_winning_a_campaign_island(monkeypatch):
         user = setup(monkeypatch, ["U05"], ["U58", "SU02", "U63"])
         user["userInfo"]["world"]["campaign"]["active"]["C037"] = {"status": 2 << 20, "fleets": []}
         session["battle"] = ([100], [0, 0, 5], [], battle_engine.BattleContext(map_name="C037", island=2))
-        critical, direct = battle_engine.get_hit_value(kind("U05"), kind("U63"))
+        critical, direct = client.hit_value("U05", "U63")
         fixed_rolls(monkeypatch, direct)  # a direct hit: a kill
         coins, xp = resources()["coins"], user["userInfo"]["player"]["xp"]
         r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 2], map="C037"))["data"]
@@ -472,3 +495,250 @@ def test_winning_a_campaign_island(monkeypatch):
         damage = client_damage("U05", "U63", 5, direct)
         assert resources()["coins"] == coins + math.ceil(strength("U63") * damage * 0.01) + 3600
         assert user["userInfo"]["player"]["xp"] == xp + 1 + 1  # the kill and the island
+
+
+# --- more of the client's rules ---------------------------------------------------------------------------------
+
+def test_a_titan_of_the_player_hits_with_its_attack_strength(monkeypatch):
+    """BattleAI.GetAttackingStrengthAgainst(attacker, defender, STRENGTH_MAX) is the attacker's getAttackStrength:
+    ML11 of a level 25 player hits with 300, not with its strength 2400."""
+    with app.test_request_context():
+        setup(monkeypatch, ["ML11"], ["U05"], level=25)
+        fixed_rolls(monkeypatch, 0.5)  # mega_arm on tank: good (critical 0.99, direct 0.25), a direct hit
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        # 25 * (3 * 300 + 100) / (3 * 100 + 300) = 41.666..; / 100 * 100 cut to 41.666, ceil 42 (68 with 2400)
+        assert r["es"] == 100 - 42 == 100 - client_damage("ML11", "U05", 100, 0.5, level=25)
+
+
+def test_a_hit_that_does_no_damage_pays_nothing(monkeypatch):
+    """EnemyUnit.playDamageXPReward returns at once for a hit without damage: no reward roll, no xp."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U05"], ["U01"])
+        shield = {"consumable": {"-shield": "100"}}  # takes all of the hit
+        session["battle"] = ([100], [30], [(shield, ("enemy", 0), 5)], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)
+        rolls = count_reward_rolls(monkeypatch)
+        before, xp = dict(resources()), user["userInfo"]["player"]["xp"]
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        assert r["es"] == 30
+        assert rolls == [] and user["userInfo"]["player"]["xp"] == xp and resources() == before
+
+
+def test_a_glancing_hit_pays_no_coins(monkeypatch):
+    """EnemyUnit.playDamageXPReward sets a coinAmount for a critical or a direct hit only, a glancing hit pays the
+    xp of <combatRewards><glancinghit> (1)."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U01"], ["U05"])
+        fixed_rolls(monkeypatch, 0.5)  # antitank on tank: poor, direct 0.75: 0.5 is a glancing hit
+        count_reward_rolls(monkeypatch)
+        coins, xp = resources()["coins"], user["userInfo"]["player"]["xp"]
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        # 25 * (3 * 30 + 100) / (3 * 100 + 30) / 100 * 100 = 14.393.., * 0.10, ceil 2
+        assert r["es"] == 98 == 100 - client_damage("U01", "U05", 100, 0.5)
+        assert resources()["coins"] == coins and user["userInfo"]["player"]["xp"] == xp + 1
+
+
+def test_a_critical_hit_pays_a_rare_by_the_attackers_strength_left(monkeypatch):
+    """EnemyUnit.playDamageXPReward: a criticalhit has one rare loot (numRareLoot 1) of getRareType(attackerStrength),
+    "nrare" + strength % 5, where attackerStrength is the attacker's unit.strength now (BattleUnit.onUnitHit)."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        session["battle"] = ([98], [30], [], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.9)  # tank on antitank: great, critical 0.75: a critical hit
+        count_reward_rolls(monkeypatch)
+        before = dict(resources())
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        # 25 * (3 * 100 + 30) / (3 * 30 + 100) / 100 * 30 = 13.026.., * 1.5 = 19.539, ceil 20: 10 left, no kill
+        assert r["es"] == 10 == 30 - client_damage("U05", "U01", 30, 0.9)
+        # getRareAmount: ceil(30 * 20 * 0.0001) = 1; 98 % 5 = 3: nrare3, the fourth of resourceOrder (iron)
+        assert resources()["iron"] == before["iron"] + 1 and resources()["aluminum"] == before["aluminum"]
+        assert resources()["coins"] == before["coins"] + 6  # getCoinAmount: ceil(30 * 20 * 0.01)
+
+
+def test_mastery_coins_are_rounded_like_math_round(monkeypatch):
+    """spawnLoot: each coin loot is int(Math.round(coinAmount * scalar)); 3 * 1.1 = 3.3 gives 3 (ceil would be 4)."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        monkeypatch.setattr(battle_engine, "get_mastery_scalar", lambda: 1.1)
+        count_reward_rolls(monkeypatch)
+        coins = resources()["coins"]
+        battle_engine.doBattleRewards("directhit", 30, 10, 100)  # getCoinAmount: ceil(30 * 10 * 0.01) = 3
+        assert resources()["coins"] == coins + 3
+
+
+def test_mastery_scales_the_rare_loot(monkeypatch):
+    """spawnLoot: numRareLoot = int(Math.ceil(numRareLoot * scalar)); a criticalhit's 1 rare at 1.5 is 2 loots."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        monkeypatch.setattr(battle_engine, "get_mastery_scalar", lambda: 1.5)  # campaignMasteryScalars 1,1.5,2
+        count_reward_rolls(monkeypatch)
+        iron = resources()["iron"]
+        battle_engine.doBattleRewards("criticalhit", 300, 20, 98)  # getRareAmount: ceil(300 * 20 * 0.0001) = 1
+        assert resources()["iron"] == iron + 2  # 98 % 5 = 3: nrare3
+
+
+def test_an_energy_roll_equal_to_the_percent_gives_the_energy(monkeypatch):
+    """BattleUnit.shouldGiveReward: rewardInstance.float() <= percent gives it; <criticalhit> has an energy reward of
+    1 at percent .25, a roll of exactly 0.25 (3 digits, ZGameRandom) gives it."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U05"], ["U01"])
+        rolls = count_reward_rolls(monkeypatch, value=0.25)
+        energy = user["userInfo"]["player"]["energy"]
+        battle_engine.doBattleRewards("criticalhit", 30, 10, 100)
+        assert len(rolls) == 2  # getRandomRewards, then the energy reward
+        assert user["userInfo"]["player"]["energy"] == energy + 1
+
+
+def test_losing_a_titan_pays_its_oil(monkeypatch):
+    """PlayerUnit.playDamageXPReward: getOilAmount(getStrength) = ceil(2400 * combatRewardOilMultiplier 0.001) = 3
+    for ML11 of a level 25 player, coins ceil(2400 * 100 * 0.01); its cost has no rare resource."""
+    with app.test_request_context():
+        setup(monkeypatch, ["ML11"], ["U01"], level=25)
+        before = dict(resources())
+        battle_engine.doLossRewards(item("ML11"), 100)
+        assert resources()["oil"] == before["oil"] + 3 and resources()["coins"] == before["coins"] + 2400
+        assert [r for r in ("aluminum", "copper", "gold", "iron", "uranium") if resources()[r] != before[r]] == []
+
+
+def test_losing_a_unit_pays_the_first_rare_of_its_cost(monkeypatch):
+    """PlayerUnit.playDamageXPReward takes the first rare resource of unitItem.resourceCosts, which lists the
+    <cost> attributes in the order of the file (GameItem.resourceCosts). No unit of the game costs two rare
+    resources, so a made up one."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        unit = {"-code": "XX1", "-name": "two rares", "unit": {"-type": "tank,land", "-strength": "100"},
+                "cost": {"-coins": "1", "-nrare2": "3", "-nrare4": "1"}}
+        before = dict(resources())
+        battle_engine.doLossRewards(unit, 10)
+        assert resources()["gold"] == before["gold"] + 1  # nrare2, the third of resourceOrder
+        assert resources()["uranium"] == before["uranium"]
+
+
+def test_a_power_kill_of_a_titan_pays_by_its_attack_strength(monkeypatch):
+    """EnemyUnit.playDamageXPReward counts the coins from the hit unit's getAttackStrength: N76 (500) kills the ML11
+    of a level 1 player (strength 1200, attackStrength 150): ceil(150 * 500 * 0.01) = 750."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["ML11"])
+        count_reward_rolls(monkeypatch)
+        coins = resources()["coins"]
+        left = [400]
+        battle_engine.apply_consumable_direct_impact({}, item("N76"), 0, [item("ML11")], left, {}, False, [])
+        assert left == [0] and resources()["coins"] == coins + 750
+
+
+def test_a_power_against_land_also_hits_a_titan_harder(monkeypatch):
+    """The client takes a power's <against> modifier with UnitItem.getModifier: the first <against> whose type the
+    unit has among all its types (UnitItem.hasType, m_types.indexOf). N04 (di 30) has <against type="land"
+    mod="2.0">; ML11 is "mega_arm,tank,land,mega", so the client hits it for 30 * 2.0 = 60, like a U05 ("tank,land")."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["ML11", "U05"])
+        count_reward_rolls(monkeypatch)
+        left = [400, 100]
+        battle_engine.apply_consumable_direct_impact({}, item("N04"), 0, [item("ML11"), item("U05")], left, {}, False,
+                                                     [])
+        battle_engine.apply_consumable_direct_impact({}, item("N04"), 1, [item("ML11"), item("U05")], left, {}, False,
+                                                     [])
+        assert left == [400 - 60, 100 - 60]
+
+
+def test_only_the_first_matching_against_of_a_power_counts(monkeypatch):
+    """UnitItem.getModifier stops at the first <against> the unit has (it jumps out of the loop), it does not
+    multiply them. No power of the game has two, so this one is made up: land 2.0 then tank 3.0 on a U05
+    ("tank,land") hits for 30 * 2.0 = 60, not 30 * 2.0 * 3.0 = 180."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05"])
+        count_reward_rolls(monkeypatch)
+        power = copy.deepcopy(item("N04"))
+        power["consumable"]["against"] = [{"-type": "land", "-mod": "2.0"}, {"-type": "tank", "-mod": "3.0"}]
+        left = [100]
+        battle_engine.apply_consumable_direct_impact({}, power, 0, [item("U05")], left, {}, False, [])
+        assert left == [100 - 60]
+
+
+def test_collateral_damage_that_would_leave_1_takes_the_last_point(monkeypatch):
+    """N80 (di 30, chipFactor 3) on the first of two enemy units: ChipDamageManager.getDamage gives the other
+    ceil(4 * 3 * 30 / 100) = 4 (4 for two units); it has 5, so 1 would be left and the client adds it
+    (Battle.onUnitDamageFromConsumable "Incing damage to prevent 1 strength"): a kill by 5."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01", "U05"])
+        record_progress(monkeypatch)
+        count_reward_rolls(monkeypatch)
+        coins = resources()["coins"]
+        left = [30, 5]
+        battle_engine.apply_consumable_direct_impact({}, item("N80"), 0, [item("U01"), item("U05")], left, {}, False,
+                                                     [])
+        assert left == [0, 0]
+        # kills of the target (ceil(30 * 30 * 0.01) = 9) and of the other (ceil(100 * 5 * 0.01) = 5)
+        assert resources()["coins"] == coins + 9 + 5
+
+
+def test_a_power_pays_the_unit_it_killed_once(monkeypatch):
+    """The target killed by N80 is not paid again for its own collateral damage (there is none for it, 0)."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01", "U05"])
+        progress = record_progress(monkeypatch)
+        rolls = count_reward_rolls(monkeypatch)
+        coins = resources()["coins"]
+        left = [30, 100]
+        battle_engine.apply_consumable_direct_impact({}, item("N80"), 0, [item("U01"), item("U05")], left, {}, False,
+                                                     [])
+        assert left == [0, 96]  # the other takes ceil(4 * 3 * 30 / 100) = 4
+        assert resources()["coins"] == coins + 9 and len(rolls) == 1
+        assert progress == [("battleDamage", 30, None, "U01"), ("battleKill", 1, None, "U01"),
+                            ("battleDamage", 4, None, "U05")]
+
+
+ALLY_POWER = {"code": "A0A", "name": "-1", "fleet": "fleet2_1", "target": "fleet3_1", "map": None, "level": 0}
+
+
+def ally_powers(monkeypatch, codes):
+    monkeypatch.setattr(battle_engine, "lookup_items_by_type_and_subtype", lambda *a: [item(c) for c in codes])
+
+
+def test_the_ally_power_roll_of_a_half_takes_the_second(monkeypatch):
+    """int(Math.round(r * (n - 1))) of two powers with r * 1 = 0.5 is 1 (Math.round goes up): N05, 30 on the land
+    unit (N04 would be 60, twice on land)."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05"])
+        ally_powers(monkeypatch, ["N04", "N05"])  # Steele's level is the player's + 5: 6, N05 needs 6
+        fixed_rolls(monkeypatch, 0.5)
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][1]) == [70]
+
+
+def test_the_ally_power_target_roll_of_a_half_takes_the_second(monkeypatch):
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05", "U05"])
+        ally_powers(monkeypatch, ["N04"])
+        fixed_rolls(monkeypatch, 0.5)  # of two live enemy units: Math.round(0.5) = 1
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][1]) == [100, 40]
+
+
+def test_the_ally_heal_target_roll_of_a_half_takes_the_second(monkeypatch):
+    with app.test_request_context():
+        setup(monkeypatch, ["U05", "U05"], ["U05"])
+        session["battle"] = ([50, 50], [100], [], battle_engine.BattleContext())
+        ally_powers(monkeypatch, ["N40"])  # a heal of 500 for one unit, up to its strength
+        fixed_rolls(monkeypatch, 0.5)  # of two live player units: Math.round(0.5) = 1
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][0]) == [50, 100]
+
+
+def test_a_killed_titan_controller_still_casts(monkeypatch):
+    """BattleHost.state_UseSecondaryAbility (the engine's comment): killed units are taken out of the enemy fleet,
+    Titan controllers stay. No controller of the game has a secondary ability, so a torso (ML01) with N64's."""
+    lookup = battle_engine.lookup_item_by_code
+
+    def with_casting_torso(code):
+        if code != "MLX":
+            return lookup(code)
+        torso = copy.deepcopy(lookup("ML01"))
+        torso["-code"], torso["unit"]["-secondary"] = "MLX", "N64"
+        return torso
+    with app.test_request_context():
+        monkeypatch.setattr(battle_engine, "lookup_item_by_code", with_casting_torso)
+        setup_invader(monkeypatch, ["MLX", "U05"], strengths=[0, 100])
+        fixed_rolls(monkeypatch, 0.15)  # N64 casts at 20%
+        battle_engine.assign_consumable_response(AI_ASSIGN)
+        assert casting()

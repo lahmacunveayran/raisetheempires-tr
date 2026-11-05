@@ -1,10 +1,15 @@
 """Tests through the server's real save game layer: flask-session with SQLAlchemy and msgspec, the way
 empires-server.py sets it up when it runs, with save.db in a temporary folder."""
+import copy
+import html
 import json
+import os
 import pickle
+import re
 import sqlite3
 import threading
 import types
+from datetime import datetime
 
 import pyamf
 import pytest
@@ -20,6 +25,8 @@ GATEWAY = "/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservice
 VALID_USER_OBJECT = {"userInfo": {"worldName": "Test", "world": {"resources": {"coins": 10}}, "player": {
     "level": 5, "uid": 1, "xp": 0, "playerResourceType": 0, "socialXpGood": 0, "socialLevelGood": 1,
     "socialXpBad": 0, "socialLevelBad": 1}}}
+with open(os.path.join(os.path.dirname(__file__), "init_user.json")) as f:
+    INIT_USER = json.load(f)
 
 
 @pytest.fixture(scope="module")
@@ -118,12 +125,15 @@ def test_overlapping_requests_of_one_save_wait_for_each_other(server, monkeypatc
     fast = threading.Thread(target=lambda: (batch(other_client, ("WorldService.addFleet", [fleet("fast")])),
                                             fast_done.set()))
     slow.start()
-    assert slow_started.wait(10)
-    fast.start()
-    assert not fast_done.wait(0.5)  # the save is in use by the slow request
-    go_on.set()
-    slow.join(10)
-    fast.join(10)
+    try:
+        assert slow_started.wait(10)
+        fast.start()
+        assert not fast_done.wait(0.5)  # the save is in use by the slow request
+    finally:  # no request may outlive the test, also when it fails
+        go_on.set()
+        slow.join(10)
+        if fast.ident is not None:  # started
+            fast.join(10)
 
     assert fast_done.is_set()
     assert set(stored(server, sid)["fleets"]) == {"slow", "fast"}  # without waiting, slow writes over fast's fleet
@@ -133,8 +143,18 @@ def test_answers_only_ip_addresses_and_localhost(server):
     client = server.test_client()
     for host in ("127.0.0.1:5005", "localhost:5005", "192.168.1.20:5005", "[::1]:5005", "localhost"):
         assert client.get("/127.0.0.1record_stats.php", headers={"Host": host}).status_code == 204, host
-    for host in ("evil.example:5005", "evil.example", "127.0.0.1.evil.example"):
+    for host in ("evil.example:5005", "evil.example", "127.0.0.1.evil.example", "evil-localhost.example",
+                 "localhost.evil.example:5005"):
         assert client.get("/127.0.0.1record_stats.php", headers={"Host": host}).status_code == 403, host
+
+
+def test_host_names_that_only_contain_localhost_are_unknown():
+    """is_known_host: "Only an IP address or localhost" (its docstring), a name with localhost in it is neither."""
+    for host in ("evil-localhost.example", "localhost.evil.example", "evil-localhost.example:5005",
+                 "localhost.evil.example:5005", "mylocalhost", "localhost.:5005"):
+        assert not empires_server.is_known_host(host), host
+    for host in ("localhost", "LocalHost:5005", "127.0.0.1", "[::1]:5005", "192.168.1.20"):
+        assert empires_server.is_known_host(host), host
 
 
 def test_deleting_a_save_keeps_a_backup(server, backup_db, tmp_path):
@@ -177,7 +197,11 @@ def test_pickled_saves_are_converted_once(server):
         interface.client.session.commit()
         save_engine.convert_pickled_saves()
 
-    assert not raw_record(server, "pickled").startswith(b"\x80")
+        converted = raw_record(server, "pickled")
+        save_engine.convert_pickled_saves()  # on the next start: a msgpack save is left as it is
+
+    assert not converted.startswith(b"\x80")
+    assert raw_record(server, "pickled") == converted
     assert stored(server, "pickled") == save
 
 
@@ -195,9 +219,64 @@ def test_save_editor_writes_nothing_of_an_incomplete_save(server, backup_db):
     assert stored(server, sid)["user_object"]["userInfo"]["worldName"] == "Edited"
 
 
-def test_save_editor_opens_for_a_new_save_and_old_backups(server):
-    assert server.test_client().get("/save-editor").status_code == 200
-    assert empires_server.format_backup_message({"saved_on": None, "replaced_on": None})
+def save_editor_page(client):
+    """The save game the save editor shows, or None for any other page (the error page is 'It went wrong')."""
+    page = client.get("/save-editor").get_data(as_text=True)
+    textarea = re.search(r'<textarea rows="30" cols="135" name="savegame" >(.*?)</textarea>', page, re.S)
+    return json.loads(html.unescape(textarea.group(1))) if textarea else None
+
+
+SAVE_EDITOR_KEYS = ("user_object", "profilePic", "quests", "battle", "last_battle", "fleets", "population", "saved",
+                    "save_version", "original_save_version")
+
+
+def test_save_editor_opens_for_a_new_save(server):
+    # save_editor: every key the save does not have is shown as null, a new save has none of them (no quests either)
+    assert save_editor_page(server.test_client()) == dict.fromkeys(SAVE_EDITOR_KEYS)
+
+
+def test_save_editor_lists_the_quests_of_a_save(server):
+    client, _ = new_save(server, user_object=VALID_USER_OBJECT, quests=[{"name": "Q0516", "complete": False}])
+    shown = save_editor_page(client)
+    assert shown["quests"] == [{"name": "Q0516", "complete": False}]
+    assert shown["user_object"] == VALID_USER_OBJECT
+
+
+def test_old_backups_without_dates_are_listed_from_1970():
+    """format_backup_message: saved_on - replaced_on @version message, no date counts as 0 (the start of 1970 in the
+    local time zone), no version as UNKNOWN VERSION."""
+    def local(timestamp):
+        return datetime.fromtimestamp(timestamp).strftime("%d %b %Y %H:%M:%S")
+    assert empires_server.format_backup_message({"saved_on": None, "replaced_on": None}) == \
+        local(0) + " - " + local(0) + " @UNKNOWN VERSION "
+    assert empires_server.format_backup_message({"saved_on": 86400, "replaced_on": 90000, "save_version": "0.08a",
+                                                 "message": "Level 5"}) == \
+        local(86400) + " - " + local(90000) + " @0.08a Level 5"
+
+
+def test_save_editor_writes_nothing_of_an_invalid_user_object(server):
+    """save_savegame checks everything before writing anything (its comment): quests are fine, but a user_object
+    without a player is not a save game."""
+    client, sid = new_save(server, user_object=VALID_USER_OBJECT, quests=[])
+    edited = {"user_object": {"userInfo": {"worldName": "Edited"}}, "quests": []}
+    response = client.post("/save-editor", data={"savegame": json.dumps(edited), "message": "x"})
+
+    assert response.status_code == 400 and response.get_data(as_text=True).startswith("Not saved")
+    assert stored(server, sid)["user_object"] == VALID_USER_OBJECT
+
+
+def test_save_editor_takes_an_old_backup_without_battle_fleets_and_population(server):
+    """save_savegame: "an older backup may not have these" (battle, fleets, population): they are emptied."""
+    client, sid = new_save(server, user_object=VALID_USER_OBJECT, quests=[], battle=None, fleets={"fleet1_1": []},
+                           population=5, save_version="0.08a")
+    old = {"user_object": copy.deepcopy(VALID_USER_OBJECT), "quests": []}
+    old["user_object"]["userInfo"]["worldName"] = "Old"
+    response = client.post("/save-editor", data={"savegame": json.dumps(old), "message": "x"})
+
+    assert response.status_code == 302 and response.headers["Location"].endswith("/home.html")
+    save = stored(server, sid)
+    assert save["user_object"]["userInfo"]["worldName"] == "Old"
+    assert (save["battle"], save["fleets"], save["population"], save["save_version"]) == (None, None, None, None)
 
 
 @pytest.mark.parametrize("modded", [b"<settings/>", "<settings/>"])  # a replaced file, an xmldiff
@@ -210,23 +289,61 @@ def test_mods_of_the_settings_files_are_served(server, monkeypatch, modded):
         assert b"<settings" in response.data, route
 
 
+def test_the_settings_files_are_served_without_a_mod(server, monkeypatch):
+    for path in ("assets/29oct2012/gameSettings_with_fixes.xml", "assets/29oct2012/questSettings_with_fixes.xml"):
+        monkeypatch.delitem(empires_server.mod_engine.mod, path, raising=False)
+    client = server.test_client()
+
+    # what only the files themselves have: assets/29oct2012/gameSettings_with_fixes.xml starts with
+    # <settings><gamesettings and has the combat chain, questSettings_with_fixes.xml starts with <quests><quest
+    game = client.get("/gameSettings.xml")
+    assert game.mimetype == "text/xml" and b"<settings><gamesettings " in game.data[:200]
+    assert b'<chain type="infantry" great="antitank"' in game.data
+    quests = client.get("/127.0.0.1questSettings.xml")
+    assert b"<quests><quest " in quests.data[:200]
+
+
 def test_crew_from_another_local_save(server, monkeypatch):
     building = {}
     monkeypatch.setattr(empires_server, "lookup_object", lambda building_id: building)
     monkeypatch.setattr(empires_server, "lookup_crew_template",
-                        lambda name: {"-numUnbuyableSlots": "0", "position": [{}, {}]})
+                        lambda name: {"-numUnbuyableSlots": "0", "position": [{}, {}, {}]})
     with server.test_request_context():
-        empires_server.crew_request_response([[2681928178598866.0], 10003, "Parliament", "crew"])
+        empires_server.crew_request_response([[124, 2681928178598866.0, 111], 10003, "Parliament", "crew"])
 
-    assert building["crewInfo"] == ["2681928178598866"]  # not in allies/, and its id came as a double
+    # "only neighbor allies can be added": 124 is MissTery (allies/MissTery-island.json, "neighbor": false), 111
+    # AcidCaos (a neighbor); 2681928178598866 is not in allies/ (another local save) and its id came as a double
+    assert building["crewInfo"] == ["2681928178598866", "111"]
 
 
 def test_list_of_a_missing_object_can_be_logged(monkeypatch):
     emitted = []
     monkeypatch.setattr(logger.socketio, "emit", lambda *args: emitted.append(args))
-    logger.report_world_log.__wrapped__("list", [], {}, 1, "/1", None, 0)  # without never_fails
+    logger.report_world_log("list", [], {}, 1, "/1", None, 0)
 
-    assert emitted[0][1][1] == "response"
+    # report_world_log: an empty list is logged as {} with no id, so as "response"; never_fails would hide an
+    # error here, then nothing is emitted at all
+    assert emitted == [("world_log", ["list", "response", {}, 1, "/1", None, 0, [], []])]
+
+
+def test_an_answer_of_none_can_be_logged(monkeypatch):
+    emitted = []
+    monkeypatch.setattr(logger.socketio, "emit", lambda *args: emitted.append(args))
+    logger.report_world_log("op", None, {}, 1, "/1", None, 0)
+
+    # report_world_log: only a dict answer is logged by its id, anything else (None) as it is
+    assert emitted == [("world_log", ["op", None, {}, 1, "/1", None, 0, [], None])]
+
+
+def test_logging_for_the_log_page_never_fails_the_call(monkeypatch, capsys):
+    def log_page_gone(*args):
+        raise RuntimeError("no log page")
+    monkeypatch.setattr(logger.socketio, "emit", log_page_gone)
+
+    # never_fails: "Logging for the log page must never fail the call it reports on"
+    assert logger.report_world_log("op", {"id": 1}, {}, 1, "/1", None, 0) is None
+    assert logger.report_tutorial_step("no such step", None, 0, 1, "/1") is None  # describe_step finds no step
+    assert capsys.readouterr().out.count("Could not report to the log page:") == 2
 
 
 def test_every_state_machine_of_the_items_can_be_looked_up():
@@ -241,6 +358,13 @@ def test_every_state_machine_of_the_items_can_be_looked_up():
 
     assert len(items) > 300
     assert failed == []
+
+
+def test_an_unknown_state_machine_is_an_error():
+    with pytest.raises(ValueError, match="No state machine NoSuchStateMachine"):
+        game_settings.lookup_raw_state_machine("NoSuchStateMachine")
+    with pytest.raises(ValueError, match="No state machine NoSuchStateMachine"):
+        game_settings.lookup_state_machine("NoSuchStateMachine", [])
 
 
 def test_a_stale_battle_answer_is_left_alone_by_the_client(server, monkeypatch):
@@ -264,6 +388,80 @@ def test_migration_remembers_the_version_of_0_08a_saves(server):
         assert empires_server.session["save_version"] == "0.08a.2026_08_13"
 
 
+def test_a_backup_that_cannot_be_written_does_not_stop_the_migration(server, monkeypatch):
+    """save_migration.backup: "a backups.db that can't be written (locked, disk full) must not stop the save game
+    from loading"."""
+    def locked(message):
+        raise sqlite3.OperationalError("database is locked")
+    monkeypatch.setattr(save_migration, "create_backup", locked)
+    with server.test_request_context():
+        empires_server.session["user_object"] = {"experiments": {}, "userInfo": {"world": {"objects": []}}}
+        empires_server.session["save_version"] = "0.06a"
+        save_migration.migrate({}, "0.06a", "0.08a.2026_08_13")
+
+        assert empires_server.session["save_version"] == "0.08a.2026_08_13"
+        assert empires_server.session["user_object"]["experiments"]["empire_mech_lab_master"] == 3  # 0.08a full
+
+
+def test_migrating_a_0_02a_save_keeps_a_backup(server, tmp_path):
+    """The update to 0.03a resets the quests and expansions, a backup is made before (its comment)."""
+    with server.test_request_context():
+        empires_server.session["user_object"] = copy.deepcopy(INIT_USER)
+        empires_server.session["quests"] = [{"name": "Q0516", "complete": False, "expired": False,
+                                              "progress": [1], "completedTasks": 1}]
+        empires_server.session["save_version"] = "0.02a"
+        save_migration.migrate({}, "0.02a", "0.03a")
+
+        assert empires_server.session["save_version"] == "0.03a"
+        assert empires_server.session["quests"][0]["completedTasks"] == 0
+    with sqlite3.connect(tmp_path / "backups.db") as con:
+        rows = con.execute("SELECT message, save_version FROM backups").fetchall()
+    assert rows == [("Update to 0.03a", "0.02a")]  # the save as it was before
+
+
+def test_init_user_migrates_a_0_08a_preview_save(server, monkeypatch, tmp_path):
+    """A 0.08a save without empire_mech_lab_master is from the 0.08a preview: initUser migrates it ("includes from
+    preview 0.08a with same version number") and it gets the server's version."""
+    monkeypatch.setattr(empires_server, "get_saves", lambda: [])  # no neighbors from the other tests' saves
+    monkeypatch.setattr(empires_server.quest_trees, "_spots_file", lambda: str(tmp_path / "quest_tree_spots.json"))
+    user_object = copy.deepcopy(INIT_USER)
+    del user_object["experiments"]["empire_mech_lab_master"]
+    client, sid = new_save(server, user_object=user_object, quests=[], save_version="0.08a")
+    answers = batch(client, ("UserService.initUser", ["", 0]))
+
+    assert answers[0]["errorType"] == 0
+    save = stored(server, sid)
+    assert save["save_version"] == empires_server.version
+    assert save["user_object"]["experiments"]["empire_mech_lab_master"] == 3  # set by the 0.08a full step
+
+
+def test_other_saves_changed_by_a_call_that_works_are_written(server, monkeypatch):
+    """defer_save_writes: other save games written in the block are written when it ends without an error."""
+    other_client, other_sid = new_save(server, user_object=VALID_USER_OBJECT, quests=[])
+    client, sid = new_save(server, fleets={})
+    add_fleet = empires_server.add_fleet_response
+
+    def add_fleet_and_change_the_other_save(param):
+        other = dict(stored(server, other_sid), session_id="session:" + other_sid, changed_by_call=True)
+        empires_server.store_session(other)
+        return add_fleet(param)
+
+    monkeypatch.setattr(empires_server, "add_fleet_response", add_fleet_and_change_the_other_save)
+    answers = batch(client, ("WorldService.addFleet", [fleet("first")]))
+
+    assert [answer["errorType"] for answer in answers] == [0]
+    assert stored(server, other_sid)["changed_by_call"] is True
+    assert set(stored(server, sid)["fleets"]) == {"first"}
+
+
+def test_bytes_the_client_sent_can_be_saved(server):
+    """enc_hook: a ByteArray of the client (AMF3) is saved as its bytes."""
+    serializer = server.session_interface.serializer
+    assert serializer.decode(serializer.encode({"picture": pyamf.amf3.ByteArray(b"ab")})) == {"picture": b"ab"}
+    _, sid = new_save(server, picture=pyamf.amf3.ByteArray(b"ab"))
+    assert stored(server, sid)["picture"] == b"ab"
+
+
 def test_world_names_cannot_end_the_home_page_script():
     text = empires_server.script_json([{"name": "</script><b>x</b>"}])
 
@@ -271,12 +469,29 @@ def test_world_names_cannot_end_the_home_page_script():
     assert json.loads(text) == [{"name": "</script><b>x</b>"}]
 
 
+@pytest.mark.parametrize("page", ["/home.html", "/ruffle.html", "/nodebug.html"])
+def test_world_names_cannot_end_the_script_of_the_game_pages(server, page):
+    """The friends of getFriendData are the other saves, by their world names: a name with </script> in it must not
+    end the page's script, and the friends must still be the JSON the page returns."""
+    user_object = copy.deepcopy(VALID_USER_OBJECT)
+    user_object["userInfo"]["worldName"] = "</script><b>x</b>"
+    client, _ = new_save(server, user_object=user_object, quests=[])
+    text = client.get(page).get_data(as_text=True)
+
+    assert "</script><b>" not in text
+    friends = re.search(r"function getFriendData\(\) \{.*?return (.*?);\s*\}", text, re.S)
+    assert friends, text[:100]  # the error page ('It went wrong') has no script
+    assert "</script><b>x</b>" in [friend["name"] for friend in json.loads(friends.group(1))]
+
+
 def test_every_path_checks_the_host_also_socketio():
     from werkzeug.test import Client
     from werkzeug.wrappers import Response
     client = Client(empires_server.KnownHostsOnly(Response("ok")))  # around Flask-SocketIO's middleware in the server
 
-    assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": "evil.example:5005"}).status_code == 403
+    for host in ("evil.example:5005", "evil-localhost.example:5005", "localhost.evil.example"):
+        assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": host}).status_code == 403, host
+    assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": "localhost:5005"}).status_code == 200
     assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": "127.0.0.1:5005"}).status_code == 200
 
 

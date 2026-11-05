@@ -9,10 +9,12 @@ import os
 import random
 import sys
 
+import pytest
 from flask import Flask, session
 
 import battle_engine
 import bot_empires
+import client_settings
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -21,7 +23,7 @@ with open(os.path.join(os.path.dirname(__file__), "init_user.json")) as f:
     INIT_USER = json.load(f)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GRADES = bot_empires.GRADES
+GRADES = client_settings.CHANCE  # CombatChain.POOR 0, GOOD 1, GREAT 2
 UNITS_ASSETS = os.path.join(ROOT, "assets", "sol_assets_octdict", "assets", "game", "units")
 
 
@@ -165,14 +167,15 @@ def test_bot_worlds_grow_with_their_level(monkeypatch, tmp_path):
         assert bot_empires.island(bot_empires.bots()[6]) == bot_empires.ISLANDS[-1]
 
 
+# the client's CombatChain, read from gameSettings_with_fixes.xml (client_settings), for units of these kinds
 @functools.lru_cache(maxsize=None)
-def hit_value(attacker_kind, defender_kind):  # battle_engine.get_hit_value, looked up once
-    return battle_engine.get_hit_value(attacker_kind, defender_kind)
+def hit_value(attacker_kind, defender_kind):  # CombatChain.GetAttackingHitValue: (critical, direct)
+    return client_settings.settings()["hit_values"][client_settings.grade_of_types([attacker_kind], [defender_kind])]
 
 
 @functools.lru_cache(maxsize=None)
-def hit_chance(attacker_kind, defender_kind):  # battle_engine.get_hit_chance
-    return GRADES[battle_engine.get_combat_chain_grade(attacker_kind, defender_kind)]
+def hit_chance(attacker_kind, defender_kind):  # CombatChain.GetAttackingHitChance
+    return GRADES[client_settings.grade_of_types([attacker_kind], [defender_kind])]
 
 
 def player_pick(player, bot, player_left, bot_left):
@@ -364,10 +367,9 @@ def test_a_write_cut_short_keeps_the_old_state(monkeypatch, tmp_path):
             raise OSError("disk full")
         monkeypatch.setattr(bot_empires.json, "dump", cut_short)
         save["user_object"]["pvp"]["invaders"]["u2"] = {"status": 1}
-        try:
+        # _write_state: "a write cut short leaves the old state"; it does not hide the error from the call
+        with pytest.raises(OSError, match="disk full"):
             bot_empires.store_save(save)
-        except OSError:
-            pass
         monkeypatch.undo()
         setup_session(monkeypatch, tmp_path)
         assert bot_empires.find_save(uid)["user_object"]["pvp"]["invaders"] == {"u1": {"status": 1}}
