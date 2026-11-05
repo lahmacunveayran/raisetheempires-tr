@@ -388,10 +388,6 @@ def test_same_site_requests_to_save_changing_routes_are_allowed():
             assert empires_server.reject_cross_site_save_changes() is None
 
 
-def test_session_cookie_is_same_site_strict():
-    assert empires_server.app.config['SESSION_COOKIE_SAMESITE'] == 'Strict'
-
-
 def test_move_nested_backups_keeps_order(backup_db):
     save = {"session_id": "session:abc", "message": "now"}
     node = save

@@ -25,34 +25,7 @@ T0 = 1_600_000_000.0  # a time in the past (Windows can not take timestamps near
 SAME_SITE = {"Referer": "http://localhost/save-editor"}  # the test client's host is localhost
 
 
-def _forget_save_database(app):
-    """Undo db.init_app / sess.init_app: both can only be done once for an app (a second time raises), so a module
-    that sets the server up must take it down again for the next one (test/session_layer_test.py sets it up too)."""
-    db = empires_server.db
-    if "sqlalchemy" in app.extensions:
-        for engine in db._app_engines.pop(app, {}).values():
-            engine.dispose()
-        del app.extensions["sqlalchemy"]
-        while db._teardown_session in app.teardown_appcontext_funcs:
-            app.teardown_appcontext_funcs.remove(db._teardown_session)
-    table = db.metadata.tables.get("sessions")
-    if table is not None:
-        db.metadata.remove(table)
-
-
-@pytest.fixture(scope="module")
-def server(tmp_path_factory):
-    app = empires_server.app
-    _forget_save_database(app)  # a module before this one may have left its set up behind
-    saved = app.session_interface, app.config["SQLALCHEMY_DATABASE_URI"], app._got_first_request
-    app._got_first_request = False  # the server sets up before its first request
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + (tmp_path_factory.mktemp("saves") / "save.db").as_posix()
-    empires_server.db.init_app(app)
-    empires_server.sess.init_app(app)
-    app.session_interface = empires_server.AssetSkippingSessionInterface(app.session_interface)
-    yield app
-    _forget_save_database(app)
-    app.session_interface, app.config["SQLALCHEMY_DATABASE_URI"], app._got_first_request = saved
+# `server` (test/conftest.py): the app as configure_app sets it up, save.db in a temporary folder
 
 
 @pytest.fixture(autouse=True)
@@ -243,12 +216,15 @@ def test_the_save_editor_shows_every_part_of_the_save(server):
 
 
 def test_the_save_editor_says_when_the_save_is_corrupt(server):
-    """save-editor.html shows 'Your savegame is corrupt.' when validate_save fails."""
+    """save-editor.html shows 'Your savegame is corrupt.' when validate_save fails; the editor checks the save as a
+    save game (validate_save(session, False)), so no save at all is not one either ("Your save game is required to
+    have a user object key", the page's own text)."""
     good, _ = new_save(server, user_object=copy.deepcopy(INIT_USER), quests=[])
     bad, _ = new_save(server, user_object={"userInfo": {"worldName": "No player"}}, quests=[])
 
     assert "Your savegame is corrupt." not in editor_page(good)
     assert "Your savegame is corrupt." in editor_page(bad)
+    assert "Your savegame is corrupt." in editor_page(server.test_client())
 
 
 def test_the_save_editor_links_the_quests_by_their_state(server):
@@ -290,11 +266,24 @@ def test_the_save_editor_writes_what_it_was_given(server, clock):
 
 
 def test_an_edit_without_an_avatar_keeps_the_saves(server):
-    client, sid = new_save(server, **a_save(profilePic="a.png", backup=None))
+    save = a_save(profilePic="a.png", backup=None)
+    del save["saved"]  # never changed outside the game before
+    client, sid = new_save(server, **save)
     edited = {"user_object": copy.deepcopy(INIT_USER), "quests": []}
 
     assert client.post("/save-editor", data={"savegame": json.dumps(edited), "message": "x"}).status_code == 302
     assert stored(server, sid)["profilePic"] == "a.png"
+    assert stored(server, sid)["saved"] == "edit"  # the mark starts from nothing
+
+
+def test_the_save_editor_does_not_give_an_avatar_to_a_save_without_one(server):
+    """A save gets its first avatar from the avatar page (/chooseavatar/), not from the editor: an edit only replaces
+    an avatar the save already has (source: save_savegame's own check, nothing in the client)."""
+    client, sid = new_save(server, **a_save(backup=None))
+    edited = {"user_object": copy.deepcopy(INIT_USER), "profilePic": "b.png", "quests": []}
+
+    assert client.post("/save-editor", data={"savegame": json.dumps(edited), "message": "x"}).status_code == 302
+    assert "profilePic" not in stored(server, sid)
 
 
 def local(timestamp):  # format_backup_message: the dates as the backup list shows them
