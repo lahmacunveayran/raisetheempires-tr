@@ -1,10 +1,12 @@
 import copy
 import json
+import math
 import os
 
 from flask import Flask, session
 
 import battle_engine
+import client_settings as client
 import titan_lab
 
 app = Flask(__name__)
@@ -111,6 +113,22 @@ def test_titan_units_grow_with_the_player_level():
         assert battle_engine.get_unit_max_strength(battle_engine.lookup_item_by_code("ML11"), False) == 6000
 
 
+def test_titan_strength_at_an_entry_level_is_the_next_entrys():
+    """UnitItem.getXmlStrength takes the first <entry> whose level is above the player level (playerLevel < level):
+    ML11 has <entry level="20" strength="1200" attackStrength="150"/><entry level="30" strength="2400" .../>, so a
+    level 19 player meets 1200 / 150 and a level 20 one 2400 / 300."""
+    entries = client.unit("ML11")["entries"]
+    assert entries[:2] == [(20, 1200, 150), (30, 2400, 300)]
+    ml11 = battle_engine.lookup_item_by_code("ML11")
+    with app.test_request_context():
+        user = setup_session()
+        for level in (19, 20, 29, 30):
+            user["userInfo"]["player"]["level"] = level
+            assert battle_engine.get_unit_max_strength(ml11, False) == client.strength("ML11", level)
+            assert battle_engine.get_unit_attack_strength(ml11, False) == client.attack_strength("ML11", level)
+        assert [client.strength("ML11", level) for level in (19, 20, 29, 30)] == [1200, 2400, 2400, 3200]
+
+
 def test_won_titan_battle_gives_the_part():
     with app.test_request_context():
         user = setup_session()
@@ -130,10 +148,17 @@ def test_titan_battle_won_by_the_last_hit(monkeypatch):
         user["userInfo"]["player"]["level"] = 25
         start_battle(index=2)
         params = {"id": [0, 0], "fleet": OWN_FLEET, "target": ENEMY, "ch": 1, "map": None}
-        critical, direct = battle_engine.get_hit_value("antitank", "mega_arm")
+        # CombatChain of the client from the XML: V06 (antitank) on ML11 (mega_arm, tank, ...): poor
+        critical, direct = client.hit_value("V06", "ML11")
         monkeypatch.setattr(battle_engine, "roll_random_between", lambda a, b: direct)  # direct hits
         data = battle_engine.battle_complete_response(params)["data"]
-        assert data["es"] == 2400 - 30  # 25 * (3 * 150 + 2400) / (3 * 2400 + 150) / 100 * 300 = 29.1, not 232.7
+        # BattleAI.GetAttackingDamage: 25 * (3 * attack + left) / (3 * left + attack) / 100 * the Titan's attack
+        # strength (UnitItem.getXmlStrength of a level 25 player: 2400 and 300), cut to 3 digits, ceil
+        attack, left, titan_attack = client.attack_strength("V06"), client.strength("ML11", 25), \
+            client.attack_strength("ML11", 25)
+        damage = math.ceil(math.floor(25 * (3 * attack + left) / (3 * left + attack) / 100 * titan_attack * 1000) / 1000)
+        assert (left, damage) == (2400, 30)  # 29.08, not 232.7 with its strength
+        assert data["es"] == left - damage
         session["battle"][1][:] = [0, 0, 0, 0, 20]
         params["id"] = [0, 4]
         assert battle_engine.battle_complete_response(params)["data"]["es"] == 0
