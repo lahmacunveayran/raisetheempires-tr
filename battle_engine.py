@@ -870,7 +870,8 @@ def get_survival_player_fleet():
     "target": "",
     "consumables": [],
     "inventory": [],
-    "playerLevel": 1,
+    # the client sizes Titans by this level (UnitItem.getXmlStrength), the server by the player's
+    "playerLevel": int(session['user_object']["userInfo"]["player"]["level"]),
     "specialBits": None,
     "lost": None,
     "lastUnitLost": None,
@@ -1087,6 +1088,7 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
         units_strengths[targeted_unit] -= damage
         if not ally and 1 >= units_strengths[targeted_unit] > 0:
             units_strengths[targeted_unit] = 0
+            damage += 1  # the client adds the 1 to the damage, which the coins are counted from
             print("Enemy inced to prevent 1 strength")
         if units_strengths[targeted_unit] <= 0:
             units_strengths[targeted_unit] = 0  # dead
@@ -1114,6 +1116,7 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             units_strengths[live_index[i]] -= colateral_damage
             if not ally and 1 >= units_strengths[live_index[i]] > 0:
                 units_strengths[live_index[i]] = 0
+                colateral_damage += 1
                 print("Enemy inced to prevent 1 strength")
             print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[live_index[i]], "collateral damage")
             if units_strengths[live_index[i]] <= 0:
@@ -1125,15 +1128,16 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
 
 
 def consumable_hit_rewards(meta, unit, damage, killed, ally, params):
-    """A power hits like a unit does (BattleUnit.onUnitHit): a hit on an enemy unit pays and counts for the
-    battleDamage and battleKill tasks (no attacking unit), losing a unit of the player pays the loss loot."""
+    """A power's hit counts for the battleDamage and battleKill tasks (no attacking unit). Only a kill pays: the hit
+    event of Battle.onUnitDamageFromConsumable carries the damage only when the unit is dead (dead ? damage : false)
+    and EnemyUnit.playDamageXPReward / PlayerUnit.playDamageXPReward give nothing (and roll nothing) without it."""
     if damage <= 0:
         return
     if not ally:
         handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, {}, unit))
         if killed:
             handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {}, unit))
-        doBattleRewards("kill" if killed else "directhit", get_unit_attack_strength(unit, False, params), damage, None)
+            doBattleRewards("kill", get_unit_attack_strength(unit, False, params), damage, None)
     elif killed:
         doLossRewards(unit, damage)
 

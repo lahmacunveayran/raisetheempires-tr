@@ -461,6 +461,7 @@ def test_get_survival_player_fleet():
     with app.test_request_context():
 
         setup_session_invade()
+        session['user_object']["userInfo"]["player"] = {"level": 7}  # the fleet gets it
 
         session["last_battle"] = ([10, 11, 12, 13, 14], [], [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
                              '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
@@ -485,7 +486,7 @@ def test_get_survival_player_fleet():
             "target": "",
             "consumables": [],
             "inventory": [],
-            "playerLevel": 1,
+            "playerLevel": 7,
             "specialBits": None,
             "lost": None,
             "lastUnitLost": None,

@@ -353,6 +353,34 @@ def test_losing_a_unit_to_a_power_pays_the_loss_loot(monkeypatch):
         assert resources()["oil"] == before["oil"] + 1 and resources()["iron"] == before["iron"] + 1
 
 
+
+def test_power_hits_that_do_not_kill_pay_nothing(monkeypatch):
+    """Battle.onUnitDamageFromConsumable puts the damage in the hit event only for a dead unit (dead ? damage :
+    false); without it EnemyUnit.playDamageXPReward gives nothing and rolls nothing. The damage still counts."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U05"], ["U05"])
+        progress = record_progress(monkeypatch)
+        rolls = count_reward_rolls(monkeypatch)
+        coins, xp = resources()["coins"], user["userInfo"]["player"]["xp"]
+        left = [100]
+        battle_engine.apply_consumable_direct_impact({}, item("N04"), 0, [item("U05")], left, {}, False, [])
+        assert left == [40] and resources()["coins"] == coins and user["userInfo"]["player"]["xp"] == xp
+        assert rolls == [] and progress == [("battleDamage", 60, None, "U05")]
+
+
+def test_a_power_kill_by_the_last_point_pays_for_it(monkeypatch):
+    """60 damage would leave the U01 at 1: the client adds the 1 to the damage (Incing damage to prevent 1 strength)
+    and counts the coins from 61."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        record_progress(monkeypatch)
+        count_reward_rolls(monkeypatch)
+        coins = resources()["coins"]
+        left = [61]
+        battle_engine.apply_consumable_direct_impact({}, item("N04"), 0, [item("U01")], left, {}, False, [])
+        assert left == [0] and resources()["coins"] == coins + math.ceil(30 * 61 * 0.01)
+
+
 # --- secondary abilities ------------------------------------------------------------------------------------------
 
 ZID_FLEETS = ["fleet%d_2341959767162880" % i for i in range(1, 14, 2)]

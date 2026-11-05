@@ -169,18 +169,38 @@ SAVE_CHANGING_PATH_PREFIXES = ("/wipe_session", "/list_session", "/gazillionaire
                                "/chooseavatar/", "/login.html", "/new.html")
 
 
-@app.before_request
-def reject_unknown_hosts():
+def is_known_host(host):
     """Only an IP address or localhost: a web page that points its own domain name at this computer (DNS rebinding)
     must not reach the saves. The server can still be used on the local network by its IP address (SERVERS.md)."""
-    host = request.host.rsplit(":", 1)[0] if not request.host.endswith("]") else request.host
+    host = host.rsplit(":", 1)[0] if not host.endswith("]") else host
     host = host.strip("[]")
     try:
         ipaddress.ip_address(host)
+        return True
     except ValueError:
-        if host.lower() != "localhost":
-            print("Blocked request for host", request.host)
-            return "Unknown host", 403
+        return host.lower() == "localhost"
+
+
+class KnownHostsOnly:
+    """is_known_host for everything the server answers, also the log page's Socket.IO, which Flask-SocketIO answers
+    before Flask sees the request."""
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        host = environ.get("HTTP_HOST") or environ.get("SERVER_NAME", "")
+        if not is_known_host(host):
+            print("Blocked request for host", host)
+            start_response("403 Forbidden", [("Content-Type", "text/plain")])
+            return [b"Unknown host"]
+        return self.wsgi_app(environ, start_response)
+
+
+@app.before_request
+def reject_unknown_hosts():
+    if not is_known_host(request.host):
+        print("Blocked request for host", request.host)
+        return "Unknown host", 403
 
 
 @app.before_request
@@ -545,8 +565,13 @@ def save_savegame():
         print("restoring backup")
         message = "Revert to backup \"" + format_backup_message(save_game) + "\""
     else:
-        save_game = json.loads(request.form['savegame'])
-        message = "before " + request.form.get("message")
+        try:
+            save_game = json.loads(request.form['savegame'])
+        except (KeyError, ValueError):
+            return "Not saved: the save game is not valid JSON", 400
+        message = "before " + str(request.form.get("message"))
+    if not isinstance(save_game, dict):
+        return "Not saved: the save game is not valid (not an object)", 400
 
     print(repr(save_game))
     # check everything before writing anything, so a wrong edit can't leave the save half new and half old
@@ -962,6 +987,10 @@ def guarded_call(reqq, batch_id):
     try:
         with defer_save_writes():
             response = call_response(reqq, batch_id)
+            # a value the save game can't hold fails this call now, not the whole batch when the save is written
+            encode = getattr(getattr(app.session_interface, "serializer", None), "encode", None)
+            if encode is not None:
+                encode(dict(session))
         if response is not None:
             return response
         print("No answer to", reqq.functionName)
@@ -2293,7 +2322,8 @@ def random_fleet_challenge_response(host_uid):
         "target": "",
         "consumables": [],
         "inventory": [],
-        "playerLevel": 1,
+        # the client sizes Titans by this level (UnitItem.getXmlStrength), the server by the player's
+        "playerLevel": int(session['user_object']["userInfo"]["player"]["level"]),
         "specialBits": None,
         "lost": None,
         "lastUnitLost": None,
@@ -2377,7 +2407,8 @@ def random_enemy_fleet_challenge_response(enemy_fleet_id):
         "target": "",
         "consumables": [],
         "inventory": [],
-        "playerLevel": 1,
+        # the client sizes Titans by this level (UnitItem.getXmlStrength), the server by the player's
+        "playerLevel": int(session['user_object']["userInfo"]["player"]["level"]),
         "specialBits": None,
         "lost": None,
         "lastUnitLost": None,
@@ -3173,10 +3204,17 @@ def delete_save(message):
 
 @app.errorhandler(500)
 def server_error_page(error):
-    if settings.crash_log:  # in its own thread: the editor waits until it is closed, the answer must not
-        threading.Thread(target=editor.edit, kwargs={"filename": os.path.join(log_path(), "log.txt")},
-                         daemon=True).start()
+    global crash_log_editor
+    # in its own thread: the editor waits until it is closed, the answer must not. One editor at a time: the client
+    # sends a failed batch again and again
+    if settings.crash_log and not (crash_log_editor and crash_log_editor.is_alive()):
+        crash_log_editor = threading.Thread(target=editor.edit, kwargs={"filename": os.path.join(log_path(), "log.txt")},
+                                            daemon=True)
+        crash_log_editor.start()
     return 'It went wrong'
+
+
+crash_log_editor = None
 
 
 def enc_hook(obj):
@@ -3240,6 +3278,7 @@ if __name__ == '__main__':
     if settings.compression:
         compress.init_app(app)
     socketio.init_app(app)
+    app.wsgi_app = KnownHostsOnly(app.wsgi_app)  # around Flask-SocketIO's middleware, so Socket.IO is checked too
     db.init_app(app)
     sess.init_app(app)
     app.session_interface = AssetSkippingSessionInterface(app.session_interface)

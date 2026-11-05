@@ -13,6 +13,10 @@ ve önceliklendirir. Raporların kendisi denetçilerin yazdığı gibi, kelimesi
 
 ## 0. Yönetici özeti (proje sahibi için)
 
+> **5 Kasım 2026 güncellemesi:** bulguların hepsi düzeltildi ve düzeltmeler bağımsız olarak yeniden denetlendi.
+> Puanlar şimdi çekirdek 8/10, savaş 8/10. Ayrıntı ve açık kalan küçük noktalar: Bölüm 7. Aşağıdaki özet raporun
+> ilk hâlidir.
+
 - **Temel sağlam, hata yolu zayıf.** Puanlar: çekirdek 5,5/10, savaş 5/10.
   - Kayıt her isteğin sonunda tek seferde yazılıyor, yarım kayıt oluşmuyor.
   - Hata olunca kayıt geri alınıyor.
@@ -170,4 +174,73 @@ Kendim doğrulamadıklarım:
   - Oyun ayarları ve yamalar.
   - Türkçe çeviri ve araçlar.
   - Kurulum ve belgeler.
-- Bu turda hiçbir bulgu düzeltilmedi; rapor yalnızca durumu ve önceliği belirler.
+- Raporun ilk hâlinde hiçbir bulgu düzeltilmemişti. Düzeltmeler ve onların bağımsız yeniden denetimi Bölüm 7'de.
+
+## 7. Düzeltme durumu — 5 Kasım 2026
+
+Bölüm 5'teki bütün bulgular aynı dalda (`denetim-1`) düzeltildi. Sonra iki yeni bağımsız denetçi düzeltmeleri
+inceledi. Onlara da hiçbir sonuç söylenmedi; yalnız eski raporlar ve kod farkı verildi.
+
+- Çekirdek yeniden denetimi: [`denetim/yeniden-cekirdek.md`](denetim/yeniden-cekirdek.md), betikler
+  `denetim/hesap/yeniden-cekirdek/` (`y01`…`y07`).
+- Savaş yeniden denetimi: [`denetim/yeniden-savas.md`](denetim/yeniden-savas.md), betikler
+  `denetim/hesap/yeniden-savas/`.
+
+**Puanlar:** çekirdek 5,5 → **8/10**, savaş 5 → **8/10**. Yeniden denetimin bulduğu 5 yeni sorunun 4'ü de düzeltildi
+(aşağıda). Bütün testler geçiyor: `pytest -q` → **193 passed**. Yeni testlerin çoğu gerçek kayıt katmanından ve savaşın
+kendisinden geçiyor.
+
+### 7.1 Bulgu bulgu
+
+| Kimlik | Durum | Ne yapıldı |
+|---|---|---|
+| CEK-01 | Düzeltildi | Her çağrı ayrı korunuyor (`guarded_call`): çağrıdan önce kaydın kopyası alınıyor, hata olursa yalnız o çağrı geri alınıyor ve oyuna `errorType 100` dönüyor. Sağlam çağrılar kaydediliyor. Oyunun kodunda bu cevabın sessizce geçildiği doğrulandı. |
+| CEK-02 | Düzeltildi | Tek `define`'lı ve iki kez tanımlı durum makineleri çözülüyor. Raffle Center ve öteki 3 öğe artık yerleşiyor. |
+| CEK-03 | Düzeltildi | Günlük satırları boş listede çökmüyor; günlük işlevleri hiçbir zaman çağrıyı düşürmüyor. |
+| CEK-04 | Düzeltildi | Aynı kayda gelen istekler kayıt başına bir kilitle sırayla işleniyor. Kilit hata yollarında da bırakılıyor. |
+| CEK-05 | Düzeltildi | `undefined` ve ByteArray değerleri kaydedilebiliyor. Kaydedilemeyen bir değer bırakan çağrı ayrıca geri alınıyor (YC-02). |
+| CEK-06 | Düzeltildi | Yalnız IP adresi ya da `localhost` adıyla gelen istekler kabul ediliyor (DNS rebinding'e karşı). Socket.IO da bu denetimden geçiyor (YC-01). |
+| CEK-07 | Kısmen | Silmeden önce yedek alınıyor ve onay soruluyor. Kalan: yedek yeni oturumdan arayüzle geri getirilemiyor; silme hâlâ bir GET isteği. |
+| CEK-08 | Düzeltildi | Yerel kayıttan ekip istemek çökmüyor. |
+| CEK-09 | Düzeltildi | Ayar modları açıkken oyun açılıyor. Örnek mod `_with_fixes` dosyasına bağlandı; 107829 modu kapalı kaldı. |
+| CEK-10 | Düzeltildi | Komşu kayıtları da msgspec ile yazılıyor; eski pickle kayıtlar sunucu açılırken dönüştürülüyor. Bu sırada bulunan eski bir hata da düzeldi: başka kayda her yazım `.db` adı yüzünden çöküyordu. |
+| CEK-11 | Düzeltildi | `test/session_layer_test.py`: gerçek flask-session + SQLAlchemy + msgspec katmanından geçen 22 test. |
+| CEK-12 | Kısmen | Başka kayıtlara yazımlar çağrı başarılı olana kadar bekletiliyor. Kalan: `bot_empires.py`, `event_buildings.py` ve `quest_trees.py`'nin dosya yazımları bekletilmiyor. |
+| CEK-13 | Kısmen | Geçersiz kayıtta initUser artık cevap alıyor. Kalan: oyunun `TInitUser` işleminde hata karşılığı yok, oyun yine yükleme ekranında kalıyor (bu oyunun tarafı). |
+| CEK-14 | Düzeltildi | Kayıt düzenleyici yazmadan önce denetliyor; eksik alan, bozuk JSON ya da sözlük olmayan kayıt 400 dönüyor, kayıt değişmiyor. |
+| CEK-15 | Kısmen | Yedek alınamazsa seviye atlama ve sürüm geçişi durmuyor; 0.02a geçişinden önce de yedek alınıyor; 0.08a kayıtların sürümü güncelleniyor. Kalan: geçiş yedeği, kaydın bir kısmı değiştikten sonra alınıyor. |
+| CEK-16 | Düzeltildi | Dünya adı ve arkadaş listesi sayfa betiğine güvenli yazılıyor (`script_json`). |
+| SAV-01 | Düzeltildi | Titan'lar saldırı gücüyle vuruyor, seviye istemci gibi seçiliyor. 390 vuruşun hepsi istemciyle aynı. |
+| SAV-02 | Düzeltildi | Bütün birimler sersemletilmişken sunucu çökmüyor. |
+| SAV-03 | Düzeltildi | Bütün yuvarlamalar istemcinin `Math.round`'u gibi (`as3_round`). 400 savaşta, 7334 hamlede tek ayrılık yok. |
+| SAV-04 | Düzeltildi | Güçle öldürmenin ödülü ve "battleKill" ilerlemesi doğru tarafa yazılıyor. |
+| SAV-05 | Düzeltildi | Araştırma yükseltmesinden sonra güç yuvarlanıyor. |
+| SAV-06 | Düzeltildi | Vuruş ödülleri ve ödül zarı oyunun ayarlarından, istemcinin sırasıyla hesaplanıyor. |
+| SAV-07 | Düzeltildi | Eski savaş isteğine `data: None` dönüyor; istemci bunu hata saymıyor. |
+| SAV-08 | Kısmen | Savaş turu, yapay zekâ, ödül ve güç testleri eklendi (`test/battle_turn_test.py`). Kalan boşluklar yeniden denetim raporunda. |
+| SAV-09 | Düzeltildi | Uçaksavar NPC'leri çökertmiyor. |
+| SAV-10 | Düzeltildi | Düşmanın ikinci yeteneği istemcinin sırasıyla seçiliyor. |
+| SAV-11 | Düzeltildi | Düzeltilmiş motorla yeniden ölçüldü (54 takım, takım ve bot başına 20 savaş, savaşları motorun kendisi oynadı): %54, %50, %45, %40, %35; ayna bot %62. Belgedeki sayılar bunlarla değiştirildi. Denge testi, kendi kopyasının motorla aynı sonucu verdiğini de denetliyor. |
+| SAV-12 | Düzeltildi | Bot durum dosyası güvenli yazılıyor; `invasion_complete` eksik alanda çökmüyor; Titan parçası para yetmezse açılmıyor. |
+
+### 7.2 Yeniden denetimin yeni bulguları
+
+| Kimlik | Önem | Durum | Ne yapıldı |
+|---|---|---|---|
+| YC-01 | Düşük | Düzeltildi | Socket.IO bağlantıları da Host denetiminden geçiyor (`KnownHostsOnly`); yabancı adla 403. |
+| YC-02 | Düşük | Büyük ölçüde | Çağrıdan sonra kayıt bir kez deneme olarak kodlanıyor; kodlanamıyorsa yalnız o çağrı geri alınıyor. Kayıt düzenleyici bozuk girişte 400 dönüyor. Not Defteri aynı anda yalnız bir kez açılıyor. Kalan: çağrıların dışındaki seyrek hatalarda (ör. veritabanı yazılamazsa) paket yine düşüyor. |
+| YC-03 | Düşük | Açık | Başka bir kayda yazım o kaydın kilidini almıyor. O kayıt aynı anda başka bir tarayıcıda açıksa komşuya yapılan yardım kaybolabilir. İki tarayıcıda iki kayıtla oynamayı gerektiriyor. |
+| YS-01 | Orta | Düzeltildi | Güç (hava saldırısı vb.) yalnız birimi öldürünce ödül ve zar alıyor, istemci gibi. Son puanla öldürme de istemci gibi sayılıyor. |
+| YS-02 | Düşük | Düzeltildi | Rastgele meydan okuma filoları oyuncunun seviyesiyle gidiyor; Titan iki tarafta aynı seviyede. |
+
+YS-01, asıl denetimdeki SAV-04/06 açıklamasının bir yanlışından çıktı: güç vuruşunun her hasarda ödül verdiği
+sanılmıştı, oysa istemci yalnız öldürmede veriyor. Düzeltme oyunun koduna göre yapıldı.
+
+### 7.3 Bedel ve sınırlar
+
+- **Bedel:** her çağrı için kaydın kopyası (~2,6 ms) ve deneme kodlaması (~0,8 ms), 490 KB'lık bir kayıtta. Bir pakette
+  birkaç çağrı olduğu için oyuncu fark etmez.
+- **Bilerek dokunulmayanlar:** `SESSION_REFRESH_EACH_REQUEST` olduğu gibi kaldı (değiştirmek oturum süresini etkiler).
+- **Hâlâ denenmeyenler:** gerçek Flash istemcisi otomatik olarak çalıştırılmadı; istemcinin tepkileri bytecode'dan
+  okundu. DNS rebinding tarayıcıda denenmedi. Açık kalan beş nokta (CEK-07, CEK-12, CEK-13, CEK-15, YC-03) düşük ya da
+  orta önemde ve oyunu bozmuyor; sonraki bir turda ele alınabilir.

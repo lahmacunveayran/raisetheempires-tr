@@ -269,3 +269,51 @@ def test_world_names_cannot_end_the_home_page_script():
 
     assert "</" not in text
     assert json.loads(text) == [{"name": "</script><b>x</b>"}]
+
+
+def test_every_path_checks_the_host_also_socketio():
+    from werkzeug.test import Client
+    from werkzeug.wrappers import Response
+    client = Client(empires_server.KnownHostsOnly(Response("ok")))  # around Flask-SocketIO's middleware in the server
+
+    assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": "evil.example:5005"}).status_code == 403
+    assert client.get("/socket.io/?EIO=4&transport=polling", headers={"Host": "127.0.0.1:5005"}).status_code == 200
+
+
+def test_a_call_that_leaves_an_unsaveable_value_is_undone(server, monkeypatch):
+    client, sid = new_save(server, fleets={})
+    add_fleet = empires_server.add_fleet_response
+
+    def add_unsaveable_fleet(param):
+        if param["name"] == "bad":
+            empires_server.session["fleets"]["bad"] = object()
+        return add_fleet(param) if param["name"] != "bad" else empires_server.dummy_response()
+
+    monkeypatch.setattr(empires_server, "add_fleet_response", add_unsaveable_fleet)
+    answers = batch(client, ("WorldService.addFleet", [fleet("bad")]), ("WorldService.addFleet", [fleet("good")]))
+
+    assert [answer["errorType"] for answer in answers] == [empires_server.CALL_FAILED, 0]
+    assert set(stored(server, sid)["fleets"]) == {"good"}
+
+
+def test_save_editor_refuses_what_is_not_a_save_game(server):
+    client, sid = new_save(server, user_object=VALID_USER_OBJECT, quests=[])
+    for text in ("not json", "[1, 2]"):
+        assert client.post("/save-editor", data={"savegame": text, "message": "x"}).status_code == 400, text
+    assert stored(server, sid)["user_object"] == VALID_USER_OBJECT
+
+
+def test_one_crash_log_editor_at_a_time(monkeypatch):
+    opened, close = [], threading.Event()
+    monkeypatch.setattr(empires_server.settings, "crash_log", True)
+    monkeypatch.setattr(empires_server.editor, "edit", lambda **kwargs: (opened.append(kwargs), close.wait(10)))
+    monkeypatch.setattr(empires_server, "crash_log_editor", None)
+    with empires_server.app.test_request_context():
+        empires_server.server_error_page(None)
+        empires_server.server_error_page(None)  # the client sends the failed batch again
+        close.set()
+        empires_server.crash_log_editor.join(10)
+        empires_server.server_error_page(None)  # closed, a new failure opens it again
+        close.set()
+
+    assert len(opened) == 2

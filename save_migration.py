@@ -5,9 +5,18 @@ from quest_engine import handle_quest_progress
 from save_engine import create_backup
 
 
+def backup(message):
+    """A backup before a migration step, if it can be made: a backups.db that can't be written (locked, disk full) must
+    not stop the save game from loading."""
+    try:
+        create_backup(message)
+    except Exception as error:
+        print("WARNING: no backup", repr(message), error)
+
+
 def migrate(meta, version, target_version):
     if version == "0.02a" and version != target_version:
-        create_backup("Update to 0.03a")  # quests and expansions are reset below
+        backup("Update to 0.03a")  # quests and expansions are reset below
         for q in session["quests"]:
             if not q["complete"]:
                 q["completedTasks"] = 0
@@ -26,15 +35,15 @@ def migrate(meta, version, target_version):
         version = "0.03a"
         session['save_version'] = version
     if version == "0.03a" and version != target_version:
-        create_backup("Update to 0.04a")
+        backup("Update to 0.04a")
         version = "0.04a"
         session['save_version'] = version
     if version == "0.04a" and version != target_version:
-        create_backup("Update to 0.05a")
+        backup("Update to 0.05a")
         version = "0.05a"
         session['save_version'] = version
     if version and version.startswith("0.05a") and version != target_version: # 0.06
-        create_backup("Update to 0.06a")
+        backup("Update to 0.06a")
         version = "0.06a"
         govt_fixer()
         session['user_object']["experiments"]["empire_decorations_master"] = 2
@@ -45,12 +54,12 @@ def migrate(meta, version, target_version):
         session['user_object']["experiments"]["empire_buildable_zrig_master"] = 3
         session['save_version'] = version
     if version and version.startswith("0.06a") and version != target_version:  # 0.07
-        create_backup("Update to 0.07a")
+        backup("Update to 0.07a")
         version = "0.07a"
         session['save_version'] = version
     if version and ((version.startswith("0.07a") and version != target_version) or is_0_08a_preview(version)): # 0.08 and
         # includes from preview 0.08a with same version number
-        create_backup("Update to 0.08a full")
+        backup("Update to 0.08a full")
         # version = "0.08a"
         version = target_version  # remove before release
         crew_fixer()
