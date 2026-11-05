@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for event_buildings.py: 94%</title>
+    <title>Coverage for event_buildings.py: 96%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>event_buildings.py</b>:
-            <span class="pc_cov">94%</span>
+            <span class="pc_cov">96%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">276 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">260<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">16<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">264<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">12<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="game_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-10-31 18:45 +0000
+            created at 2026-11-05 10:22 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -213,7 +213,7 @@
     <p class="pln"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t"><span class="com"># --- running event kept in a file for the settings served before login -------------------------------------------</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t"><span class="key">def</span> <span class="nam">_state_file</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">    <span class="key">return</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">my_games_path</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="str">&quot;event_buildings.json&quot;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">    <span class="key">return</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">my_games_path</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="str">&quot;event_buildings.json&quot;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t"><span class="key">def</span> <span class="nam">_read_file</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -250,7 +250,7 @@
     <p class="run"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t"><span class="key">def</span> <span class="nam">_item_block</span><span class="op">(</span><span class="nam">xml</span><span class="op">,</span> <span class="nam">code</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t">    <span class="nam">at</span> <span class="op">=</span> <span class="nam">xml</span><span class="op">.</span><span class="nam">find</span><span class="op">(</span><span class="str">&#x27; code=&quot;%s&quot;&#x27;</span> <span class="op">%</span> <span class="nam">code</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t170" href="#t170">170</a></span><span class="t">    <span class="key">if</span> <span class="nam">at</span> <span class="op">&lt;</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t172" href="#t172">172</a></span><span class="t">    <span class="nam">start</span> <span class="op">=</span> <span class="nam">xml</span><span class="op">.</span><span class="nam">rfind</span><span class="op">(</span><span class="str">&quot;&lt;item &quot;</span><span class="op">,</span> <span class="num">0</span><span class="op">,</span> <span class="nam">at</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t173" href="#t173">173</a></span><span class="t">    <span class="nam">end</span> <span class="op">=</span> <span class="nam">xml</span><span class="op">.</span><span class="nam">find</span><span class="op">(</span><span class="str">&quot;&lt;/item&gt;&quot;</span><span class="op">,</span> <span class="nam">at</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t174" href="#t174">174</a></span><span class="t">    <span class="key">return</span> <span class="op">(</span><span class="nam">start</span><span class="op">,</span> <span class="nam">end</span><span class="op">)</span> <span class="key">if</span> <span class="nam">start</span> <span class="op">&gt;=</span> <span class="num">0</span> <span class="key">and</span> <span class="nam">end</span> <span class="op">&gt;=</span> <span class="num">0</span> <span class="key">else</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
@@ -259,7 +259,7 @@
     <p class="run"><span class="n"><a id="t177" href="#t177">177</a></span><span class="t"><span class="key">def</span> <span class="nam">_patch_item</span><span class="op">(</span><span class="nam">xml</span><span class="op">,</span> <span class="nam">code</span><span class="op">,</span> <span class="nam">patch</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t178" href="#t178">178</a></span><span class="t">    <span class="nam">span</span> <span class="op">=</span> <span class="nam">_item_block</span><span class="op">(</span><span class="nam">xml</span><span class="op">,</span> <span class="nam">code</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t179" href="#t179">179</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">span</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t180" href="#t180">180</a></span><span class="t">        <span class="key">return</span> <span class="nam">xml</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t180" href="#t180">180</a></span><span class="t">        <span class="key">return</span> <span class="nam">xml</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t181" href="#t181">181</a></span><span class="t">    <span class="nam">start</span><span class="op">,</span> <span class="nam">end</span> <span class="op">=</span> <span class="nam">span</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t182" href="#t182">182</a></span><span class="t">    <span class="key">return</span> <span class="nam">xml</span><span class="op">[</span><span class="op">:</span><span class="nam">start</span><span class="op">]</span> <span class="op">+</span> <span class="nam">patch</span><span class="op">(</span><span class="nam">xml</span><span class="op">[</span><span class="nam">start</span><span class="op">:</span><span class="nam">end</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="nam">xml</span><span class="op">[</span><span class="nam">end</span><span class="op">:</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t183" href="#t183">183</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -323,7 +323,7 @@
     <p class="run"><span class="n"><a id="t241" href="#t241">241</a></span><span class="t">            <span class="nam">xml</span> <span class="op">=</span> <span class="nam">xml</span><span class="op">[</span><span class="op">:</span><span class="nam">begin</span><span class="op">]</span> <span class="op">+</span> <span class="nam">re</span><span class="op">.</span><span class="nam">sub</span><span class="op">(</span><span class="str">r&#x27;icon=&quot;%s[^&quot;]*&quot;&#x27;</span> <span class="op">%</span> <span class="nam">re</span><span class="op">.</span><span class="nam">escape</span><span class="op">(</span><span class="nam">MISSING_ICONS</span><span class="op">[</span><span class="nam">event</span><span class="op">[</span><span class="str">&quot;code&quot;</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t242" href="#t242">242</a></span><span class="t">                                       <span class="str">&#x27;icon=&quot;%s&quot;&#x27;</span> <span class="op">%</span> <span class="nam">event</span><span class="op">[</span><span class="str">&quot;icon&quot;</span><span class="op">]</span><span class="op">,</span> <span class="nam">xml</span><span class="op">[</span><span class="nam">begin</span><span class="op">:</span><span class="nam">end</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="nam">xml</span><span class="op">[</span><span class="nam">end</span><span class="op">:</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t243" href="#t243">243</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">running</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t244" href="#t244">244</a></span><span class="t">        <span class="key">return</span> <span class="nam">xml</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t244" href="#t244">244</a></span><span class="t">        <span class="key">return</span> <span class="nam">xml</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t245" href="#t245">245</a></span><span class="t">    <span class="nam">event</span><span class="op">,</span> <span class="nam">start</span> <span class="op">=</span> <span class="nam">running</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t246" href="#t246">246</a></span><span class="t">    <span class="nam">span</span> <span class="op">=</span> <span class="nam">_quest_block</span><span class="op">(</span><span class="nam">xml</span><span class="op">,</span> <span class="nam">event</span><span class="op">[</span><span class="str">&quot;quest&quot;</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t247" href="#t247">247</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">span</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -532,7 +532,7 @@
             <a class="nav" href="game_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-10-31 18:45 +0000
+            created at 2026-11-05 10:22 +0000
         </p>
     </div>
 </footer>
