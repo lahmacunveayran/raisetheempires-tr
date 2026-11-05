@@ -21,6 +21,12 @@ class StaleBattleReference(Exception):
     pass
 
 
+def as3_round(x):
+    """Math.round of the client: halves go up (int(Math.round(r * (n - 1))) picks among n units or powers).
+    Python's round() takes halves to the even number and so picks another unit than the client now and then."""
+    return math.floor(x + 0.5)
+
+
 def battle_complete_response(params):
     friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables = init_battle(params)
     meta = {"newPVE": 0}
@@ -39,11 +45,13 @@ def battle_complete_response(params):
         second_target = enemy_target if player_turn else ally_target
 
         # print("repr baddies", baddies)
-        baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
+        # BattleAI.GetAttackingDamage: the attacker hits with its attack strength, the hit takes a share of the
+        # defender's attack strength (UnitItem.getAttackStrength); they differ from the max strength for Titans only
+        baddie_attack_strength = get_unit_attack_strength(baddies[enemy_unit_id], False, params)
         baddie_weak = get_unit_weak(baddies[enemy_unit_id])
         baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
 
-        friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id], True)
+        friendly_attack_strength = get_unit_attack_strength(friendlies[player_unit_id], True)
         friendly_weak = get_unit_weak(friendlies[player_unit_id])
         friendly_unit_type = get_unit_type(friendlies[player_unit_id])
 
@@ -66,11 +74,11 @@ def battle_complete_response(params):
         base_damage = 25 # TODO tier difference & increments
 
         if player_turn:
-            damage = base_damage * (3 * friendly_max_strength + baddie_strength) / (3 * baddie_strength + friendly_max_strength)
-            damage = damage / 100 * baddie_max_strength
+            damage = base_damage * (3 * friendly_attack_strength + baddie_strength) / (3 * baddie_strength + friendly_attack_strength)
+            damage = damage / 100 * baddie_attack_strength
         else:
-            damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
-            damage = damage / 100 * friendly_max_strength
+            damage = base_damage * (3 * baddie_attack_strength + friendly_strength) / (3 * friendly_strength + baddie_attack_strength)
+            damage = damage / 100 * friendly_attack_strength
 
 
         consumable_extra_damage = \
@@ -113,7 +121,8 @@ def battle_complete_response(params):
                 handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_id], baddies[enemy_unit_id]))
                 # session["battle"] = None
             print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
-            doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
+            if damage > 0:
+                doBattleRewards(hit_type, baddie_attack_strength, damage, friendly_strength, glancing=not hit)
             handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
 
         elif damage > 0 and is_shielded(ally_target, active_consumables) == True:
@@ -124,6 +133,8 @@ def battle_complete_response(params):
             if friendly_strengths[player_unit_id] <= 0:
                 friendly_strengths[player_unit_id] = 0  # dead
                 print("Player unit", player_unit_id, "down")
+                if damage > 0:
+                    doLossRewards(friendlies[player_unit_id], damage)
                 # session["battle"] = None
             print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
     else:
@@ -294,9 +305,13 @@ def neighbor_repelled(enemy_fleet):
 
 def invasion_complete(enemy_fleet_uid, params, friendlies, friendly_strengths):
     save = bot_empires.find_save(enemy_fleet_uid)
-    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["status"] = 2
-    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["attacker_fleet"] = [format_player_fleet(friendlies[i]["-code"]) for i in get_alive_unit_index(friendly_strengths)]
-    bot_empires.store_save(save)
+    invasion = save['user_object']["pvp"]["invaders"].get("u" + str(get_zid())) if save else None
+    if invasion is None:  # e.g. the bot state file was removed during the battle: nothing left to mark won
+        print("No invasion of", enemy_fleet_uid, "to complete")
+    else:
+        invasion["status"] = 2
+        invasion["attacker_fleet"] = [format_player_fleet(friendlies[i]["-code"]) for i in get_alive_unit_index(friendly_strengths)]
+        bot_empires.store_save(save)
     bot_empires.battle_won(enemy_fleet_uid)
 
 
@@ -349,11 +364,12 @@ def handle_strength_upgrades(strength, unit):
         mod_damage = upgrade_item["modifier"].get("-strength")
         if mod_damage:
             if upgrade_item["modifier"].get("-percent"):
-                strength *= 1 + float(mod_damage) / 100
+                strength += strength * float(mod_damage) / 100
                 print("Applying strength upgrade for", mod_damage, "percent")
             else:
                 strength += int(mod_damage)
                 print("Applying strength upgrade for", mod_damage, "more")
+            strength = as3_round(strength)  # WorldUpgradeManager.getModifiedStrength rounds after each upgrade
     return strength
 
 
@@ -581,8 +597,10 @@ def get_hit_value(type, defender_type):
 
 def get_combat_chain_grade(type, defender_type):
     # print("chain grade", type, defender_type)
-    [chain] = [e for e in game_settings['settings']['combatChain']['chain'] if e['-type'] == type]
-    if defender_type in chain.get('-great', '').split(','):
+    [chain] = [e for e in game_settings['settings']['combatChain']['chain'] if e['-type'] == type] or [None]
+    if chain is None:  # CombatChain.getHitValue: a unit of no kind in the chain (the NPC anti air) hits good
+        grade = 'good'
+    elif defender_type in chain.get('-great', '').split(','):
         grade = 'great'
     elif defender_type in chain.get('-poor', '').split(','):
         grade = 'poor'
@@ -852,7 +870,8 @@ def get_survival_player_fleet():
     "target": "",
     "consumables": [],
     "inventory": [],
-    "playerLevel": 1,
+    # the client sizes Titans by this level (UnitItem.getXmlStrength), the server by the player's
+    "playerLevel": int(session['user_object']["userInfo"]["player"]["level"]),
     "specialBits": None,
     "lost": None,
     "lastUnitLost": None,
@@ -911,18 +930,24 @@ def assign_consumable_response(params):
 
         selected_random_consumable_roll = roll_random_between(0, len(valid_consumables) - 1)
 
-        selected_random_consumable = round(selected_random_consumable_roll) # required roll fixed allyconsumable in tutorialstep
+        selected_random_consumable = as3_round(selected_random_consumable_roll) # required roll fixed allyconsumable in tutorialstep
         selected_consumable = valid_consumables[selected_random_consumable]
         handle_quest_progress(meta, progress_useAOA_consumable(selected_consumable))
     elif params.get("name") == "AI":
-        secondaries = [get_unit_secondary(b) for b, i in zip(baddies, range(len(baddies))) if get_unit_secondary(b) is not None and not is_stunned(("enemy", i), active_consumables)]
-        if len(secondaries) > 1:
-            print("WARN: more that one secondary", repr(secondaries))
-        if not secondaries:
-            print("ERROR: no secondary", repr(secondaries))
-            raise Exception("ERROR: no secondary", repr(secondaries))
+        # BattleHost.state_UseSecondaryAbility: the client goes through the units of the enemy fleet (killed units
+        # are taken out of it, Titan controllers stay) and sends an "AI" assign for each one with a secondary ability
+        # that is not stunned, each rolling its own cast percent, until one casts. So the n-th "AI" assign of an enemy
+        # turn is for the n-th of these units; the assigns made are counted by markers that go with the turn.
+        casters = [i for i, b in enumerate(baddies) if get_unit_secondary(b) is not None
+                   and (baddie_strengths[i] > 0 or "controller" in get_unit_types(b))
+                   and not is_stunned(("enemy", i), active_consumables)]
+        tried = sum(1 for _, target, _ in active_consumables if target[0] == "AI tried")
+        if tried >= len(casters):
+            print("ERROR: no secondary", repr(casters), "tried", tried)
+            raise Exception("ERROR: no secondary", repr(casters))
 
-        selected_consumable = lookup_item_by_code(secondaries[0])
+        selected_consumable = lookup_item_by_code(get_unit_secondary(baddies[casters[tried]]))
+        active_consumables.append(({"consumable": {}}, ("AI tried", None), -1))
         enemy_turn = True
 
         cast_chance = roll_random_float()
@@ -951,7 +976,7 @@ def assign_consumable_response(params):
                     targeted_baddie = int(params["id"])
                 #TODO enemy support heals, accuracy,...
                 else:
-                    targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
+                    targeted_baddie = live_baddies_index[as3_round(roll_random_between(0, len(live_baddies_index) - 1))] if len(live_baddies_index) > 1 else live_baddies_index[0]
                 apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False, active_consumables)
                     # session["battle"] = None`
                 # handle_win(baddie_strengths, meta, {})  #TODO next map?
@@ -968,7 +993,7 @@ def assign_consumable_response(params):
                         s > 0 and not is_affected_by_consumable(("ally", i), selected_consumable, active_consumables))
                 else:
                     targeted_friendly = live_friendly_index[
-                        round(roll_random_between(0, round(len(live_friendly_index) - 1)))] if len(
+                        as3_round(roll_random_between(0, len(live_friendly_index) - 1))] if len(
                         live_friendly_index) > 1 else live_friendly_index[0]
                 apply_consumable_direct_impact(meta, selected_consumable, targeted_friendly, friendlies, friendly_strengths,
                                                params, True, active_consumables)
@@ -1063,14 +1088,12 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
         units_strengths[targeted_unit] -= damage
         if not ally and 1 >= units_strengths[targeted_unit] > 0:
             units_strengths[targeted_unit] = 0
+            damage += 1  # the client adds the 1 to the damage, which the coins are counted from
             print("Enemy inced to prevent 1 strength")
         if units_strengths[targeted_unit] <= 0:
             units_strengths[targeted_unit] = 0  # dead
             print("Enemy unit" if not ally else "Friendly unit", targeted_unit, "down")
-            if ally:
-                handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
-                                                                         units[targeted_unit]))
-                doBattleRewards("kill", unit_current_strength, unit_current_strength, 0)
+        consumable_hit_rewards(meta, units[targeted_unit], damage, units_strengths[targeted_unit] == 0, ally, params)
 
         if units_strengths[targeted_unit] > get_unit_max_strength(units[targeted_unit], ally, params):
             print("Limiting heal to max strength")
@@ -1093,15 +1116,30 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             units_strengths[live_index[i]] -= colateral_damage
             if not ally and 1 >= units_strengths[live_index[i]] > 0:
                 units_strengths[live_index[i]] = 0
+                colateral_damage += 1
                 print("Enemy inced to prevent 1 strength")
             print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[live_index[i]], "collateral damage")
             if units_strengths[live_index[i]] <= 0:
                 units_strengths[live_index[i]] = 0  # dead
                 print("Enemy unit" if not ally else "Friendly unit", live_index[i], "down by collateral damage")
-                if ally:
-                    handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
-                                                                             units[live_index[i]]))
-                    doBattleRewards("kill", collateral_unit_current_strength, collateral_unit_current_strength, 0)
+            if collateral_unit_current_strength > 0:  # not the unit the power killed itself
+                consumable_hit_rewards(meta, units[live_index[i]], colateral_damage, units_strengths[live_index[i]] == 0,
+                                       ally, params)
+
+
+def consumable_hit_rewards(meta, unit, damage, killed, ally, params):
+    """A power's hit counts for the battleDamage and battleKill tasks (no attacking unit). Only a kill pays: the hit
+    event of Battle.onUnitDamageFromConsumable carries the damage only when the unit is dead (dead ? damage : false)
+    and EnemyUnit.playDamageXPReward / PlayerUnit.playDamageXPReward give nothing (and roll nothing) without it."""
+    if damage <= 0:
+        return
+    if not ally:
+        handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, {}, unit))
+        if killed:
+            handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {}, unit))
+            doBattleRewards("kill", get_unit_attack_strength(unit, False, params), damage, None)
+    elif killed:
+        doLossRewards(unit, damage)
 
 
 def get_adjacent_factor(unit_1, unit_2, count):
@@ -1182,7 +1220,7 @@ def ai_best_attack(player_units, player_units_strengths, baddies, baddies_streng
     max_grade = max([grade for baddie_index, grade, player_index in best_units])
     best_pairings = [(baddie_index, grade, player_index) for baddie_index, grade, player_index in best_units if grade == max_grade and grade >= 0]
     if best_pairings:
-        best_pairing = best_pairings[round(roll_random_between(0, len(best_pairings) - 1)) if len(best_pairings) > 1 else 0]  #optional roll
+        best_pairing = best_pairings[as3_round(roll_random_between(0, len(best_pairings) - 1)) if len(best_pairings) > 1 else 0]  #optional roll
         best_pairing = (best_pairings[0][0],) + best_pairing[1:]  # bugged pairings
         print("best AI pairing method 1 (baddie, grade, friendly)", repr(best_pairing))
     else:
@@ -1191,7 +1229,8 @@ def ai_best_attack(player_units, player_units_strengths, baddies, baddies_streng
     baddies_tuple = zip(baddies, baddies_strengths, range(len(baddies)))
     best_units_2 = [ai_best_unit(player_units, player_units_strengths,  baddie, first_random, active_consumables, "ally") + (i,) for baddie, strength, i in baddies_tuple if strength > 0]
     max_grade_2 = max([grade for player_index, grade, baddie_index  in best_units_2])
-    best_players = [player_index for player_index, grade, baddie_index in best_units_2 if grade == max_grade_2]
+    # FindBestDefendingUnitAgainstBestAttacker: no attacker when every player unit left is stunned, then no roll
+    best_players = [player_index for player_index, grade, baddie_index in best_units_2 if grade == max_grade_2 and grade >= 0]
     if best_players:
         best_player = best_players[0]
         second_random = roll_random_float()
@@ -1220,7 +1259,7 @@ def ai_best_unit(first_units, first_units_strengths, second_unit, random, active
     best_units = [i for first_unit, strength, i in first_units_tuple if strength > 0 and not is_stunned((target_group, i), active_consumables) and get_hit_chance(first_unit, second_unit) == best_grade]
     # print("AI best unit" ,repr((first_units, first_units_strengths, second_unit, random)),best_grade, repr(best_units))
     if best_units:
-        random_roll = round(random * (len(best_units) - 1))
+        random_roll = as3_round(random * (len(best_units) - 1))
         print(best_units[random_roll])
         return best_units[random_roll], best_grade
     else:
@@ -1235,16 +1274,30 @@ def get_unit_terrain(unit):
     return unit["unit"].get("-type", ",").split(',')[1]
 
 
+def get_unit_types(unit):
+    return unit["unit"].get("-type", "").split(',')
+
+
 def get_unit_secondary(unit):
     return unit["unit"].get("-secondary")
 
 
 def get_unit_max_strength(unit, ally, params=None):
+    return get_unit_strength(unit, ally, params, "-strength")
+
+
+def get_unit_attack_strength(unit, ally, params=None):
+    """What the unit hits with and what a hit on it takes a share of (UnitItem.getAttackStrength): a Titan has an
+    attackStrength beside its strength, other units hit with their strength."""
+    return get_unit_strength(unit, ally, params, "-attackStrength")
+
+
+def get_unit_strength(unit, ally, params, attribute):
     strength = int(unit["unit"].get("-strength", "0"))
     if "-strength" not in unit["unit"] and "strengths" in unit["unit"]:  # Titan units grow with the player level
         level = int(session['user_object']["userInfo"]["player"]["level"])
         entries = simple_list(unit["unit"]["strengths"]["entry"])
-        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])["-strength"])
+        strength = int(next((e for e in entries if level < int(e["-level"])), entries[-1])[attribute])
     _, island, map_item = get_current_island(params)
     if has_battle_context() and session["battle"][3].replaying:
         island = session["battle"][3].island
@@ -1331,42 +1384,34 @@ def get_unit_weak(unit):
 
 
 
-#TODO: fix kill has more coins?
-def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
-    #mod strength?
-    coin_amount = math.ceil(max_strength * damage * 0.01)  # * unit mult * ammo experiment
-    rare_amount = math.ceil(max_strength * damage * 0.0001)  # * unit mult * ammo experiment
-    rare_count = 0
-    xp = 1
-    energy = 0
+def doBattleRewards(hit_type, attack_strength, damage, attacker_strength, glancing=False):
+    """What the client gives for a hit on an enemy unit (EnemyUnit.playDamageXPReward, then spawnLoot). hit_type is
+    the client's: glancinghit, directhit, criticalhit, kill or criticalkill (a glancing hit that kills is a kill
+    without coins); attack_strength is the hit unit's, attacker_strength what the attacking unit has left (None for
+    a power). The client rolls the reward random on every hit for its doobers and then once for each energy reward
+    of the hit type, but only while the mastery scalar is 1."""
+    coin_amount = math.ceil(attack_strength * damage * 0.01)  # getCoinAmount: combatRewardCoinsMultiplier
+    rare_amount = math.ceil(attack_strength * damage * 0.0001)  # getRareAmount: combatRewardRareMultiplier
+    coin_count = 0 if glancing else 3 if hit_type == "criticalkill" else 1
+    rare_count = 3 if hit_type == "criticalkill" else 1 if hit_type == "criticalhit" else 0
     # TODO: energyRewardModVariant
-    # TODO combat losses
 
-    rare_type = int(friendly_max_strength % 5)
-
-    if hit_type == "glancinghit":
-        coin_amount = 0
-    elif hit_type == "criticalkill":
-        coin_amount *= 3
-        rare_count = 3
-        xp = 3
-        energy = 1 if roll_reward_random_float() <= 0.8 else 0
-        energy += 1 if roll_reward_random_float() <= 0.2 else 0
-
-    elif hit_type == "criticalhit":
-        rare_count = 1
-        energy = 1 if roll_reward_random_float() <= 0.25 else 0
-
-    rare_amount *= rare_count
+    roll_reward_random_float()  # DooberManager.getRandomRewards (the client drops its doobers right after)
 
     mastery_scalar = get_mastery_scalar()
-    coin_amount *= mastery_scalar
-    xp *= mastery_scalar
-    rare_amount *= mastery_scalar
-    #oil ?
+    xp = 0
+    energy = 0
+    for reward in simple_list(game_settings['settings']['combatRewards'][hit_type]['reward']):  # addRewards
+        if reward['-type'] == 'xp':
+            xp = int(reward['-count'])
+        elif reward['-type'] == 'energy' and reward.get('-percent') and mastery_scalar == 1:
+            if roll_reward_random_float() <= float(reward['-percent']):  # shouldGiveReward
+                energy += int(reward['-count'])
 
-    if mastery_scalar != 1:
-        energy = 0
+    # spawnLoot: the mastery scalar multiplies the number of xp and rare loots and each coin loot
+    coin_amount = as3_round(coin_amount * mastery_scalar) * coin_count
+    xp = math.ceil(xp * mastery_scalar)
+    rare_amount *= math.ceil(rare_count * mastery_scalar)
 
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
@@ -1377,6 +1422,7 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
 
     print("Combat rewards", hit_type ,  "coins:", coin_amount, "(" + str(resources['coins']) + ")")
     if rare_amount:
+        rare_type = int(attacker_strength % 5)  # getRareType: "nrare" + the attacker's strength now % 5
         resource_order = world['resourceOrder']
         resources[resource_order[rare_type]] += rare_amount
         print("Combat rewards", hit_type ,  "rare" + str(rare_type) + ":", rare_amount, "(" + str(resources[resource_order[rare_type]]) + ")")
@@ -1388,6 +1434,22 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
         player['energy'] += energy
         resources['energy'] += energy # needed?
         print("Combat rewards", hit_type ,  "energy:", energy, "(" + str(player['energy']) + ")")
+
+
+def doLossRewards(unit, damage):
+    """What the client gives when an enemy hit destroys a unit of the player (PlayerUnit.playDamageXPReward): coins
+    for the hit, oil and one of the first rare resource in the unit's cost."""
+    strength = get_unit_max_strength(unit, True)  # UnitItem.getStrength
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    resources['coins'] += math.ceil(strength * damage * 0.01)  # getCoinAmount: combatRewardCoinsMultiplier
+    resources['oil'] += math.ceil(strength * 0.001)  # getOilAmount: combatRewardOilMultiplier
+    rares = {"-rare": 0, "-nrare0": 0, "-nrare1": 1, "-nrare2": 2, "-nrare3": 3, "-nrare4": 4}  # as do_rewards
+    rare = next((rares[cost] for cost in unit.get("cost", {}) if cost in rares), None)  # GameItem.resourceCosts
+    if rare is not None:
+        resources[world['resourceOrder'][rare]] += 1
+    print("Combat loss rewards", unit["-code"], "coins:", math.ceil(strength * damage * 0.01), "oil:",
+          math.ceil(strength * 0.001), "rare" + str(rare) + ":", 1 if rare is not None else 0)
 
 
 def defenseshield_activate(friendlies, active_consumables, selected_consumable):

@@ -359,6 +359,11 @@ def run_assign_consumable_response(monkeypatch, params, expected_player_unit_id,
     with app.test_request_context():
         setup_session()
         session['user_object']["userInfo"]["player"] = {"inventory": {"items" : {}}, "tutorialProgress": "tut_step_powerUpPowerUsed", "energy" : 35, "energyMax": 35, "lastEnergyCheck": 0} # free powerup
+        # the power's hits pay like a unit's (battle_engine.consumable_hit_rewards)
+        session['user_object']["userInfo"]["player"]["xp"] = 0
+        session['user_object']["userInfo"]["world"].update(
+            {"resources": {"coins": 0, "energy": 0, "oil": 0, "aluminum": 0, "copper": 0, "gold": 0, "iron": 0, "uranium": 0},
+             "resourceOrder": ["aluminum", "copper", "gold", "iron", "uranium"], "rewardRandSeedW": 1, "rewardRandSeedZ": 1})
         session["quests"] = []
         for setup_session_func in setup_session_funcs:
             setup_session_func(session)
@@ -456,6 +461,7 @@ def test_get_survival_player_fleet():
     with app.test_request_context():
 
         setup_session_invade()
+        session['user_object']["userInfo"]["player"] = {"level": 7}  # the fleet gets it
 
         session["last_battle"] = ([10, 11, 12, 13, 14], [], [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
                              '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
@@ -480,7 +486,7 @@ def test_get_survival_player_fleet():
             "target": "",
             "consumables": [],
             "inventory": [],
-            "playerLevel": 1,
+            "playerLevel": 7,
             "specialBits": None,
             "lost": None,
             "lastUnitLost": None,

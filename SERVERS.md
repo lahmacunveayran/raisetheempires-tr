@@ -22,7 +22,7 @@ python empires-server.py --host <host_IP> --port <port_number>
 | Synopsis                  | Description                                                    | Notes                                      |
 |---------------------------|----------------------------------------------------------------|--------------------------------------------|
 |``--port <port_number>``   | Sets the server's running port number                          | Default: `port_number = 5005`<br /> Recommended: `port_number > 1024`           |
-|``--host <host_IP>``       | Sets the host to listen on `0.0.0.0` for all <br />interfaces   | Default: `host_IP = 127.0.0.1`<br /> `<host_IP> = 127.0.0.1` for only localhost |
+|``--host <host_IP>``       | Sets the host to listen on `0.0.0.0` for all <br />interfaces. There is no login: anyone who can reach the server can read, change and delete every save, so only use it on a network you trust. Use the server's IP address in the browser, host names other than localhost are refused   | Default: `host_IP = 127.0.0.1`<br /> `<host_IP> = 127.0.0.1` for only localhost |
 |``--http-host <host_IP>``  | Opened address to the Web Browser on <br />startup              | Default: `host_IP = 127.0.0.1`<br /> `<host_IP>` should not be `0.0.0.0`        |
 |``--no-popup``             | The game page is not opened in the Web <br />Browser on startup | Default: the page is opened on startup     |
 |``--http-path <page_path>``| Sets a specific page to open on startup                        | Default: `page_path = ''`                  |

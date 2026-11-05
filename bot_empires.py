@@ -16,9 +16,10 @@ than the player would be far too easy or far too hard. Air and navy units are mi
 the same against the player's squad; support units do not fight. The game's units come in steps of strength, so
 the defenders are the mix of steps whose ratios to the player's units are on average the level difference and each
 close to it. The enemy AI (battle_engine.ai_best_attack) goes for the player's most dangerous unit, so an exact
-mirror of the player's own level wins about 63% of the battles; the bots are made HANDICAP levels weaker than they
-show, which makes the bot of the player's level an even match. So made, random squads of level 10 to 95 won about
-58%, 54%, 49%, 39% and 33% of the battles against the five steps (test/bot_empires_test.py plays them with the
+mirror of the player's own level wins about 62% of the battles; the bots are made HANDICAP levels weaker than they
+show, which makes the bot of the player's level a nearly even match. So made, 54 random squads of level 10 to 95 won
+about 54%, 50%, 45%, 40% and 35% of the battles against the five steps (20 battles a squad and bot, played by
+battle_engine itself: docs/denetim/hesap/savas/bot_denge.py; test/bot_empires_test.py plays them with a copy of the
 engine's rules). The defenders are the regular army units of the bot's level whose battle animations are all in the
 game's assets; bots differ by the models they pick among units of the same kind and strength. The world of a bot
 grows with its level: the ally islands from the smallest to the largest town.
@@ -142,8 +143,11 @@ def _read_state():
 
 
 def _write_state(state):
-    with open(STATE_PATH, "w", encoding="utf-8") as f:
+    """Written aside and then put in place: a write cut short leaves the old state, not a broken file that
+    _read_state would take for no state at all."""
+    with open(STATE_PATH + ".tmp", "w", encoding="utf-8") as f:
         json.dump(state, f)
+    os.replace(STATE_PATH + ".tmp", STATE_PATH)
 
 
 def _unit_strength(item):

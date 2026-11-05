@@ -37,12 +37,13 @@ def test_random_fleet_challenge_response(monkeypatch):
     with app.test_request_context():
         session.sid = "0"
         session["fleets"] = {}
+        session["user_object"] = {"userInfo": {"player": {"level": 7}}}  # the challenger fleet gets it
         resp = empires_server.random_fleet_challenge_response(1)
 
         assert resp == {'errorType': 0, 'userId': 1, 'metadata': {'newPVE': 0},
                         'data': {'state': 0,
                                  'challengerFleet': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 0,
-                                                     'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 1,
+                                                     'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 7,
                                                      'specialBits': None, 'lost': None, 'lastUnitLost': None,
                                                      'lastIndexLost': None, 'allies': None, 'battleTarget': None,
                                                      'battleTimestamp': None, 'ransomRandom': None,
@@ -55,7 +56,7 @@ def test_random_fleet_challenge_response(monkeypatch):
 
         assert session['fleets'] == {
             'FleetName': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 0, 'target': '',
-                                        'consumables': [], 'inventory': [], 'playerLevel': 1, 'specialBits': None,
+                                        'consumables': [], 'inventory': [], 'playerLevel': 7, 'specialBits': None,
                                         'lost': None, 'lastUnitLost': None, 'lastIndexLost': None, 'allies': None,
                                         'battleTarget': None, 'battleTimestamp': None, 'ransomRandom': None,
                                         'ransomResource': None, 'ransomAmount': None,
@@ -73,7 +74,7 @@ def test_random_enemy_fleet_challenge_response():
                              'fleet11_2341959767162880': None,
                              'fleet13_2341959767162880': None}
 
-        session['user_object'] = {}
+        session['user_object'] = {"userInfo": {"player": {"level": 7}}}  # the challenger fleet gets it
         session['user_object']["pvp"] = {}
         session['user_object']["pvp"]["invaders"] = \
             {'pve': {'quest': True},
@@ -88,7 +89,7 @@ def test_random_enemy_fleet_challenge_response():
                         'data': {'state': 0,
                                  'challengerFleet': {'type': 'army', 'uid': '1', 'invaded_uid': None,
                                                      'name': 'FleetName', 'status': 0, 'target': '', 'consumables': [],
-                                                     'inventory': [], 'playerLevel': 1, 'specialBits': None,
+                                                     'inventory': [], 'playerLevel': 7, 'specialBits': None,
                                                      'lost': None, 'lastUnitLost': None, 'lastIndexLost': None,
                                                      'allies': None, 'battleTarget': None, 'battleTimestamp': None,
                                                      'ransomRandom': None, 'ransomResource': None, 'ransomAmount': None,
@@ -103,7 +104,7 @@ def test_random_enemy_fleet_challenge_response():
                 'fleet13_2341959767162880': None,
                 'FleetName': {'type': 'army', 'uid': '1', 'invaded_uid': None,
                                              'name': 'FleetName', 'status': 0, 'target': '', 'consumables': [],
-                                             'inventory': [], 'playerLevel': 1, 'specialBits': None, 'lost': None,
+                                             'inventory': [], 'playerLevel': 7, 'specialBits': None, 'lost': None,
                                              'lastUnitLost': None, 'lastIndexLost': None, 'allies': None,
                                              'battleTarget': None,
                                              'battleTimestamp': None, 'ransomRandom': None, 'ransomResource': None,

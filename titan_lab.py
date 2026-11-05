@@ -64,7 +64,11 @@ def unlock_part(obj, code, part_code):
     if part is None or part.get("-locked") != "true" or _unlocks(obj).get(part_code):
         print("Titan lab: nothing to unlock for", part_code)
         return
-    session['user_object']["userInfo"]["player"]["cash"] -= int(part.get("-unlockCost", 0))
+    player = session['user_object']["userInfo"]["player"]
+    if player["cash"] < int(part.get("-unlockCost", 0)):  # the client does not ask without the cash either
+        print("Titan lab: not enough cash to unlock", part_code)
+        return
+    player["cash"] -= int(part.get("-unlockCost", 0))
     _unlocks(obj)[part_code] = True
     print("Titan lab: part", part_code, "unlocked for cash")
 
