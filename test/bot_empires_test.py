@@ -8,6 +8,7 @@ import math
 import os
 import random
 import sys
+import xml.etree.ElementTree as ET
 
 import pytest
 from flask import Flask, session
@@ -61,8 +62,34 @@ def test_fight_list_follows_the_player_level_easy_ones_first(monkeypatch, tmp_pa
         assert min(i["level"] for i in bot_empires.fight_list()["info"]) == 1
 
 
+def xml_regular_army():
+    """[(required level, strength)] of the army units a player buys at a level, read from the XML with ElementTree
+    by the rule of bot_empires' docstring: <item type="Buildable" subtype="army" buyable="true">, not an event unit
+    (no <requiredDate>), not contractLocked, a single <unit> with a fixed strength (Titans have none), not a
+    Titan part (PT...), a <requiredLevel> of 1 or more. In file order; an item that is in the file twice counts
+    twice, as in the item list of game_settings."""
+    found = []
+    for item in ET.parse(client_settings.PATH).getroot().find("items").findall("item"):
+        units = item.findall("unit")
+        level = item.findtext("requiredLevel")
+        if (item.get("type"), item.get("subtype"), item.get("buyable")) == ("Buildable", "army", "true") and \
+                item.find("requiredDate") is None and item.get("contractLocked") != "true" and len(units) == 1 \
+                and units[0].get("strength", "").isdigit() and not item.get("code").startswith("PT") \
+                and level and int(level) >= 1:
+            found.append((int(level), int(units[0].get("strength"))))
+    return found
+
+
 def test_units_get_stronger_by_a_few_percent_a_level():
-    assert 1.03 < bot_empires.STRENGTH_PER_LEVEL < 1.06
+    """STRENGTH_PER_LEVEL is exp of the least squares slope of ln(strength) over the required level of the regular
+    army units of the XML (bot_empires: "a fit over the army units, about 4%"), computed here from the XML."""
+    points = [(x, math.log(s)) for x, s in xml_regular_army()]
+    assert len(points) >= 20  # enough units for a fit
+    mean_x = sum(x for x, _ in points) / len(points)
+    mean_y = sum(y for _, y in points) / len(points)
+    slope = sum((x - mean_x) * (y - mean_y) for x, y in points) / sum((x - mean_x) ** 2 for x, _ in points)
+    assert bot_empires.STRENGTH_PER_LEVEL == math.exp(slope)
+    assert 1.03 < math.exp(slope) < 1.06  # "about 4%", the docstring's figure
 
 
 def test_bots_mirror_the_players_best_squad(monkeypatch, tmp_path):
@@ -250,12 +277,6 @@ def play(player, bot, roll):
     return player_left, bot_left
 
 
-def battle(player, bot, rng):
-    """play() with Python's random numbers (the engine's are as even); True if the player wins."""
-    player_left, bot_left = play(player, bot, lambda: math.floor(rng.random() * 1000) / 1000)
-    return sum(player_left) > sum(bot_left)
-
-
 def random_squad(rng, level):
     """3 to 5 recent units of a player of the level."""
     pool = [i["-code"] for i in bot_empires.DEFENDER_POOL if level - 20 <= int(i["requiredLevel"]) <= level]
@@ -319,27 +340,49 @@ def test_the_battles_played_here_are_the_engines(monkeypatch, tmp_path):
 
 
 def test_the_easy_bots_are_beaten_more_often(monkeypatch, tmp_path):
-    """81 random squads (3 to 5 recent units, players of level 10 to 90) against the bots of each step, 3 battles
-    each. What the player wins depends mostly on the squads drawn, so many squads and few battles: over 20 seeds this
-    sample won 54-67%, 47-61%, 44-57%, 33-46% and 28-39% against the five steps (bot_empires: the numbers of a
-    larger sample). The bounds hold for all of them."""
+    """A measurement of bot_empires' design, not of a number taken from it.
+
+    What is measured: 81 random squads (3 to 5 recent units, players of level 10 to 90) fight the 15 bots that
+    defense_fleet builds for them, 3 battles each, played by play() with the engine's random numbers
+    (EngineRandom) from a fixed seed. play() is a copy of battle_engine's battle rules written in this test; it is
+    not its own oracle: every 300th battle of this sample is played again by battle_engine.battle_complete_response
+    itself and must end the same (test_the_battles_played_here_are_the_engines does the same for other squads).
+
+    What is expected, from bot_empires' docstring, not from running it: the bots of the five steps
+    (GlobalPVPPlayerDelta -2, -1, 0, +2, +4) are easier the lower the step, the bot of the player's level is
+    "a nearly even match" (HANDICAP), so the easiest are beaten more than half the time and the hardest less.
+    "Nearly even" is taken as within 8 points of half; with HANDICAP 0 (an exact mirror) the docstring has the
+    player win about 38%, outside it. What the player wins depends mostly on the squads drawn, so the sample has
+    many squads and few battles."""
+    monkeypatch.setattr(battle_engine, "report_battle_log", lambda *a: None)
     rng = random.Random(7)
     wins, games = [0] * len(bot_empires.DELTAS), [0] * len(bot_empires.DELTAS)
+    replayed = 0
     with app.test_request_context():
+        session.sid = "0"
         for level in range(10, 100, 10):
             for _ in range(9):
                 units = random_squad(rng, level)
                 setup_session(monkeypatch, tmp_path, level=level, units=units)
                 player = [(kind(u), strength(u)) for u in units]
-                for i, bot in enumerate(bot_empires.bots()):
-                    fleet = [(kind(u), strength(u)) for u in bot_empires.defense_fleet(bot)]
+                fleets = [[u.split(",")[0] for u in bot_empires.defense_fleet(bot)] for bot in bot_empires.bots()]
+                for i, fleet in enumerate(fleets):
+                    bot = [(kind(u), strength(u)) for u in fleet]
                     for _ in range(3):
-                        wins[i // 3] += battle(player, fleet, rng)
+                        w, z = rng.randrange(1, 2 ** 32), rng.randrange(1, 2 ** 32)
+                        player_left, bot_left = play(player, bot, EngineRandom(w, z))
+                        if sum(games) % 300 == 0:
+                            with contextlib.redirect_stdout(io.StringIO()):  # the engine prints a lot
+                                assert engine_play(units, fleet, w, z) == (player_left, bot_left)
+                            replayed += 1
+                        wins[i // 3] += sum(player_left) > sum(bot_left)
                         games[i // 3] += 1
     rates = [w / g for w, g in zip(wins, games)]
-    print("player wins by step", [round(r, 2) for r in rates])
-    assert rates[0] > rates[2] > rates[4] and rates[0] - rates[4] >= 0.12
-    assert 0.48 <= rates[0] <= 0.73 and 0.38 <= rates[2] <= 0.62 and 0.22 <= rates[4] <= 0.45
+    print("player wins by step", [round(r, 2) for r in rates], "battles replayed by the engine", replayed)
+    assert games == [81 * 9] * 5 and replayed == 13
+    assert rates[0] > rates[1] > rates[2] > rates[3] > rates[4]
+    assert abs(rates[2] - 0.5) <= 0.08
+    assert rates[0] > 0.5 > rates[4]
 
 
 def test_bot_saves_keep_invasions(monkeypatch, tmp_path):
