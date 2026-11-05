@@ -7,9 +7,14 @@ def _repo_files(root):
     """Every file of the repository folder with its size and time, to see what a test run wrote there."""
     files = {}
     for folder, subfolders, names in os.walk(root):
-        subfolders[:] = [s for s in subfolders if s not in (".git", "__pycache__", ".pytest_cache")]
+        # not git's own folders, nor other checkouts inside this one (worktrees under .claude/, a nested clone): what
+        # happens in them is not this run's doing
+        subfolders[:] = [s for s in subfolders if s not in (".git", "__pycache__", ".pytest_cache", ".claude")
+                         and not os.path.exists(os.path.join(folder, s, ".git"))]
         for name in names:
-            if name in (".git", ".coverage") or name.startswith(".coverage."):  # git's worktree link, coverage's data
+            # git's worktree link, coverage's data, and the reports pytest itself writes when asked to (CI's
+            # --junitxml=test-results.xml and --cov-report=xml)
+            if name in (".git", ".coverage", "test-results.xml", "coverage.xml") or name.startswith(".coverage."):
                 continue
             path = os.path.join(folder, name)
             try:
