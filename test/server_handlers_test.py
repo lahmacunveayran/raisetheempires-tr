@@ -293,6 +293,48 @@ def test_using_an_item_that_is_not_in_the_inventory_changes_nothing(server):
     assert stored(server, sid) == before
 
 
+def test_bought_expansion_keys_go_to_the_inventory(server):
+    """xk01 (expansionkey01: type consumable, subtype expansion, cost cash 2). Player.buyGameItem and
+    Player.buyMultiRequirementItem (TBuyItems) add it to the inventory: addToInventory(code, amount). Only items of
+    type expansion (x01..x03) are not kept in the inventory."""
+    client, sid, _ = player_save(server)
+    before = stored(server, sid)
+
+    batch(client, ("UserService.buyItem", [{"code": "xk01", "useCash": True, "amount": 3}]))
+
+    after = stored(server, sid)
+    assert player(after)["cash"] == player(before)["cash"] - 3 * xml_cash("xk01")
+    assert inventory(after["user_object"]).get("xk01", 0) == 3
+
+
+def test_using_an_energy_item_gives_its_energy(server):
+    """UI.tryUsePlayerEnergies: m_energy.energy += referenceItem.energyYield (not capped), removeInventoryItem(code),
+    then TUseItem. EN1 (energy01): energyYield 1 in the XML."""
+    def edit(user_object):
+        inventory(user_object).update(EN1=1)
+        user_object["userInfo"]["player"]["energy"] = 10
+    client, sid, _ = player_save(server, edit)
+
+    batch(client, ("UserService.useItem", ["EN1"]))
+
+    assert player(stored(server, sid))["energy"] == 10 + int(ITEMS["EN1"].find("energyYield").text)
+
+
+def test_an_energy_refill_is_paid(server):
+    """EnergyRefillItem.refillAmount = energyMax - energy; UI.buyAndAddToInventory: Player.buyItem(ERX, useCash) takes
+    EnergyRefillItem.cash = ceil(refillAmount * costMultiplierByType('energypurchase')) = refillAmount (no price tests:
+    priceTestSettings {}), then TPurchaseEnergyRefill. The server used to fill the energy first and then take
+    energyMax - energy = 0 cash."""
+    def edit(user_object):
+        user_object["userInfo"]["player"].update(energy=5, energyMax=25, cash=100)
+    client, sid, _ = player_save(server, edit)
+
+    batch(client, ("UserService.purchaseEnergyRefill", [{"code": "ERX", "useCash": True, "amount": 1}]))
+
+    after = player(stored(server, sid))
+    assert (after["energy"], after["cash"]) == (25, 100 - (25 - 5))
+
+
 # UserService.setWorldName
 
 

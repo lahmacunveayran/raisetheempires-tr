@@ -2706,8 +2706,8 @@ def buy_item(meta, code, amount):
     # resources[standard_resources[int(market["item"])]] += market["units"]
     if item["-type"] == 'mercenary':
         print("Buying mercenary")
-    elif item.get("-subtype") == "expansion":
-        print("Buying expansion")
+    elif item["-type"] == "expansion":  # not the expansion keys xk01 (consumable, subtype expansion): the client
+        print("Buying expansion")        # puts those in the inventory (Player.buyGameItem -> addToInventory)
     elif "-resourceType" in item and item["-resourceType"] != "energy":
         resources[item["-resourceType"]] += amount * int(item.get("resourceYield", "1"))
 
@@ -2740,6 +2740,8 @@ def use_item_response(param):
     print(param)
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
     item_inventory[param] -= 1
+    # UI.tryUsePlayerEnergies adds the item's energyYield to the energy (not capped at energyMax) before it sends this
+    session['user_object']["userInfo"]["player"]["energy"] += int(lookup_item_by_code(param).get("energyYield", 0))
     use_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
 
@@ -2755,9 +2757,12 @@ def purchase_energy_refill_response(param):
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
 
-    player['energy'] += int(player['energyMax']-player['energy'])  # TODO put item in inventory (storable?)
+    # EnergyRefillItem: refillAmount = energyMax - energy, the client pays ceil(refillAmount * 1) cash for it (no
+    # price tests); counted before the energy is filled, after it the refill would cost nothing
+    refill = int(player['energyMax'] - player['energy'])
+    player['energy'] += refill  # TODO put item in inventory (storable?)
 
-    player['cash'] -= int(player['energyMax']-player['energy'])
+    player['cash'] -= refill
 
     purchase_energy_refill_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
