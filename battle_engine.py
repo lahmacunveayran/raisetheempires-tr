@@ -49,11 +49,11 @@ def battle_complete_response(params):
         # defender's attack strength (UnitItem.getAttackStrength); they differ from the max strength for Titans only
         baddie_attack_strength = get_unit_attack_strength(baddies[enemy_unit_id], False, params)
         baddie_weak = get_unit_weak(baddies[enemy_unit_id])
-        baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
+        baddie_unit_type = get_unit_types(baddies[enemy_unit_id])  # all its kinds (CombatChain.getHitValue)
 
         friendly_attack_strength = get_unit_attack_strength(friendlies[player_unit_id], True)
         friendly_weak = get_unit_weak(friendlies[player_unit_id])
-        friendly_unit_type = get_unit_type(friendlies[player_unit_id])
+        friendly_unit_type = get_unit_types(friendlies[player_unit_id])
 
         friendly_strength = friendly_strengths[player_unit_id]
         baddie_strength = baddie_strengths[enemy_unit_id]
@@ -89,9 +89,12 @@ def battle_complete_response(params):
         if consumable_extra_damage:
             print("Consumable extra damage", max(consumable_extra_damage, -damage))
 
+        damage_before_upgrades = damage
         if player_turn:
             damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
 
+        # BattleAI.GetAttackingDamage: the damage and what the research added to it (upgradeDamage), cut to 3 digits
+        upgrade_damage = math.floor((damage - damage_before_upgrades) * 10 ** 3) / 10 ** 3
         damage = math.floor(damage * 10 ** 3) / 10 ** 3
 
         glance = 0.10
@@ -101,12 +104,16 @@ def battle_complete_response(params):
 
         if not hit:
             damage *= glance
+            upgrade_damage *= glance
             hit_type = "glancinghit"
         elif roll != 2 and roll >= crit:
             damage *= critter
+            upgrade_damage *= critter
             hit_type = "criticalhit"
 
         damage = math.ceil(damage)
+        if damage - math.ceil(upgrade_damage) == 0:  # BattleHost.resolveAttack: a hit does at least 1 of its own
+            damage += 1
 
         if player_turn:
             baddie_strengths[enemy_unit_id] -= damage
@@ -148,7 +155,8 @@ def battle_complete_response(params):
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
      "energy": None}
 
-    process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn)
+    process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn, baddies,
+                                friendlies)
     handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths)
     handle_loss(friendly_strengths)
 
@@ -165,7 +173,8 @@ def battle_complete_response(params):
 #              "-defend": "99", BuffEvasive
 # "-dot": "5" , PoisonGas
 
-def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn):
+def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn, baddies,
+                                friendlies):
     for consumable_tuple in active_consumables:
         (consumable, target, tries) = consumable_tuple
 
@@ -173,16 +182,16 @@ def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_s
             if target[0] == "enemy" and target[1] is None:
                 # apply to all baddies
                 for selected_baddie in range(len(baddie_strengths)):
-                    apply_dot_damage(consumable, selected_baddie, baddie_strengths, "Baddie")
+                    apply_dot_damage(consumable, selected_baddie, baddie_strengths, baddies, False)
             elif target[0] == "enemy":
                 # apply to target[1]
-                apply_dot_damage(consumable, target[1], baddie_strengths, "Baddie")
+                apply_dot_damage(consumable, target[1], baddie_strengths, baddies, False)
         else: # player dot after player turn
             if target[0] == "ally" and target[1] is None:
                 for selected_friendly in range(len(friendly_strengths)):
-                    apply_dot_damage(consumable, selected_friendly, friendly_strengths, "Friendly")
+                    apply_dot_damage(consumable, selected_friendly, friendly_strengths, friendlies, True)
             elif target[0] == "ally":  #if  target[0] == "ally":
-                apply_dot_damage(consumable, target[1], friendly_strengths, "Friendly")
+                apply_dot_damage(consumable, target[1], friendly_strengths, friendlies, True)
 
     # active_consumables[:] = [(consumable, target, tries - (1 if is_consumable_for_turn(target, player_turn) else 0)) for consumable, target, tries
     #                          in active_consumables if tries > (1 if is_consumable_for_turn(target, player_turn) else 0)]
@@ -198,12 +207,20 @@ def is_consumable_for_turn(target, player_turn):
     return (target[0] == "ally" and player_turn) or (target[0] in ["enemy", "AI"] and not player_turn)
 
 
-def apply_dot_damage(consumable, selected_unit, strengths, target_description):
+def apply_dot_damage(consumable, selected_unit, strengths, units, ally):
+    """Fleet.triggerConsumable(..., 'dot', ...) hits each live unit of the power with Battle.onUnitDamageFromConsumable:
+    the dot times UnitItem.getModifier, and an enemy unit is not left at 1 strength."""
+    target_description = "Friendly" if ally else "Baddie"
     dot_damage = int(consumable["consumable"].get("-dot", "0"))
     if dot_damage:
         print("Applying", dot_damage, "damage over time")
 
         if strengths[selected_unit] > 0:
+            dot_damage *= get_against_modifier(simple_list(consumable["consumable"].get("against", '')),
+                                               units[selected_unit])
+            if not ally and 1 >= strengths[selected_unit] - dot_damage > 0:
+                dot_damage += 1
+                print("Enemy inced to prevent 1 strength")
             strengths[selected_unit] -= dot_damage
             print(target_description, selected_unit, "strength", strengths[selected_unit])
             if strengths[selected_unit] <= 0:
@@ -596,14 +613,20 @@ def get_hit_value(type, defender_type):
 
 
 def get_combat_chain_grade(type, defender_type):
-    # print("chain grade", type, defender_type)
-    [chain] = [e for e in game_settings['settings']['combatChain']['chain'] if e['-type'] == type] or [None]
+    """CombatChain.getHitValue for an attacker of the kind(s) type on a defender of the kind(s) defender_type (one
+    kind, or all the kinds of a unit, get_unit_types): the Chain of the attacker is the first chain of a kind the
+    attacker hasType (CombatChain.getChain), none is GOOD; Chain.getHitValue: POOR if the defender hasType one of
+    poor, else GREAT if it hasType one of great, else GOOD. A Titan ("mega_arm,tank,land,mega") is a tank too."""
+    attacker_types = [type] if isinstance(type, str) else list(type)
+    defender_types = {defender_type} if isinstance(defender_type, str) else set(defender_type)
+    [chain] = [e for e in game_settings['settings']['combatChain']['chain'] if e['-type'] in attacker_types][:1] \
+        or [None]
     if chain is None:  # CombatChain.getHitValue: a unit of no kind in the chain (the NPC anti air) hits good
         grade = 'good'
-    elif defender_type in chain.get('-great', '').split(','):
-        grade = 'great'
-    elif defender_type in chain.get('-poor', '').split(','):
+    elif defender_types & set(chain.get('-poor', '').split(',')):
         grade = 'poor'
+    elif defender_types & set(chain.get('-great', '').split(',')):
+        grade = 'great'
     else:
         grade = 'good'
     return grade
@@ -614,7 +637,7 @@ def get_hit_chance(attacker, defender):
         'poor':0,
         'good':1,
         'great':2,
-    }[get_combat_chain_grade(get_unit_type(attacker), get_unit_type(defender))]
+    }[get_combat_chain_grade(get_unit_types(attacker), get_unit_types(defender))]
 
 
 def spawn_fleet(params):
@@ -992,6 +1015,14 @@ def assign_consumable_response(params):
                         i for s, i in zip(friendly_strengths, range(len(friendly_strengths))) if
                         s > 0 and not is_affected_by_consumable(("ally", i), selected_consumable, active_consumables))
                 else:
+                    # BattleAllyConsumable.createEffect: Fleet.getRandomLiveUnitIndexFromFleet(heals) picks a heal's
+                    # unit among the damaged live ones (getRandomLiveUnitIndexFromDamagedFleet), if there are any
+                    heals = selected_consumable["consumable"].get("-target") != "enemy" and direct_impact_of(
+                        selected_consumable) < 0
+                    damaged = [i for i in live_friendly_index
+                               if friendly_strengths[i] < get_unit_max_strength(friendlies[i], True)]
+                    if heals and damaged:
+                        live_friendly_index = damaged
                     targeted_friendly = live_friendly_index[
                         as3_round(roll_random_between(0, len(live_friendly_index) - 1))] if len(
                         live_friendly_index) > 1 else live_friendly_index[0]
@@ -1038,9 +1069,11 @@ def assign_consumable_response(params):
 
         if targeted and enemy_turn:
             print("Consumable use ends enemy turn")
-            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, False)
+            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, False, baddies,
+                                        friendlies)
         elif not enemy_turn:
-            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, True)
+            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, True, baddies,
+                                        friendlies)
 
         handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths)
         handle_loss(friendly_strengths)
@@ -1058,6 +1091,10 @@ def assign_consumable_response(params):
     return assign_consumable_response
 
 
+def direct_impact_of(consumable):  # ConsumableItem.di
+    return int(consumable["consumable"].get("-di", 0))
+
+
 def get_alive_unit_index(strengths):
     return [i for s, i in zip(strengths, range(len(strengths))) if s > 0]
 
@@ -1072,10 +1109,7 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     # pirateship04(npc), pirateship03(npc), pirateinfantry02 PU2(npc), pirateInfantry02 PU4(npc), pirateAntiAir02(npc), pirateAntiAir03(npc),
     # pirateBalloon01(npc), pirateFighter01, pirateBomber01, pirateFighter02, pirateBomber02, pirateFighter03,pirateBomber03, pirateFighter05, pirateBomber05,
     # pirateUBoat03, pirateCaptainKrunsch and many more
-    for a in against:  # like the client (UnitItem.getModifier): the first one of any of the unit's types counts
-        if a['-type'] in get_unit_types(units[targeted_unit]):
-            damage *= float(a['-mod'])
-            break
+    damage *= get_against_modifier(against, units[targeted_unit])
     if damage > 0 and is_shielded(("ally" if ally else "enemy",targeted_unit), active_consumables) == True:
         consume_shield(("ally" if ally else "enemy",targeted_unit), active_consumables)
 
@@ -1111,9 +1145,9 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             colateral_damage = math.ceil(get_adjacent_factor(live_index.index(targeted_unit), i, len(live_index)) *
                                          int(selected_consumable["consumable"]["-chipFactor"]) *
                                          int(selected_consumable["consumable"].get("-di", 0)) / 100)
-            for a in against:
-                if a['-type'] in (get_unit_type(units[live_index[i]]), get_unit_terrain(units[live_index[i]])):
-                    colateral_damage *= float(a['-mod'])
+            # Battle.onUnitDamageFromConsumable takes the chipDamage of ChipDamageManager.getDamage and multiplies it
+            # by UnitItem.getModifier like the damage of the power itself
+            colateral_damage *= get_against_modifier(against, units[live_index[i]])
             units_strengths[live_index[i]] -= colateral_damage
             if not ally and 1 >= units_strengths[live_index[i]] > 0:
                 units_strengths[live_index[i]] = 0
@@ -1126,6 +1160,16 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             if collateral_unit_current_strength > 0:  # not the unit the power killed itself
                 consumable_hit_rewards(meta, units[live_index[i]], colateral_damage, units_strengths[live_index[i]] == 0,
                                        ally, params)
+
+
+def get_against_modifier(against, unit):
+    """UnitItem.getModifier, which Battle.onUnitDamageFromConsumable applies to every damage of a power (its direct
+    impact, its chip damage and its damage over time): the mod of the first <against> whose type the unit has among
+    all its types (UnitItem.hasType, m_types.indexOf), 1 when it has none of them."""
+    for a in against:
+        if a['-type'] in get_unit_types(unit):
+            return float(a['-mod'])
+    return 1
 
 
 def consumable_hit_rewards(meta, unit, damage, killed, ally, params):

@@ -128,21 +128,81 @@ def client_ai(rand, enemies, enemy_left, players, player_left, stunned_players=(
     return basic if use_basic else (defender_2, attacker)
 
 
-def client_damage(attacker, defender, defender_left, r, level=1):
-    """BattleAI.GetAttackingDamage and BattleHost.resolveAttack (no powers, no research, no weaker units):
-    the attacker's attack strength against what the defender has left, times the defender's attack strength / 100
-    (GetDamageBase 25: combatDamageBase, the first tier increment is 0), cut to 3 digits; a roll below direct is a
-    glancing hit (combatGlancingBlowMultiplier), from critical on a critical one (combatCriticalHitMultiplier) but
-    never with the STRONG_ROLL; then Math.ceil."""
+def cut_to_3(x):  # MathUtils.roundTo(x, 3): int(x * 1000) / 1000, int() cuts toward zero (also below zero)
+    return int(x * 1000) / 1000
+
+
+def hit_modifier(attacker_research=(), defender_research=(), to_hit=0.0):
+    """BattleAI.getHitPercentModifier, which GetAttackingHitValue takes off both critical and direct when it is not 0:
+    WorldUpgradeManager.getModifiedAccuracy of the attacker's research (each accuracy upgrade adds mod * 0.01, cut to
+    3 digits), less getModifiedDodge of the defender's (no research of the game has dodge), plus the powers'
+    Fleet.getToHitModifier * 0.01 (the attack of the attacker's fleet's powers on it, less the defend of the
+    defender's); the miss bonus is off (combatEnableMissBonus="false"); then cut to 3 digits."""
+    accuracy = 0
+    for code in attacker_research:
+        if "accuracy" in client.upgrade(code):
+            accuracy = cut_to_3(accuracy + float(client.upgrade(code)["accuracy"]) * 0.01)
+    dodge = 0
+    for code in defender_research:
+        if "dodge" in client.upgrade(code):
+            dodge += cut_to_3(float(client.upgrade(code)["dodge"]) * 0.01)
+    modifier = accuracy - dodge
+    if to_hit != 0:
+        modifier += to_hit * 0.01
+    return cut_to_3(modifier)
+
+
+def modified_damage(research, damage):
+    """WorldUpgradeManager.getModifiedDamage: a percent damage upgrade adds damage * mod / 100 (cut to 3 digits), any
+    other adds mod."""
+    for code in research:
+        modifier = client.upgrade(code)
+        if "damage" in modifier:
+            if modifier.get("percent"):
+                damage = cut_to_3(damage + damage * float(modifier["damage"]) / 100)
+            else:
+                damage += float(modifier["damage"])
+    return damage
+
+
+def client_damage(attacker, defender, defender_left, r, level=1, attacker_research=(), defender_research=(),
+                  to_hit=0.0, damage_bonus=0.0, ai=False, ai_can_critical=True):
+    """BattleAI.GetAttackingDamage and BattleHost.resolveAttack (no weaker units: no unit of the game has weaker="1"):
+    - the attacker's attack strength against what the defender has left, times the defender's attack strength / 100
+      (GetDamageBase 25: combatDamageBase, the first tier increment is 0), strengths with their research;
+    - Fleet.getDamageModifier (the damage of the attacker's powers less the shield of the defender's), not below 0;
+    - the attacker's damage research (getModifiedDamage); damage and upgradeDamage (what the research added) cut to
+      3 digits;
+    - the hit chances less hit_modifier; a roll below direct is a glancing hit (combatGlancingBlowMultiplier; the AI
+      glances too, combatAICanMiss="false"), from critical on a critical one (combatCriticalHitMultiplier) but never
+      with the STRONG_ROLL nor for an AI that cannot critical; both multiplied;
+    - Math.ceil of both; damage - upgradeDamage == 0 gives one more (a hit does at least 1 of its own); a hit of the
+      player that would leave the enemy unit at 0 < strength <= 1 one more ("Incing damage to prevent 1 strength")."""
     critical, direct = client.hit_value(attacker, defender)
-    attack = client.attack_strength(attacker, level)
-    damage = 25 * (3 * attack + defender_left) / (3 * defender_left + attack)
-    damage = round_to_3(damage / 100 * client.attack_strength(defender, level))
+    modifier = hit_modifier(attacker_research, defender_research, to_hit)
+    if modifier != 0:
+        critical, direct = critical - modifier, direct - modifier
+    attack = cut_to_3(client.attack_strength(attacker, level, attacker_research))  # GetAttackingStrengthAgainst
+    left = cut_to_3(defender_left)
+    damage = 25 * (3 * attack + left) / (3 * left + attack)
+    damage = damage / 100 * client.attack_strength(defender, level, defender_research)
+    if damage_bonus != 0:
+        damage = max(damage + damage_bonus, 0)
+    before_research = damage
+    damage = modified_damage(attacker_research, damage)
+    damage, upgrade_damage = cut_to_3(damage), cut_to_3(damage - before_research)
     if r < direct:
-        damage *= client.game_number("combatGlancingBlowMultiplier")
-    elif r != STRONG_ROLL and r >= critical:
-        damage *= client.game_number("combatCriticalHitMultiplier")
-    return math.ceil(damage)
+        multiplier = client.game_number("combatGlancingBlowMultiplier")
+    elif r != STRONG_ROLL and (ai_can_critical or not ai) and r >= critical:
+        multiplier = client.game_number("combatCriticalHitMultiplier")
+    else:
+        multiplier = 1
+    damage, upgrade_damage = math.ceil(damage * multiplier), math.ceil(upgrade_damage * multiplier)
+    if damage - upgrade_damage == 0:
+        damage += 1
+    if not ai and 0 < defender_left - damage <= 1:
+        damage += 1
+    return damage
 
 
 # --- turns --------------------------------------------------------------------------------------------------------
@@ -171,13 +231,13 @@ def test_turns_follow_the_client(monkeypatch):
                     d = rng.choice([i for i, s in enumerate(enemy_left) if s > 0])
                     r = battle_engine.battle_complete_response(dict(PARAMS, id=[a, d]))["data"]
                     roll = client_roll(players[a], enemies[d], rand)
-                    enemy_left[d] -= client_damage(players[a], enemies[d], enemy_left[d], roll)
-                    enemy_left[d] = 0 if enemy_left[d] <= 1 else enemy_left[d]  # not left at 1
+                    enemy_left[d] = max(0, enemy_left[d] - client_damage(players[a], enemies[d], enemy_left[d], roll))
                 else:
                     r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
                     d, a = client_ai(rand, enemies, enemy_left, players, player_left)
                     roll = client_roll(enemies[d], players[a], rand)
-                    player_left[a] = max(0, player_left[a] - client_damage(enemies[d], players[a], player_left[a], roll))
+                    player_left[a] = max(0, player_left[a] - client_damage(enemies[d], players[a], player_left[a], roll,
+                                                                           ai=True))
                 turns += 1
                 assert (r["playerUnit"], r["enemyUnit"], r["ur"]) == (a, d, roll)
                 assert (r["ps"], r["es"]) == (player_left[a], enemy_left[d])
@@ -187,6 +247,116 @@ def test_turns_follow_the_client(monkeypatch):
                     break
                 assert list(session["battle"][0]) == player_left and list(session["battle"][1]) == enemy_left
     assert turns > 300
+
+
+# ships and aircraft (navy and air battles): attackship, fighters, a bomber
+SEA_AIR_POOL = ["UJ01", "SL7", "SF1", "AU06", "U101"]
+# land units with a pirate infantry (PU4, "infantry,land"), which the poison gas hits twice (<against type="infantry">)
+LAND_POOL = POOL + ["PU4"]
+RESEARCH = ["XD01", "XD02", "XA01", "XA02", "XS03", "XS04"]  # damage 25%, accuracy 10%, strength
+# powers as assign_consumable_response puts them in the battle: (code, side); a power of type="all" affects the whole
+# side (index None, ConsumableItem.affectsAll), any other the unit it was used on
+POWERS = [("N02", "ally"), ("N06", "ally"), ("N08", "ally"), ("N09", "ally"),  # the player's buffs of type all
+          ("N07", "enemy"), ("N12", "enemy"), ("N24", "enemy"), ("N36", "enemy"),  # the player's on the enemy
+          ("N62", "ally"), ("N65", "ally"),  # the enemy's secondary abilities on a player unit
+          ("N63", "enemy"), ("N02", "enemy"), ("N06", "enemy")]  # the enemy's buffs
+
+
+def side_bonus(powers, side, unit, name):
+    """Fleet.getModifier: the sum of the battle value of every power of that side's fleet that affectsAll or is on
+    the unit."""
+    return sum(client.battle_value(code, name) for code, s, index, _ in powers
+               if s == side and (index is None or index == unit))
+
+
+def client_dot(powers, side, units, left):
+    """Battle.state_UpdateFleetConsumables after an attack: Fleet.triggerDOTConsumables of the attacking side's fleet;
+    every power with a dot (in the order they were put on) hits each live unit it is on (all of them for affectsAll,
+    percent 1: no roll) by Battle.onUnitDamageFromConsumable: dot * UnitItem.getModifier, an enemy unit not left at
+    0 < strength <= 1."""
+    for code, s, index, _ in powers:
+        dot = client.battle_value(code, "dot")
+        if s != side or not dot:
+            continue
+        for u in (range(len(units)) if index is None else [index]):
+            if left[u] > 0:
+                damage = dot * client.modifier(client.consumable(code)[1], units[u])
+                if side == "enemy" and 0 < left[u] - damage <= 1:
+                    damage += 1
+                left[u] = max(0, left[u] - damage)
+
+
+def test_turns_with_powers_research_ships_and_levels_follow_the_client(monkeypatch):
+    """Whole battles as above with what the first test leaves out: research of the player's units (strength, damage,
+    accuracy), powers on either side (accuracy, evasion, damage, shield, damage over time), players of level 10 and
+    up (the AI's critical hits then come from the experiment empire_combataicancritical, which every save has at
+    2 = ENABLED), navy and air battles. After every attack the damage over time of the attacking side's powers ticks;
+    after the enemy's the powers' durations go down by one (Fleet.updateConsumables on BATTLE_SEQUENCE_COMPLETE with
+    endTurn) and those at 0 are gone."""
+    rng = random.Random(11)
+    turns = dots = 0
+    with app.test_request_context():
+        for _ in range(40):
+            pool = rng.choice([LAND_POOL, SEA_AIR_POOL])
+            level = rng.choice([1, 9, 10, 25])
+            players = [rng.choice(pool) for _ in range(rng.randint(1, 4))]
+            enemies = [rng.choice(pool) for _ in range(rng.randint(1, 4))]
+            user = setup(monkeypatch, players, enemies, level=level)
+            # the same codes may be on both sides: the research is the player's only
+            research = {code: rng.sample(RESEARCH, rng.randint(0, 3)) for code in sorted(set(players) | set(enemies))}
+            user["userInfo"]["world"]["research"] = {code: r for code, r in research.items() if r}
+            world = user["userInfo"]["world"]
+            world["randSeedW"], world["randSeedZ"] = rng.randrange(1, 2 ** 32), rng.randrange(1, 2 ** 32)
+            rand = ClientRandom(world["randSeedW"], world["randSeedZ"])
+            ai_can_critical = (client.settings()["game"]["combatAICanCritical"] == "true" if level < 10
+                               else user["experiments"]["empire_combataicancritical"] == 2)
+            player_research = [research[c] for c in players]
+            player_left = [client.strength(c, level, research[c]) for c in players]
+            enemy_left = [client.strength(c, level) for c in enemies]
+            battle_engine.init_battle(PARAMS)
+            assert list(session["battle"][0]) == player_left and list(session["battle"][1]) == enemy_left
+            powers = []
+            for code, side in rng.sample(POWERS, rng.randint(0, 4)):
+                index = None if client.affects_all(code) else rng.randrange(len(players if side == "ally" else enemies))
+                powers.append([code, side, index, int(client.battle_value(code, "duration"))])
+                session["battle"][2].append((item(code), (side, index), powers[-1][3]))
+            for turn in range(60):
+                if turn % 2 == 0:
+                    a = rng.choice([i for i, s in enumerate(player_left) if s > 0])
+                    d = rng.choice([i for i, s in enumerate(enemy_left) if s > 0])
+                    r = battle_engine.battle_complete_response(dict(PARAMS, id=[a, d]))["data"]
+                    roll = client_roll(players[a], enemies[d], rand)
+                    enemy_left[d] = max(0, enemy_left[d] - client_damage(
+                        players[a], enemies[d], enemy_left[d], roll, level, attacker_research=player_research[a],
+                        to_hit=side_bonus(powers, "ally", a, "attack") - side_bonus(powers, "enemy", d, "defend"),
+                        damage_bonus=side_bonus(powers, "ally", a, "damage") - side_bonus(powers, "enemy", d, "shield")))
+                else:
+                    r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
+                    d, a = client_ai(rand, enemies, enemy_left, players, player_left)
+                    roll = client_roll(enemies[d], players[a], rand)
+                    player_left[a] = max(0, player_left[a] - client_damage(
+                        enemies[d], players[a], player_left[a], roll, level, defender_research=player_research[a],
+                        to_hit=side_bonus(powers, "enemy", d, "attack") - side_bonus(powers, "ally", a, "defend"),
+                        damage_bonus=side_bonus(powers, "enemy", d, "damage") - side_bonus(powers, "ally", a, "shield"),
+                        ai=True, ai_can_critical=ai_can_critical))
+                turns += 1
+                assert (r["playerUnit"], r["enemyUnit"], r["ur"]) == (a, d, roll)
+                assert (r["ps"], r["es"]) == (player_left[a], enemy_left[d])
+                assert r["seeds"] == {"w": rand.w, "z": rand.z}
+                before = player_left + enemy_left
+                if turn % 2 == 0:
+                    client_dot(powers, "ally", players, player_left)
+                else:
+                    client_dot(powers, "enemy", enemies, enemy_left)
+                    powers = [[c, s, i, n - 1] for c, s, i, n in powers if n - 1 > 0]
+                dots += before != player_left + enemy_left
+                if not any(player_left) or not any(enemy_left):
+                    assert session["battle"] is None  # handle_win / handle_loss closed it
+                    break
+                assert list(session["battle"][0]) == player_left and list(session["battle"][1]) == enemy_left
+                assert [(c["-code"], tuple(t), n) for c, t, n in session["battle"][2]] == \
+                    [(c, (s, i), n) for c, s, i, n in powers]
+    assert turns > 400 and dots > 20
 
 
 def test_ai_turn_rolls_like_the_client(monkeypatch):
@@ -272,7 +442,7 @@ def test_titans_hit_with_their_attack_strength(monkeypatch):
         fixed_rolls(monkeypatch, direct)
         r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
         # 25 * (3 * 300 + 150) / (3 * 150 + 300) = 35; / 100 * 150 = 52.5, ceil 53 (97 with its strength 2400)
-        assert r["ps"] == 150 - 53 == 150 - client_damage("ML11", "V06", 150, direct, level=25)
+        assert r["ps"] == 150 - 53 == 150 - client_damage("ML11", "V06", 150, direct, level=25, ai=True)
 
 
 def test_research_strength_is_rounded():
@@ -510,18 +680,25 @@ def test_a_titan_of_the_player_hits_with_its_attack_strength(monkeypatch):
         assert r["es"] == 100 - 42 == 100 - client_damage("ML11", "U05", 100, 0.5, level=25)
 
 
-def test_a_hit_that_does_no_damage_pays_nothing(monkeypatch):
-    """EnemyUnit.playDamageXPReward returns at once for a hit without damage: no reward roll, no xp."""
+def test_a_hit_the_shield_takes_all_of_still_does_one(monkeypatch):
+    """BattleAI.GetAttackingDamage takes the shield off and stops at 0 (Math.max(damage + modifier, 0)); then
+    BattleHost.resolveAttack: Math.ceil(damage) - Math.ceil(upgradeDamage) == 0 adds 1, so no hit of the client does
+    nothing. N30 (BuffHunkerDown, shield="15") on a U05 against a U01: 25 * (3 * 30 + 100) / (3 * 100 + 30) / 100 *
+    100 = 14.39, less 15 is 0 (glancing or not): 1, for the player's hit and for the enemy's."""
+    shield = client.battle_value("N30", "shield")
     with app.test_request_context():
-        user = setup(monkeypatch, ["U05"], ["U01"])
-        shield = {"consumable": {"-shield": "100"}}  # takes all of the hit
-        session["battle"] = ([100], [30], [(shield, ("enemy", 0), 5)], battle_engine.BattleContext())
-        fixed_rolls(monkeypatch, 0.5)
-        rolls = count_reward_rolls(monkeypatch)
-        before, xp = dict(resources()), user["userInfo"]["player"]["xp"]
+        setup(monkeypatch, ["U01"], ["U05"])
+        session["battle"] = ([30], [100], [(item("N30"), ("enemy", None), 5)], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)  # antitank on tank: poor, direct 0.75: a glancing hit
+        count_reward_rolls(monkeypatch)
         r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
-        assert r["es"] == 30
-        assert rolls == [] and user["userInfo"]["player"]["xp"] == xp and resources() == before
+        assert r["es"] == 100 - 1 == 100 - client_damage("U01", "U05", 100, 0.5, damage_bonus=-shield)
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U01"])
+        session["battle"] = ([100], [30], [(item("N30"), ("ally", None), 5)], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)
+        r = battle_engine.battle_complete_response(dict(PARAMS))["data"]
+        assert r["ps"] == 100 - 1 == 100 - client_damage("U01", "U05", 100, 0.5, ai=True, damage_bonus=-shield)
 
 
 def test_a_glancing_hit_pays_no_coins(monkeypatch):
@@ -742,3 +919,230 @@ def test_a_killed_titan_controller_still_casts(monkeypatch):
         fixed_rolls(monkeypatch, 0.15)  # N64 casts at 20%
         battle_engine.assign_consumable_response(AI_ASSIGN)
         assert casting()
+
+
+def test_a_stunned_support_unit_does_not_cast(monkeypatch):
+    """BattleHost.state_UseSecondaryAbility leaves stunned units out (the engine's comment): UL31 (N68 at 10%) is
+    stunned by the player's N64, so the first "AI" assign is SU06's, N64 at 20%: a roll of 0.15 casts."""
+    with app.test_request_context():
+        setup_invader(monkeypatch, ["UL31", "SU06", "U05"], strengths=[250, 225, 100])
+        session["battle"][2].append((item("N64"), ("enemy", 0), 5))
+        fixed_rolls(monkeypatch, 0.15)
+        battle_engine.assign_consumable_response(AI_ASSIGN)
+        assert casting()
+
+
+def test_the_enemys_power_on_a_player_unit_hits_it_and_ends_the_enemy_turn(monkeypatch):
+    """After the "AI" assign that casts, the client sends the power itself for the player unit it chose (the player's
+    fleet name, the code, the unit): SU04's N62 (di 30, attack -99, 5 turns, target="enemy" from the enemy's side).
+    Battle.onUnitDamageFromConsumable: 30 on the U05 (a player unit: no last point added); the power stays on that
+    unit, and a secondary ability ends the enemy's turn (BattleHost.onContinueFromConsumable goes on with the
+    sequence, endTurn): the durations go down by one, the cast marker is gone. The U05 then hits with
+    hit_modifier(to_hit=-99): critical and direct 0.99 higher."""
+    with app.test_request_context():
+        setup_invader(monkeypatch, ["SU04", "U01"], strengths=[125, 30])
+        fixed_rolls(monkeypatch, 0.15)  # N62 casts at 20%
+        battle_engine.assign_consumable_response(AI_ASSIGN)
+        assert casting()
+        battle_engine.assign_consumable_response({"id": 1, "level": 0, "name": OWN, "fleet": None, "map": None,
+                                                  "code": "N62"})
+        assert list(session["battle"][0]) == [100, 100 - client.battle_value("N62", "di")]
+        assert [(c["-code"], tuple(t), n) for c, t, n in session["battle"][2]] == \
+            [("N62", ("ally", 1), client.battle_value("N62", "duration") - 1)]
+        fixed_rolls(monkeypatch, 0.9)  # tank on antitank: great (critical 0.75, direct 0): now 1.74 and 0.99
+        r = battle_engine.battle_complete_response(dict(AI_ATTACK, id=[1, 1]))["data"]
+        # 25 * (3 * 100 + 30) / (3 * 30 + 100) / 100 * 30 = 13.03 (its attack strength, not what it has left), now
+        # a glancing hit (0.9 < 0.99): 1.303, ceil 2
+        assert r["es"] == 30 - client_damage("U05", "U01", 30, 0.9, to_hit=client.battle_value("N62", "attack")) \
+            == 30 - 2
+
+
+def test_the_poison_gas_hits_infantry_twice_and_leaves_no_enemy_at_one(monkeypatch):
+    """The player's N36 (dot 15, type all, <against type="infantry" mod="2.0">) on the enemy side ticks after the
+    enemy's attack (Battle.state_UpdateFleetConsumables, Fleet.triggerDOTConsumables of the enemy fleet) through
+    Battle.onUnitDamageFromConsumable: PU4 ("infantry,land") takes 30, a U05 at 16 would be left at 1 and takes 16,
+    a U05 at 40 takes 15; the dead U01 is skipped."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["PU4", "U05", "U05", "U01"])
+        session["battle"] = ([100], [20, 16, 40, 0], [(item("N36"), ("enemy", None), 7)],
+                             battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)
+        battle_engine.battle_complete_response(dict(PARAMS))
+        left = [20, 16, 40, 0]
+        client_dot([["N36", "enemy", None, 7]], "enemy", ["PU4", "U05", "U05", "U01"], left)
+        assert left == [0, 0, 40 - 15, 0] == list(session["battle"][1])
+
+
+def test_the_enemys_damage_over_time_ticks_after_the_players_attack(monkeypatch):
+    """SU05's N65 (dot 20, not type all) on the player's second unit ticks after the player's attack (the attacking
+    side's fleet): 21 - 20 leaves 1, a player unit may keep it; the first unit is not touched."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05", "U05"], ["U05"])
+        session["battle"] = ([100, 21], [100], [(item("N65"), ("ally", 1), 5)], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        assert list(session["battle"][0]) == [100, 1] and r["ps"] == 100
+
+
+def test_collateral_damage_takes_the_first_against_the_unit_has(monkeypatch):
+    """Battle.onUnitDamageFromConsumable multiplies the chipDamage (ChipDamageManager.getDamage: ceil(uniqueNumber *
+    chipFactor * di / 100), 4 * 3 * 30 / 100 = 4 for two units) by UnitItem.getModifier, the same as the power's own
+    damage: the mod of the first <against> whose type the unit has among all its types. A made-up unit of the types
+    x, y, aircraft and a made-up N80 with <against aircraft 2.0> then <against y 3.0>: 4 * 2.0 = 8 (by its first two
+    types only it would be y: 12; both: 24). As the power's target it takes 30 * 2.0 = 60."""
+    made_up = {"-code": "XXA", "-name": "three kinds", "unit": {"-type": "x,y,aircraft", "-strength": "100"}}
+    power = copy.deepcopy(item("N80"))
+    power["consumable"]["against"] = [{"-type": "aircraft", "-mod": "2.0"}, {"-type": "y", "-mod": "3.0"}]
+    against = [{"type": "aircraft", "mod": "2.0"}, {"type": "y", "mod": "3.0"}]
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05"])
+        record_progress(monkeypatch)
+        count_reward_rolls(monkeypatch)
+        monkeypatch.setattr(client, "types", lambda code: made_up["unit"]["-type"].split(",") if code == "XXA"
+                            else client.unit(code)["types"])
+        chip = math.ceil(4 * client.battle_value("N80", "chipFactor") * client.battle_value("N80", "di") / 100)
+        left = [100, 100]
+        battle_engine.apply_consumable_direct_impact({}, power, 0, [item("U05"), made_up], left, {}, False, [])
+        assert left == [100 - 30 * client.modifier(against, "U05"), 100 - chip * client.modifier(against, "XXA")] \
+            == [70, 92]
+        left = [100, 100]
+        battle_engine.apply_consumable_direct_impact({}, power, 1, [item("U05"), made_up], left, {}, False, [])
+        assert left == [100 - chip * client.modifier(against, "U05"), 100 - 30 * client.modifier(against, "XXA")] \
+            == [96, 40]
+
+
+def test_the_ally_power_target_roll_below_a_half_takes_the_first(monkeypatch):
+    """Fleet.getRandomUnitIndexFromList: int(Math.round(randBetween(0, n - 1))) of the live units: 0.2 of two is 0."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05", "U05"])
+        ally_powers(monkeypatch, ["N04"])
+        fixed_rolls(monkeypatch, 0.2)
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][1]) == [40, 100]
+
+
+def test_the_ally_power_on_the_last_live_unit_rolls_no_target(monkeypatch):
+    """Fleet.getRandomUnitIndexFromList returns the only unit of a list of one without a random number: the roll
+    picks the power (of two), and no other roll is made."""
+    with app.test_request_context():
+        setup(monkeypatch, ["U05"], ["U05", "U05"])
+        session["battle"] = ([100], [0, 100], [], battle_engine.BattleContext())
+        ally_powers(monkeypatch, ["N04", "N05"])
+        rolls = []
+        monkeypatch.setattr(battle_engine, "roll_random_float", lambda: rolls.append("float") or 0.2)
+        monkeypatch.setattr(battle_engine, "roll_random_between", lambda a, b: rolls.append((a, b)) or a + (b - a) * 0.2)
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert rolls == [(0, 1)] and list(session["battle"][1]) == [0, 40]  # N04 (0.2 of two: the first)
+
+
+def test_the_ally_heal_goes_to_a_damaged_unit(monkeypatch):
+    """BattleAllyConsumable.createEffect: Fleet.getRandomLiveUnitIndexFromFleet(heals) takes the damaged live units
+    (strength below getStrength) for a heal (ConsumableItem.heals: not targetsEnemy and di < 0), and of a list of one
+    rolls nothing: N40 (di -500) heals the U05 at 50, not the full one, whatever the roll."""
+    assert client.battle_value("N40", "di") < 0 and client.consumable("N40")[0].get("target") != "enemy"
+    with app.test_request_context():
+        setup(monkeypatch, ["U05", "U05"], ["U05"])
+        session["battle"] = ([50, 100], [100], [], battle_engine.BattleContext())
+        ally_powers(monkeypatch, ["N40"])
+        fixed_rolls(monkeypatch, 0.9)
+        target_rolls = []
+        monkeypatch.setattr(battle_engine, "roll_random_between",
+                            lambda a, b: target_rolls.append((a, b)) or a + (b - a) * 0.9)
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][0]) == [100, 100]
+        assert target_rolls == [(0, 0)]  # only the choice of the one power; no target roll of one unit
+
+
+def test_the_ally_heal_target_roll_below_a_half_takes_the_first(monkeypatch):
+    with app.test_request_context():
+        setup(monkeypatch, ["U05", "U05"], ["U05"])
+        session["battle"] = ([50, 50], [100], [], battle_engine.BattleContext())
+        ally_powers(monkeypatch, ["N40"])
+        fixed_rolls(monkeypatch, 0.2)  # of two damaged player units: Math.round(0.2) = 0
+        battle_engine.assign_consumable_response(dict(ALLY_POWER))
+        assert list(session["battle"][0]) == [100, 50]
+
+
+
+
+def test_a_titan_is_a_tank_to_the_combat_chain(monkeypatch):
+    """Chain.getHitValue: POOR if the defender hasType one of the chain's poor kinds (all its kinds, UnitItem.hasType).
+    PU4 (infantry: poor="...,tank,...") on ML11 ("mega_arm,tank,land,mega") is poor, though mega_arm, its first kind,
+    is in none of infantry's lists; and the enemy picks its unit by it (BattleAI.findBestUnit)."""
+    assert client.grade("PU4", "ML11") == "poor" and client.grade("PU4", "U05") == "poor"
+    with app.test_request_context():
+        setup(monkeypatch, ["PU4"], ["ML11"])
+        assert battle_engine.get_hit_chance(item("PU4"), item("ML11")) == client.chance("PU4", "ML11") == 0
+        assert battle_engine.get_hit_value(battle_engine.get_unit_types(item("PU4")),
+                                           battle_engine.get_unit_types(item("ML11"))) == client.hit_value("PU4", "ML11")
+        fixed_rolls(monkeypatch, 0.5)  # poor: direct 0.75, a glancing hit
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        assert r["es"] == client.strength("ML11") - client_damage("PU4", "ML11", client.strength("ML11"), 0.5)
+
+
+def test_a_power_of_type_all_hits_every_live_enemy_once(monkeypatch):
+    """The player's N36 (di 15, dot 15, type all, target enemy, <against type="infantry" mod="2.0">) used on the
+    enemy fleet: Fleet.triggerConsumable of an affectsAll power hits each live unit of the side (dead ones are
+    skipped) through Battle.onUnitDamageFromConsumable with di * UnitItem.getModifier: PU4 20 - 30 is dead, U05
+    100 - 15; the dead U01 gets nothing (no damage counted for it). The power then stays on the whole side for its
+    duration (7)."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U05"], ["PU4", "U05", "U01"])
+        user["userInfo"]["player"]["inventory"]["items"]["N36"] = 1
+        session["battle"] = ([100], [20, 100, 0], [], battle_engine.BattleContext())
+        progress = record_progress(monkeypatch)
+        count_reward_rolls(monkeypatch)
+        fixed_rolls(monkeypatch, 0.5)
+        battle_engine.assign_consumable_response({"id": 0, "level": 0, "name": "fleet3_1", "fleet": None, "map": None,
+                                                  "code": "N36"})
+        di, against = client.battle_value("N36", "di"), client.consumable("N36")[1]
+        assert list(session["battle"][1]) == [0, 100 - di * client.modifier(against, "U05"), 0] == [0, 85, 0]
+        assert [p[0] for p in progress] == ["battleDamage", "battleKill", "battleDamage"]
+        assert [p[3] for p in progress] == ["PU4", "PU4", "U05"]
+        assert [(c["-code"], tuple(t), n) for c, t, n in session["battle"][2]] == \
+            [("N36", ("enemy", None), client.battle_value("N36", "duration"))]
+
+
+def test_an_enemy_power_of_type_all_rolls_its_percent_for_each_unit(monkeypatch):
+    """UL31's N68 (di 75, type all, percent="80") on the player's fleet: Fleet.triggerConsumable rolls
+    ZGameRandom.float() for each live unit of an affectsAll power whose percent is not 1 (ConsumableItem.percent
+    80 / 100) and a roll above it misses (UNIT_MISS): rolls 0.5 and 0.9 hit the first U05 and miss the second."""
+    with app.test_request_context():
+        setup_invader(monkeypatch, ["UL31", "U05"], strengths=[250, 100])
+        rolls = iter([0.05, 0.5, 0.9])  # the cast (10%), then one per player unit
+        monkeypatch.setattr(battle_engine, "roll_random_float", lambda: next(rolls))
+        monkeypatch.setattr(battle_engine, "roll_random_between", lambda a, b: a + (b - a) * next(rolls))
+        battle_engine.assign_consumable_response(AI_ASSIGN)
+        assert casting()
+        battle_engine.assign_consumable_response({"id": 0, "level": 0, "name": OWN, "fleet": None, "map": None,
+                                                  "code": "N68"})
+        assert client.battle_value("N68", "percent") / 100 == 0.8
+        assert list(session["battle"][0]) == [100 - client.battle_value("N68", "di"), 100]
+        assert next(rolls, None) is None
+
+
+def test_a_power_without_damage_leaves_the_shield(monkeypatch):
+    """BattleHost.updateUnitHealth takes a shield (N75, givesAbility shield) only for a damage above 0: the player's
+    N08 (attack 99, type all, di 0) on its own side leaves the shield of its U05."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U05"], ["U05"])
+        user["userInfo"]["player"]["inventory"]["items"]["N08"] = 1
+        session["battle"] = ([100], [100], [(item("N75"), ("ally", 0), 9999999)], battle_engine.BattleContext())
+        fixed_rolls(monkeypatch, 0.5)
+        battle_engine.assign_consumable_response({"id": 0, "level": 0, "name": "fleet2_1", "fleet": None, "map": None,
+                                                  "code": "N08"})
+        assert battle_engine.is_shielded(("ally", 0), session["battle"][2])
+        assert [c["-code"] for c, t, n in session["battle"][2]] == ["N75", "N08"]
+
+def test_a_glancing_hit_with_damage_research_glances_the_research_too(monkeypatch):
+    """BattleAI.GetAttackingDamage gives upgradeDamage, what the research added (XD01: 25%), and BattleHost.resolveAttack
+    multiplies it by the glancing multiplier too before Math.ceil(damage) - Math.ceil(upgradeDamage) == 0 adds 1:
+    U01 on U01 (30): 25 * (3 * 30 + 30) / (3 * 30 + 30) / 100 * 30 = 7.5, 9.375 with the research, glancing
+    0.9375 and 0.1875: ceil 1 - 1 == 0, so 2 (the research unglanced, ceil 1.875 = 2, would leave 1)."""
+    with app.test_request_context():
+        user = setup(monkeypatch, ["U01"], ["U01"])
+        user["userInfo"]["world"]["research"] = {"U01": ["XD01"]}
+        fixed_rolls(monkeypatch, 0.1)  # antitank on antitank: direct 0.25, a glancing hit
+        count_reward_rolls(monkeypatch)
+        r = battle_engine.battle_complete_response(dict(PARAMS, id=[0, 0]))["data"]
+        assert r["es"] == 30 - 2 == 30 - client_damage("U01", "U01", 30, 0.1, attacker_research=["XD01"])
